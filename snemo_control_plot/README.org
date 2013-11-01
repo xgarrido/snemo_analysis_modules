@@ -150,7 +150,14 @@ The next items hold the configuration for the SuperNEMO control plot module.
 ** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "warning"
+  logging.priority : string = "trace"
+#+END_SRC
+
+** Histogram service label
+Set the same histogram service label as defined [[Histogram service][here]]
+#+BEGIN_SRC sh
+  #@description The Histogram Service label
+  Histo_label : string = "Histo"
 #+END_SRC
 
 * Services
