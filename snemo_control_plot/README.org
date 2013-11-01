@@ -125,7 +125,7 @@ The next items hold the configuration for the SuperNEMO control plot module.
 #+END_SRC
 ** Declaration & description
 #+BEGIN_SRC sh
-  [name="scp_module" type="snemo::snemo_control_plot_module"]
+  [name="scp_module" type="analysis::snemo_control_plot_module"]
 
   #@description A SuperNEMO module to plot key quantities from data banks
 #+END_SRC
@@ -209,9 +209,9 @@ correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadf
 and install the =snemo_control_plot= module by doing
 #+BEGIN_SRC sh
   mkdir {build,install} && cd build
-  cmake                                                                                                  \
-      -DCMAKE_PREFIX_PATH="<path to Cadfael install>;<path to Bayeux install>;<path to Falaise install>" \
-      -DCMAKE_INSTALL_PREFIX=../install                                                                  \
+  cmake                                               \
+      -DCMAKE_PREFIX_PATH="<path to Falaise install>" \
+      -DCMAKE_INSTALL_PREFIX=../install               \
       ..
   make install
   cd ..
