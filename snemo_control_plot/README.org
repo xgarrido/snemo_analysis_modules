@@ -66,6 +66,11 @@ responsible for a given task. Modules and services are declared in Section
 and the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given
 by F. Mauger.
 
+The =@SNEMO_CONTROL_PLOT_DIR@= corresponds to the directory where configuration
+files are going to be stored. This variable which varies from one installation
+to the other, is automatically change when the tangle process occurs. This is
+done /via/ the =Makefile= which parse and replace this variable.
+
 ** Module manager
 :PROPERTIES:
 :TANGLE: config/pipeline/module_manager.conf
@@ -89,14 +94,14 @@ service files.
 #+BEGIN_SRC sh
   #@description The configuration file of the embedded service manager
   service_manager.configuration : string[1] as path = \
-      "${SNEMO_CONTROL_PLOT_DIR}/config/pipeline/service_manager.conf"
+      "@SNEMO_CONTROL_PLOT_DIR@/service_manager.conf"
 #+END_SRC
 
 *** Configuration files for modules
 #+BEGIN_SRC sh
   #@description The configuration files for modules
   modules.configuration_files : string[1] as path = \
-      "${SNEMO_CONTROL_PLOT_DIR}/config/pipeline/snemo_control_plot_module.conf"
+      "@SNEMO_CONTROL_PLOT_DIR@/snemo_control_plot_module.conf"
 #+END_SRC
 
 ** Service manager
@@ -120,7 +125,7 @@ service files.
 #+BEGIN_SRC sh
   #@description The list of files that describe services
   services.configuration_files : string[1] as path = \
-      "${SNEMO_CONTROL_PLOT_DIR}/config/pipeline/services.conf"
+      "@SNEMO_CONTROL_PLOT_DIR@/services.conf"
 #+END_SRC
 
 * SuperNEMO control plot modules
@@ -201,7 +206,7 @@ Embedded histograms are declared into a dedicated file defines in
 #+BEGIN_SRC sh
   #@description The main configuration file for the embedded histogram manager
   pool.histo.setups : string[1] as path = \
-      "${SNEMO_CONTROL_PLOT_DIR}/config/pipeline/histogram_templates.conf"
+      "@SNEMO_CONTROL_PLOT_DIR@/histogram_templates.conf"
 #+END_SRC
 
 Finally, all histograms created can be stored inside ROOT files or XML archives.
@@ -214,7 +219,11 @@ Finally, all histograms created can be stored inside ROOT files or XML archives.
 
 * Running SN@ilWare processing chain
 
-First, you need to compile the =snemo_control_plot= module files. The build
+First, you need to tangle this file. As explained in the [[Content][Content]] section, you
+may use the dedicated =Makefile= to generate the pipeline configuration. Just
+run =make= within this working directory.
+
+Second, you need to compile the =snemo_control_plot= module files. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
 setup the dependences. Nevertheless, this implies that you have already and
 correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadfael]], [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux][Bayeux]] and Falaise. Then, you can configure, build
