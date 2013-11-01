@@ -24,7 +24,7 @@ namespace analysis {
 
   // Registration instantiation macro :
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_control_plot_module,
-                                    "snemo::analysis::processing::snemo_control_plot_module");
+                                    "analysis::snemo_control_plot_module");
 
   // Set the histogram pool used by the module :
   void snemo_control_plot_module::set_histogram_pool (mygsl::histogram_pool & pool_)
