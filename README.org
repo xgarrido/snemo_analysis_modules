@@ -1,0 +1,11 @@
+#+TITLE:  SN@ilWare Simulation Modules
+#+AUTHOR: Xavier Garrido
+#+DATE:   2013-11-01
+
+This repository holds several modules, one per directory, for SN@ilWare
+framework :
+
+- =snemo_control_plot= :: this module produce general plots of different
+     physical information inside different data bank. For example, it plots the
+     number of Geiger hits within the simulated data bank and within the
+     calibrated data bank, the number of calorimeters...
