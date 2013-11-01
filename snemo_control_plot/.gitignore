@@ -1,2 +1,4 @@
 .*.tangle
 /config/
+/build/
+/install/
