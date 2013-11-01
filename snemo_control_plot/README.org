@@ -219,10 +219,12 @@ Finally, all histograms created can be stored inside ROOT files or XML archives.
 
 * Running SN@ilWare processing chain
 
+** Tangling configuration
 First, you need to tangle this file. As explained in the [[Content][Content]] section, you
 may use the dedicated =Makefile= to generate the pipeline configuration. Just
 run =make= within this working directory.
 
+** Source code compilation
 Second, you need to compile the =snemo_control_plot= module files. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
 setup the dependences. Nevertheless, this implies that you have already and
@@ -233,11 +235,12 @@ and install the =snemo_control_plot= module by doing
   cmake                                               \
       -DCMAKE_PREFIX_PATH="<path to Falaise install>" \
       -DCMAKE_INSTALL_PREFIX=../install               \
-      ..
+      ../source
   make install
   cd ..
 #+END_SRC
 
+** Use and execute =snemo_control_plot= module
 After a successful build, you will get an =install= directory holding the
 =libsnemo_control_plot.so= file. Assuming you are under =bash= shell, you will
 need to add it to your =LD_LIBRARY_PATH= by doing
