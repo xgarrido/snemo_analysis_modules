@@ -21,3 +21,4 @@ all: $(files_tangle)
 
 clean:
 	@rm -rf config .*.tangle
+	@rm -rf build install
