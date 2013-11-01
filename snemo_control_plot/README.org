@@ -27,18 +27,30 @@ This will create a directory =snemo_control_plot= in the working directory
 containing all the source files needed to configure and to setup SN@ilWare
 programs.
 
-The configuration files are organised using [[http://orgmode.org/worg/org-contrib/babel/index.html][org-babel]] and its ability to execute
+* Content
+
+The code is organised as follow :
+
+- =README.org= :: This file holds the pipeline configuration + the documentation
+                  on how to use the =snemo_control_plot= module.
+- =Makefile= :: The =Makefile= allows to generate the pipeline configuration by
+                parsing and tangling this file /i.e./ =README.org= (see below).
+- =source= :: This directory holds the source code of the =snemo_control_plot=
+              module. It also has a =CMakeLists.txt= file in order to compile,
+              build and install all the software pieces through =cmake= rules.
+
+The =README.org= file is organised using [[http://orgmode.org/worg/org-contrib/babel/index.html][org-babel]] and its ability to execute
 source code. It requires then a recent installation of emacs[1] which bundles
 =org=. Without entering into too much details regarding =org-babel= abilities,
 the basic idea is to give a "literate" way to navigate through the different
-sections, each of them representing a configuration file. Moreover, using =org=
-folding/unfolding capability, item can be hide and the user can focus on
-relevant parts.
+sections, each of them representing a part of the pipeline
+configuration. Moreover, using =org= folding/unfolding capability, item can be
+hide and the user can focus on relevant parts.
 
 To export the different configuration files, you can run =org-babel-tangle=
 which will tangle each code block into the given file[2] or use the associated
-Makefile. The author recommends to use the Makefile since the tangling process
-is asynchronous and thus, does not freeze your emacs (=org-babel-tangle=
+=Makefile=. The author recommends to use the =Makefile= since the tangling
+process is asynchronous and thus, does not freeze your emacs (=org-babel-tangle=
 "occupies" emacs during its execution).
 
 [1] At the time of writing this document, emacs version is 24.3.1
