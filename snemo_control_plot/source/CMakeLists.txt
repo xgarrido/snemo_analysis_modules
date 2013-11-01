@@ -21,6 +21,8 @@ include_directories(${PROJECT_SOURCE_DIR} ${sncore_INCLUDE_DIRS})
 
 add_library(snemo_control_plot SHARED snemo_control_plot_module.h snemo_control_plot_module.cc)
 
+target_link_libraries(snemo_control_plot ${sncore_LIBRARIES})
+
 install(FILES
   ${PROJECT_BINARY_DIR}/libsnemo_control_plot${CMAKE_SHARED_LIBRARY_SUFFIX}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
