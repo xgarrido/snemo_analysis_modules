@@ -129,46 +129,144 @@ service files.
 #+END_SRC
 
 * SuperNEMO control plot modules
+
+The next item holds the configuration for the SuperNEMO control plot module. The
+second item is related to histogram declarations.
+
+** Module declaration
 :PROPERTIES:
 :TANGLE: config/pipeline/snemo_control_plot_module.conf
 :END:
 
-The next items hold the configuration for the SuperNEMO control plot module.
-** File preamble
+Here, we just set up the module declaration. The module name to be used when
+processing file is =scp_module=.
+
+*** File preamble
 #+BEGIN_SRC sh
   #@description A sample list of setups
   #@key_label   "name"
   #@meta_label  "type"
 #+END_SRC
-** Declaration & description
+*** Declaration & description
 #+BEGIN_SRC sh
   [name="scp_module" type="analysis::snemo_control_plot_module"]
 
   #@description A SuperNEMO module to plot key quantities from data banks
 #+END_SRC
 
-** Logging priority
+*** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
   logging.priority : string = "trace"
 #+END_SRC
 
-** Histogram service label
+*** Histogram service label
 Set the same histogram service label as defined [[Histogram service][here]]
 #+BEGIN_SRC sh
   #@description The Histogram Service label
   Histo_label : string = "Histo"
 #+END_SRC
 
+** Histogram declarations
+:PROPERTIES:
+:TANGLE: config/pipeline/histogram_templates.conf
+:END:
+
+The histogram declarations /i.e./ name, boundaries, binning... are set in this
+section which is organized by data bank related plot.
+
+*** Mandatory preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+
+*** Simulated data bank histograms
+**** Number of Geiger hits in =simulated_data= bank
+#+BEGIN_SRC sh
+  [name="SD::ngghits" type="mygsl::histogram_1d"]
+  #@config The histogram of the number of MC Geiger hits
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of MC Geiger hits"
+
+  #@description The group of the histogram (optional)
+  group : string = "SD::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The lower bound of the histogram
+  min : real = 0.0
+
+  #@description The upper bound of the histogram
+  max : real = 100.0
+
+  #@description The X axis label
+  display.xaxis.label : string = "Ngg"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+
+**** Number of calorimeter hits in =simulated_data= bank
+#+BEGIN_SRC sh
+  [name="SD::ncalohits" type="mygsl::histogram_1d"]
+  #@config The histogram of the number of MC calo hits
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of MC calorimeter hits"
+
+  #@description The group of the histogram (optional)
+  group : string = "SD::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 10
+
+  #@description The lower bound of the histogram
+  min : real = 0.0
+
+  #@description The upper bound of the histogram
+  max : real = 10.0
+
+  #@description The X axis label
+  display.xaxis.label : string = "Ncalo"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+
+  #@description Display style
+  display.style : string = "solid"
+
+  #@description Display color
+  display.color : string = "blue"
+#+END_SRC
+
+
 * Services
 :PROPERTIES:
 :TANGLE: config/pipeline/services.conf
 :END:
+
 A service generally hosts a specific resource that can be shared by many other
 software components, including other services or data processing modules (see
 [[https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice][SN@ilWare FAQ]]).
 
 ** Preamble
+
 #+BEGIN_SRC sh
   #@description A sample list of setups
   #@key_label   "name"
@@ -176,6 +274,7 @@ software components, including other services or data processing modules (see
 #+END_SRC
 
 ** Context service
+
 #+BEGIN_SRC sh
   [name="Ctx" type="dpp::context_service"]
 
@@ -227,11 +326,13 @@ Finally, all histograms created can be stored inside ROOT files or XML archives.
 * Running SN@ilWare processing chain
 
 ** Tangling configuration
+
 First, you need to tangle this file. As explained in the [[Content][Content]] section, you
 may use the dedicated =Makefile= to generate the pipeline configuration. Just
 run =make= within this working directory.
 
 ** Source code compilation
+
 Second, you need to compile the =snemo_control_plot= module files. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
 setup the dependences. Nevertheless, this implies that you have already and
@@ -248,6 +349,7 @@ and install the =snemo_control_plot= module by doing
 #+END_SRC
 
 ** Use and execute =snemo_control_plot= module
+
 After a successful build, you will get an =install= directory holding the
 =libsnemo_control_plot.so= file. Assuming you are under =bash= shell, you will
 need to add it to your =LD_LIBRARY_PATH= by doing
@@ -266,8 +368,11 @@ library(ies) which holds the needed modules.
       --module-manager-config $PWD/config/pipeline/module_manager.conf \
       --module scp_module                                              \
       --load-dll snemo_control_plot                                    \
+      --load-dll mctools_bio                                           \
       --input-file <path to a data record>
 #+END_SRC
+
+*TODO: Check why the =mctools_bio= library must be added to avoid segmentation fault*
 
 It will run the =scp_module= over the input file[3] and it will generate a ROOT
 file containing several histograms. This file is located by default, in
