@@ -173,7 +173,14 @@ Set the same histogram service label as defined [[Histogram service][here]]
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this
-section which is organized by data bank related plot.
+section which is organized by data bank related plots. There are two kinds of
+histograms:
+- /unique/ histogram, dedicated to one task and used only one time,
+- /template/ histogram which may be used by several data bank.
+For example, to plot the distribution of the number of Geiger hits which can be
+done for =simulated_data= and =calibrated_data= banks, we use *one* histogram
+template that define boundaries, binning, axis titles... The /template/
+histograms all belong to the =__template= group.
 
 *** Mandatory preamble
 #+BEGIN_SRC sh
