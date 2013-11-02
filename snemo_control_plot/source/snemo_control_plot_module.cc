@@ -126,14 +126,11 @@ namespace analysis {
 
   void snemo_control_plot_module::_process_simulated_data (const datatools::things & data_record_)
   {
-    const bool abort_at_missing_input = true;
-
     // Check if some 'simulated_data' are available in the data model:
     const std::string sd_label = snemo::core::model::data_info::SIMULATED_DATA_LABEL;
     if (! data_record_.has (sd_label))
       {
-        DT_THROW_IF (abort_at_missing_input, std::logic_error,
-                     "Missing simulated data to be processed !");
+        DT_LOG_DEBUG (get_logging_priority (), "Missing simulated data to be processed !");
         return;
       }
     // Grab the 'simulated_data' entry from the data model :
@@ -142,18 +139,18 @@ namespace analysis {
     DT_LOG_DEBUG (get_logging_priority (), "Simulated data : ");
     if (get_logging_priority () >= datatools::logger::PRIO_DEBUG) sd.tree_dump (std::clog);
 
-    size_t nggs = 0;
     if (_histogram_pool_->has_1d ("SD::ngghits"))
       {
         mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("SD::ngghits");
+        size_t nggs = 0;
         if (sd.has_step_hits ("gg")) nggs += sd.get_step_hits ("gg").size ();
         h1d.fill (nggs);
       }
 
-    size_t ncalos = 0;
     if (_histogram_pool_->has_1d ("SD::ncalohits"))
       {
         mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("SD::ncalohits");
+        size_t ncalos = 0;
         if (sd.has_step_hits ("calo"))  ncalos += sd.get_step_hits ("calo").size ();
         if (sd.has_step_hits ("xcalo")) ncalos += sd.get_step_hits ("xcalo").size ();
         if (sd.has_step_hits ("gveto")) ncalos += sd.get_step_hits ("gveto").size ();
