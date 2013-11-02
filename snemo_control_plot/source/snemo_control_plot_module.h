@@ -63,6 +63,9 @@ namespace analysis {
     // Generate plot for the 'simulated_data' bank
     void _process_simulated_data (const datatools::things & data_record_);
 
+    // Generate plot for the 'calibrated_data' bank
+    void _process_calibrated_data (const datatools::things & data_record_);
+
   private:
 
     // The histogram pool:

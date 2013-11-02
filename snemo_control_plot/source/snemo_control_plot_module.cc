@@ -10,6 +10,7 @@
 // SuperNEMO event model
 #include <sncore/models/data_model.h>
 #include <mctools/simulated_data.h>
+#include <sncore/models/calibrated_data.h>
 
 // Service manager
 #include <datatools/service_manager.h>
@@ -118,7 +119,8 @@ namespace analysis {
                  "Module '" << get_name () << "' is not initialized !");
 
     // Filling the histograms :
-    _process_simulated_data (data_record_);
+    _process_simulated_data  (data_record_);
+    _process_calibrated_data (data_record_);
 
     DT_LOG_TRACE (get_logging_priority (), "Exiting.");
     return dpp::PROCESS_SUCCESS;
@@ -143,7 +145,7 @@ namespace analysis {
       {
         mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("SD::ngghits");
         size_t nggs = 0;
-        if (sd.has_step_hits ("gg")) nggs += sd.get_step_hits ("gg").size ();
+        if (sd.has_step_hits ("gg")) nggs += sd.get_number_of_step_hits ("gg");
         h1d.fill (nggs);
       }
 
@@ -151,11 +153,29 @@ namespace analysis {
       {
         mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("SD::ncalohits");
         size_t ncalos = 0;
-        if (sd.has_step_hits ("calo"))  ncalos += sd.get_step_hits ("calo").size ();
-        if (sd.has_step_hits ("xcalo")) ncalos += sd.get_step_hits ("xcalo").size ();
-        if (sd.has_step_hits ("gveto")) ncalos += sd.get_step_hits ("gveto").size ();
+        if (sd.has_step_hits ("calo"))  ncalos += sd.get_number_of_step_hits ("calo");
+        if (sd.has_step_hits ("xcalo")) ncalos += sd.get_number_of_step_hits ("xcalo");
+        if (sd.has_step_hits ("gveto")) ncalos += sd.get_number_of_step_hits ("gveto");
         h1d.fill (ncalos);
       }
+    return;
+  }
+
+  void snemo_control_plot_module::_process_calibrated_data (const datatools::things & data_record_)
+  {
+    // Check if some 'simulated_data' are available in the data model:
+    const std::string cd_label = snemo::core::model::data_info::CALIBRATED_DATA_LABEL;
+    if (! data_record_.has (cd_label))
+      {
+        DT_LOG_DEBUG (get_logging_priority (), "Missing calibrated data to be processed !");
+        return;
+      }
+    // Grab the 'simulated_data' entry from the data model :
+    const snemo::core::model::calibrated_data & cd
+      = data_record_.get<snemo::core::model::calibrated_data> (cd_label);
+
+    DT_LOG_DEBUG (get_logging_priority (), "Calibrated data : ");
+    if (get_logging_priority () >= datatools::logger::PRIO_DEBUG) cd.tree_dump (std::clog);
     return;
   }
 
