@@ -37,6 +37,7 @@
 // Data processing module abstract base class
 #include <dpp/base_module.h>
 
+// Forward declarations
 namespace mygsl {
   class histogram_pool;
 }
@@ -58,6 +59,9 @@ namespace analysis {
 
     // Give default values to specific class members.
     void _set_defaults ();
+
+    // Generate plot for the 'simulated_data' bank
+    void _process_simulated_data (const datatools::things & data_record_);
 
   private:
 

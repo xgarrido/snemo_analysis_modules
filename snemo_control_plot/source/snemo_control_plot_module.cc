@@ -117,6 +117,15 @@ namespace analysis {
     DT_THROW_IF (! is_initialized (), std::logic_error,
                  "Module '" << get_name () << "' is not initialized !");
 
+    // Filling the histograms :
+    _process_simulated_data (data_record_);
+
+    DT_LOG_TRACE (get_logging_priority (), "Exiting.");
+    return dpp::PROCESS_SUCCESS;
+  }
+
+  void snemo_control_plot_module::_process_simulated_data (const datatools::things & data_record_)
+  {
     const bool abort_at_missing_input = true;
 
     // Check if some 'simulated_data' are available in the data model:
@@ -125,19 +134,14 @@ namespace analysis {
       {
         DT_THROW_IF (abort_at_missing_input, std::logic_error,
                      "Missing simulated data to be processed !");
-        // leave the data unchanged.
-        return dpp::PROCESS_ERROR;
+        return;
       }
-    // grab the 'simulated_data' entry from the data model :
-    mctools::simulated_data & sd = data_record_.grab<mctools::simulated_data> (sd_label);
+    // Grab the 'simulated_data' entry from the data model :
+    const mctools::simulated_data & sd = data_record_.get<mctools::simulated_data> (sd_label);
 
     DT_LOG_DEBUG (get_logging_priority (), "Simulated data : ");
-    if (get_logging_priority () >= datatools::logger::PRIO_DEBUG)
-      {
-        sd.tree_dump (std::clog);
-      }
+    if (get_logging_priority () >= datatools::logger::PRIO_DEBUG) sd.tree_dump (std::clog);
 
-    // Filling the histograms :
     size_t nggs = 0;
     if (_histogram_pool_->has_1d ("SD::ngghits"))
       {
@@ -155,9 +159,7 @@ namespace analysis {
         if (sd.has_step_hits ("gveto")) ncalos += sd.get_step_hits ("gveto").size ();
         h1d.fill (ncalos);
       }
-
-    DT_LOG_TRACE (get_logging_priority (), "Exiting.");
-    return dpp::PROCESS_SUCCESS;
+    return;
   }
 
 } // namespace analysis
