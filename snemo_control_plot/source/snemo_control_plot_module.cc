@@ -176,6 +176,23 @@ namespace analysis {
 
     DT_LOG_DEBUG (get_logging_priority (), "Calibrated data : ");
     if (get_logging_priority () >= datatools::logger::PRIO_DEBUG) cd.tree_dump (std::clog);
+
+    if (_histogram_pool_->has_1d ("CD::ngghits"))
+      {
+        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("CD::ngghits");
+        size_t nggs = 0;
+        if (cd.has_calibrated_tracker_hits ()) nggs += cd.calibrated_tracker_hits ().size ();
+        h1d.fill (nggs);
+      }
+
+    if (_histogram_pool_->has_1d ("CD::ncalohits"))
+      {
+        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("CD::ncalohits");
+        size_t ncalos = 0;
+        if (cd.has_calibrated_calorimeter_hits ()) ncalos += cd.calibrated_calorimeter_hits ().size ();
+        h1d.fill (ncalos);
+      }
+
     return;
   }
 

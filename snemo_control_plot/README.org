@@ -190,7 +190,7 @@ histograms all belong to the =__template= group.
 #+END_SRC
 
 *** Simulated data bank histograms
-**** Number of Geiger hits in =simulated_data= bank
+**** Number of Geiger hits
 #+BEGIN_SRC sh
   [name="SD::ngghits" type="mygsl::histogram_1d"]
   #@config The histogram of the number of MC Geiger hits
@@ -223,7 +223,7 @@ histograms all belong to the =__template= group.
   display.yaxis.label : string = "Counts"
 #+END_SRC
 
-**** Number of calorimeter hits in =simulated_data= bank
+**** Number of calorimeter hits
 #+BEGIN_SRC sh
   [name="SD::ncalohits" type="mygsl::histogram_1d"]
   #@config The histogram of the number of MC calo hits
@@ -251,6 +251,80 @@ histograms all belong to the =__template= group.
 
   #@description The X axis label
   display.xaxis.label : string = "Ncalo"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+
+  #@description Display style
+  display.style : string = "solid"
+
+  #@description Display color
+  display.color : string = "blue"
+#+END_SRC
+
+
+*** Calibrated data bank histograms
+**** Number of calibrated tracker hits
+#+BEGIN_SRC sh
+  [name="CD::ngghits" type="mygsl::histogram_1d"]
+  #@config The histogram of the number of calibrated tracker hits
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of calibrated tracker hits"
+
+  #@description The group of the histogram (optional)
+  group : string = "CD::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The lower bound of the histogram
+  min : real = 0.0
+
+  #@description The upper bound of the histogram
+  max : real = 100.0
+
+  #@description The X axis label
+  display.xaxis.label : string = "N_{calib.}(tracker)"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+
+**** Number of calibrated calorimeter hits
+#+BEGIN_SRC sh
+  [name="CD::ncalohits" type="mygsl::histogram_1d"]
+  #@config The histogram of the number of calibrated calorimeter hits
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of calibrated calorimeter hits"
+
+  #@description The group of the histogram (optional)
+  group : string = "CD::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 10
+
+  #@description The lower bound of the histogram
+  min : real = 0.0
+
+  #@description The upper bound of the histogram
+  max : real = 10.0
+
+  #@description The X axis label
+  display.xaxis.label : string = "N_{calib.}(calorimeter)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
