@@ -17,12 +17,12 @@ endif()
 # - Third party
 find_package(snanalysis 3.0.0 REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR} ${sncore_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR} ${snanalysis_INCLUDE_DIRS})
 
 add_library(snemo_bb0nu_studies SHARED
   snemo_bb0nu_halflife_limit_module.h snemo_bb0nu_halflife_limit_module.cc)
 
-target_link_libraries(snemo_bb0nu_studies ${sncore_LIBRARIES})
+target_link_libraries(snemo_bb0nu_studies ${snanalysis_LIBRARIES})
 
 install(FILES
   ${PROJECT_BINARY_DIR}/libsnemo_bb0nu_studies${CMAKE_SHARED_LIBRARY_SUFFIX}
