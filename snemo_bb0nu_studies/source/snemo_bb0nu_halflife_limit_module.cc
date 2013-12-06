@@ -10,6 +10,7 @@
 #include <datatools/clhep_units.h>
 
 // SuperNEMO event model
+#include <mctools/utils.h>
 #include <sncore/models/data_model.h>
 #include <sncore/models/event_header.h>
 #include <snanalysis/models/data_model.h>
@@ -246,107 +247,84 @@ namespace analysis {
         else nundefined++;
       }
 
-    // // Build unique key for histogram map:
-    // std::ostringstream key;
+    // Build unique key for histogram map:
+    std::ostringstream key;
 
-    // // Retrieving info from header bank:
-    // const datatools::utils::properties & eh_properties = eh.get_properties ();
+    // Retrieving info from header bank:
+    const datatools::properties & eh_properties = eh.get_properties ();
 
-    // for (std::vector<std::string>::const_iterator ifield = _key_fields_.begin ();
-    //      ifield != _key_fields_.end (); ++ifield)
-    //   {
-    //     const std::string & a_field = *ifield;
-    //     if (!eh_properties.has_key (a_field))
-    //       {
-    //         std::clog << datatools::utils::io::warning
-    //                   << "snemo::analysis::processing::"
-    //                   << "snemo_bb0nu_halflife_limit_module::process: "
-    //                   << "No properties with key '" << a_field << "' "
-    //                   << "has been found in event header !"
-    //                   << std::endl;
-    //         continue;
-    //       }
+    for (std::vector<std::string>::const_iterator ifield = _key_fields_.begin ();
+         ifield != _key_fields_.end (); ++ifield)
+      {
+        const std::string & a_field = *ifield;
+        if (!eh_properties.has_key (a_field))
+          {
+            DT_LOG_WARNING (get_logging_priority (),
+                            "No properties with key '" << a_field << "' "
+                            << "has been found in event header !");
+            continue;
+          }
 
-    //     if (eh_properties.is_vector (a_field))
-    //       {
-    //         std::clog << datatools::utils::io::warning
-    //                   << "snemo::analysis::processing::"
-    //                   << "snemo_bb0nu_halflife_limit_module::process: "
-    //                   << "Stored properties '" << a_field << "' "
-    //                   << "must be scalar !"
-    //                   << std::endl;
-    //         continue;
-    //       }
+        if (eh_properties.is_vector (a_field))
+          {
+            DT_LOG_WARNING (get_logging_priority (),
+                            "Stored properties '" << a_field << "' " << "must be scalar !");
+            continue;
+          }
+        if (eh_properties.is_boolean (a_field))      key << eh_properties.fetch_boolean (a_field);
+        else if (eh_properties.is_integer (a_field)) key << eh_properties.fetch_integer (a_field);
+        else if (eh_properties.is_real (a_field))    key << eh_properties.fetch_real (a_field);
+        else if (eh_properties.is_string (a_field))  key << eh_properties.fetch_string (a_field);
 
-    //     if (eh_properties.is_boolean (a_field))
-    //       {
-    //         key << eh_properties.fetch_boolean (a_field);
-    //       }
-    //     else if (eh_properties.is_integer (a_field))
-    //       {
-    //         key << eh_properties.fetch_integer(a_field);
-    //       }
-    //     else if (eh_properties.is_real (a_field))
-    //       {
-    //         key << eh_properties.fetch_real (a_field);
-    //       }
-    //     else if (eh_properties.is_string (a_field))
-    //       {
-    //         key << eh_properties.fetch_string (a_field);
-    //       }
+        // Add a dash separator between field
+        key << " - ";
+      }
 
-    //     // Add a dash separator between field
-    //     key << " - ";
-    //   }
+    // Add charge multiplicity
+    key << nelectron << "e-" << npositron << "e+" << nundefined << "u";
 
-    // if (nelectron == 2)                        key << "2 electrons";
-    // // else if (npositron == 1 && nelectron == 1) key << "1 electron/1 positron";
-    // // else                                       key << "others";
+    // Arbitrary selection of "two-particles" channel
+    if (nelectron != 2)
+      {
+        DT_LOG_WARNING (get_logging_priority (), "Selecting only two-eletrons events!");
+        return dpp::PROCESS_STOP;
+      }
 
-    // // if (nelectron == 2 || (npositron == 1 && nelectron == 1))
-    // //   {
-    // //     key << "2 electrons";
-    // //   }
-    // // else return STOP;
+    // Getting histogram pool
+    mygsl::histogram_pool & a_pool = grab_histogram_pool ();
 
-    // // Arbitrary selection of "two-particles" channel
-    // if (nelectron != 2) return STOP;
+    if (! a_pool.has (key.str ()))
+      {
+        mygsl::histogram_1d & h = a_pool.add_1d (key.str (), "", "energy");
+        datatools::properties hconfig;
+        hconfig.store_string ("mode", "mimic");
+        hconfig.store_string ("mimic.histogram_1d", "energy_template");
+        mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
+      }
 
-    // // Getting histogram pool
-    // mygsl::histogram_pool & a_pool = grab_histogram_pool ();
+    // Getting the current histogram
+    mygsl::histogram_1d & a_histo = a_pool.grab_1d (key.str ());
+    a_histo.fill (total_energy);
 
-    // const std::string & key_str = key.str ();
-    // if (!a_pool.has (key_str))
-    //   {
-    //     mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "energy");
-    //     datatools::utils::properties hconfig;
-    //     hconfig.store_string ("mode", "mimic");
-    //     hconfig.store_string ("mimic.histogram_1d", "energy_template");
-    //     mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
-    //   }
+    // Compute normalization factor given the total number of events generated
+    // and the weight of each event
+    double weight = 1.0;
+    if (eh_properties.has_key ("analysis.total_number_of_event"))
+      {
+        weight /= eh_properties.fetch_integer ("analysis.total_number_of_event");
+      }
+    if (eh_properties.has_key (mctools::event_utils::EVENT_GENBB_WEIGHT))
+      {
+        // TODO: WTF! Why not using *= operator
+        weight /= 1.0/eh_properties.fetch_real (mctools::event_utils::EVENT_GENBB_WEIGHT);
+      }
 
-    // // Getting the current histogram
-    // mygsl::histogram_1d & a_histo = a_pool.grab_1d (key_str);
-    // a_histo.fill (total_energy);
-
-    // // Compute normalization factor given the total number of
-    // // events generated and the weight of each event
-    // double weight = 1.0;
-    // if (eh_properties.has_key ("analysis.total_number_of_event"))
-    //   {
-    //     weight /= eh_properties.fetch_integer ("analysis.total_number_of_event");
-    //   }
-    // if (eh_properties.has_key (snemo::core::utils::sd_utils::EVENT_GENBB_WEIGHT))
-    //   {
-    //     weight /= 1.0/eh_properties.fetch_real (snemo::core::utils::sd_utils::EVENT_GENBB_WEIGHT);
-    //   }
-
-    // // Store the weight (which is fortunately a global properties
-    // // of histogram and not of bin) into histogram properties
-    // if (!a_histo.get_auxiliaries ().has_key ("weight"))
-    //   {
-    //     a_histo.grab_auxiliaries ().update ("weight", weight);
-    //   }
+    // Store the weight (which is fortunately a global properties
+    // of histogram and not of bin) into histogram properties
+    if (!a_histo.get_auxiliaries ().has_key ("weight"))
+      {
+        a_histo.grab_auxiliaries ().update ("weight", weight);
+      }
 
     return dpp::PROCESS_SUCCESS;
   }
