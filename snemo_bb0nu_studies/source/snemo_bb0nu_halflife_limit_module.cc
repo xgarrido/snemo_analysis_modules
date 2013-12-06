@@ -165,7 +165,6 @@ namespace analysis {
   // Processing :
   DPP_MODULE_PROCESS_IMPLEMENT_HEAD (snemo_bb0nu_halflife_limit_module, data_record_)
   {
-    DT_LOG_TRACE (get_logging_priority (), "Entering...");
     DT_THROW_IF (! is_initialized (), std::logic_error,
                  "Module '" << get_name () << "' is not initialized !");
 
