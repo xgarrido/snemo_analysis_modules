@@ -6,6 +6,9 @@
 
 #include <snemo_bb0nu_halflife_limit_module.h>
 
+// Utilities
+#include <datatools/clhep_units.h>
+
 // SuperNEMO event model
 #include <sncore/models/data_model.h>
 // #include <sncore/models/event_header.h>
@@ -81,9 +84,10 @@ namespace analysis {
       }
     if (config_.has_key ("experiment.isotope_mass"))
       {
-        const std::string value = config_.fetch_string ("experiment.isotope_mass");
-        _experiment_conditions_.isotope_mass
-          = datatools::utils::units::get_value_with_unit (value);
+        _experiment_conditions_.isotope_mass = config_.fetch_real ("experiment.isotope_mass");
+        if (! config_.has_explicit_unit ("experiment.isotope_mass")) {
+          _experiment_conditions_.isotope_mass *= CLHEP::kg;
+        }
       }
     if (config_.has_key ("experiment.isotope_bb2nu_halflife"))
       {
@@ -136,9 +140,9 @@ namespace analysis {
     _compute_halflife_ ();
 
     // Dump result
-    _dump_result_ (std::clog,
-                   "snemo::analysis::processing::snemo_bb0nu_halflife_limit_module::_dump_result_: ",
-                   "NOTICE: ");
+    dump_result (std::clog,
+                 "snemo::analysis::processing::snemo_bb0nu_halflife_limit_module::_dump_result_: ",
+                 "NOTICE: ");
 
     // Tag the module as un-initialized :
     _set_initialized (false);
@@ -643,10 +647,10 @@ namespace analysis {
   //     }
   // }
 
-  void snemo_bb0nu_halflife_limit_module::_dump_result_ (std::ostream      & out_,
-                                                         const std::string & title_,
-                                                         const std::string & indent_,
-                                                         bool inherit_) const) {}
+  void snemo_bb0nu_halflife_limit_module::dump_result (std::ostream      & out_,
+                                                       const std::string & title_,
+                                                       const std::string & indent_,
+                                                       bool inherit_) const {}
   // {
   //   std::string indent;
   //   if (! indent_.empty ())
