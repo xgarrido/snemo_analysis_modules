@@ -139,7 +139,7 @@ second item is related to histogram declarations.
 :END:
 
 Here, we just set up the module declaration. The module name to be used when
-processing file is =scp_module=.
+processing a file is =scp_module=.
 
 *** File preamble
 #+BEGIN_SRC sh
@@ -157,7 +157,7 @@ processing file is =scp_module=.
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "trace"
+  logging.priority : string = "warning"
 #+END_SRC
 
 *** Histogram service label
@@ -262,7 +262,6 @@ histograms all belong to the =__template= group.
   display.color : string = "blue"
 #+END_SRC
 
-
 *** Calibrated data bank histograms
 **** Number of calibrated tracker hits
 #+BEGIN_SRC sh
@@ -336,7 +335,6 @@ histograms all belong to the =__template= group.
   display.color : string = "blue"
 #+END_SRC
 
-
 * Services
 :PROPERTIES:
 :TANGLE: config/pipeline/services.conf
@@ -405,15 +403,12 @@ Finally, all histograms created can be stored inside ROOT files or XML archives.
 #+END_SRC
 
 * Running SN@ilWare processing chain
-
 ** Tangling configuration
-
 First, you need to tangle this file. As explained in the [[Content][Content]] section, you
 may use the dedicated =Makefile= to generate the pipeline configuration. Just
 run =make= within this working directory.
 
 ** Source code compilation
-
 Second, you need to compile the =snemo_control_plot= module files. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
 setup the dependences. Nevertheless, this implies that you have already and
@@ -430,7 +425,6 @@ and install the =snemo_control_plot= module by doing
 #+END_SRC
 
 ** Use and execute =snemo_control_plot= module
-
 After a successful build, you will get an =install= directory holding the
 =libsnemo_control_plot.so= file. Assuming you are under =bash= shell, you will
 need to add it to your =LD_LIBRARY_PATH= by doing
@@ -449,11 +443,14 @@ library(ies) which holds the needed modules.
       --module-manager-config $PWD/config/pipeline/module_manager.conf \
       --module scp_module                                              \
       --load-dll snemo_control_plot                                    \
-      --load-dll mctools_bio                                           \
+      --load-dll <library>_bio                                         \
       --input-file <path to a data record>
 #+END_SRC
 
-*TODO: Check why the =mctools_bio= library must be added to avoid segmentation fault*
+=<library>_bio= represents libraries which holds event data models such as
+=mctools_bio= and =sncore_bio=. Regarding the input data file and its content,
+you will need to load both to be able to retrieve =simulated_data= bank
+(=mctools_bio=) or specific SuperNEMO banks (=sncore_bio=).
 
 It will run the =scp_module= over the input file[3] and it will generate a ROOT
 file containing several histograms. This file is located by default, in
