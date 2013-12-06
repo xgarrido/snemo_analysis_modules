@@ -191,74 +191,60 @@ namespace analysis {
     const snemo::analysis::model::particle_track_data & ptd
       = data_record_.get<snemo::analysis::model::particle_track_data>(ptd_label);
 
-    // if (is_debug ())
-    //   {
-    //     std::clog << datatools::utils::io::debug
-    //               << "snemo::analysis::processing::"
-    //               << "snemo_bb0nu_halflife_limit_module::process: "
-    //               << "Event header : " << std::endl;
-    //     eh.tree_dump (std::clog, "", "DEBUG: ");
-    //     std::clog << datatools::utils::io::debug
-    //               << "snemo::analysis::processing::"
-    //               << "snemo_bb0nu_halflife_limit_module::process: "
-    //               << "Particle track data : " << std::endl;
-    //     ptd.tree_dump (std::clog, "", "DEBUG: ");
-    //   }
+    if (get_logging_priority () >= datatools::logger::PRIO_DEBUG)
+      {
+        DT_LOG_DEBUG (get_logging_priority (), "Event header : ");
+        eh.tree_dump ();
+        DT_LOG_DEBUG (get_logging_priority (), "Particle track data : ");
+        ptd.tree_dump ();
+      }
 
-    // // Particle Counters
-    // size_t nelectron  = 0;
-    // size_t npositron  = 0;
-    // size_t nundefined = 0;
+    // Particle Counters
+    size_t nelectron  = 0;
+    size_t npositron  = 0;
+    size_t nundefined = 0;
 
-    // // Calibrated energies
-    // double total_energy = 0.0;
+    // Calibrated energies
+    double total_energy = 0.0;
 
-    // // Store geom_id to avoid double inclusion of energy deposited
-    // std::set<geomtools::geom_id> gids;
+    // Store geom_id to avoid double inclusion of energy deposited
+    std::set<geomtools::geom_id> gids;
 
-    // // Loop over all saved particles
-    // const sam::particle_track_data::particle_collection_type & the_particles
-    //   = ptd.get_particles ();
+    // Loop over all saved particles
+    const snemo::analysis::model::particle_track_data::particle_collection_type &
+      the_particles = ptd.get_particles ();
 
-    // for (sam::particle_track_data::particle_collection_type::const_iterator
-    //        iparticle = the_particles.begin ();
-    //      iparticle != the_particles.end ();
-    //      ++iparticle)
-    //   {
-    //     const sam::particle_track & a_particle = iparticle->get ();
+    for (snemo::analysis::model::particle_track_data::particle_collection_type::const_iterator
+           iparticle = the_particles.begin ();
+         iparticle != the_particles.end ();
+         ++iparticle)
+      {
+        const snemo::analysis::model::particle_track & a_particle = iparticle->get ();
 
-    //     if (!a_particle.has_associated_calorimeters ()) continue;
+        if (! a_particle.has_associated_calorimeters ()) continue;
 
-    //     const sam::particle_track::calorimeter_collection_type & the_calorimeters
-    //       = a_particle.get_associated_calorimeters ();
+        const snemo::analysis::model::particle_track::calorimeter_collection_type &
+          the_calorimeters = a_particle.get_associated_calorimeters ();
 
-    //     if (the_calorimeters.size () > 2)
-    //       {
-    //         if (is_debug ())
-    //           {
-    //             std::clog << datatools::utils::io::debug
-    //                       << "snemo::analysis::processing::"
-    //                       << "snemo_bb0nu_halflife_limit_module::process: "
-    //                       << "The particle is associated to more than 2 calorimeters !"
-    //                       << std::endl;
-    //           }
-    //         continue;
-    //       }
+        if (the_calorimeters.size () > 2)
+          {
+            DT_LOG_DEBUG (get_logging_priority (),
+                          "The particle is associated to more than 2 calorimeters !");
+            continue;
+          }
 
-    //     for (size_t i = 0; i < the_calorimeters.size (); ++i)
-    //       {
-    //         const geomtools::geom_id & gid = the_calorimeters.at (i).get ().get_geom_id ();
-    //         if (gids.find (gid) != gids.end ())
-    //           continue;
+        for (size_t i = 0; i < the_calorimeters.size (); ++i)
+          {
+            const geomtools::geom_id & gid = the_calorimeters.at (i).get ().get_geom_id ();
+            if (gids.find (gid) != gids.end ()) continue;
+            gids.insert (gid);
+            total_energy += the_calorimeters.at (i).get ().get_energy ();
+          }
 
-    //         gids.insert (gid);
-    //         total_energy += the_calorimeters.at (i).get ().get_energy ();
-    //       }
-
-    //     if      (a_particle.get_charge () == sam::particle_track::negative) nelectron++;
-    //     else if (a_particle.get_charge () == sam::particle_track::positive) npositron++;
-    //     else nundefined++;
-    //   }
+        if      (a_particle.get_charge () == snemo::analysis::model::particle_track::negative) nelectron++;
+        else if (a_particle.get_charge () == snemo::analysis::model::particle_track::positive) npositron++;
+        else nundefined++;
+      }
 
     // // Build unique key for histogram map:
     // std::ostringstream key;
