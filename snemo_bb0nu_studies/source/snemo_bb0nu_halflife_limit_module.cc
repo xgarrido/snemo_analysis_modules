@@ -11,8 +11,9 @@
 
 // SuperNEMO event model
 #include <sncore/models/data_model.h>
-// #include <sncore/models/event_header.h>
-// #include <snanalysis/models/particle_track_data.h>
+#include <sncore/models/event_header.h>
+#include <snanalysis/models/data_model.h>
+#include <snanalysis/models/particle_track_data.h>
 
 // Feldman-Cousins calculation
 //#include <snanalysis/tools/root_tools.h>
@@ -161,213 +162,208 @@ namespace analysis {
   DPP_MODULE_DEFAULT_DESTRUCTOR_IMPLEMENT (snemo_bb0nu_halflife_limit_module);
 
   // Processing :
-  DPP_MODULE_PROCESS_IMPLEMENT_HEAD (snemo_bb0nu_halflife_limit_module, data_record_) {}
-  // {
-  //   DT_LOG_TRACE (get_logging_priority (), "Entering...");
-  //   DT_THROW_IF (! is_initialized (), std::logic_error,
-  //                "Module '" << get_name () << "' is not initialized !");
+  DPP_MODULE_PROCESS_IMPLEMENT_HEAD (snemo_bb0nu_halflife_limit_module, data_record_)
+  {
+    DT_LOG_TRACE (get_logging_priority (), "Entering...");
+    DT_THROW_IF (! is_initialized (), std::logic_error,
+                 "Module '" << get_name () << "' is not initialized !");
 
-  //   // Check if the 'event header' record bank is available :
-  //   namespace scm = snemo::core::model;
-  //   if (! DATATOOLS_UTILS_THINGS_CHECK_BANK (event_record_, _EH_bank_label_, scm::event_header))
-  //     {
-  //       std::cerr << datatools::utils::io::error
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::process: "
-  //                 << "Could not find any bank with label '"
-  //                 << _EH_bank_label_ << "' !"
-  //                 << std::endl;
-  //       return STOP;
-  //     }
-  //   DATATOOLS_UTILS_THINGS_CONST_BANK (event_record_, _EH_bank_label_, scm::event_header, eh);
+    // Check if the 'event header' record bank is available :
+    const std::string eh_label = snemo::core::model::data_info::EVENT_HEADER_LABEL;
+    namespace scm = snemo::core::model;
+    if (! data_record_.has (eh_label))
+      {
+        DT_LOG_ERROR (get_logging_priority (), "Could not find any bank with label '"
+                      << eh_label << "' !");
+        return dpp::PROCESS_STOP;
+      }
+    const snemo::core::model::event_header & eh
+      = data_record_.get<snemo::core::model::event_header>(eh_label);
 
-  //   // Check if the 'particle track' record bank is available :
-  //   namespace sam = snemo::analysis::model;
-  //   if (! DATATOOLS_UTILS_THINGS_CHECK_BANK (event_record_, _PTD_bank_label_, sam::particle_track_data))
-  //     {
-  //       std::clog << datatools::utils::io::error
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_discrimination_module::process: "
-  //                 << "Could not find any bank with label '"
-  //                 << _PTD_bank_label_ << "' !"
-  //                 << std::endl;
-  //       return STOP;
-  //     }
-  //   DATATOOLS_UTILS_THINGS_CONST_BANK (event_record_, _PTD_bank_label_, sam::particle_track_data, ptd);
+    // Check if the 'particle track' record bank is available :
+    const std::string ptd_label = snemo::analysis::model::data_info::PARTICLE_TRACK_DATA_LABEL;
+    if (! data_record_.has (ptd_label))
+      {
+        DT_LOG_ERROR (get_logging_priority (), "Could not find any bank with label '"
+                      << ptd_label << "' !");
+        return dpp::PROCESS_STOP;
+      }
+    const snemo::analysis::model::particle_track_data & ptd
+      = data_record_.get<snemo::analysis::model::particle_track_data>(ptd_label);
 
-  //   if (is_debug ())
-  //     {
-  //       std::clog << datatools::utils::io::debug
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::process: "
-  //                 << "Event header : " << std::endl;
-  //       eh.tree_dump (std::clog, "", "DEBUG: ");
-  //       std::clog << datatools::utils::io::debug
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::process: "
-  //                 << "Particle track data : " << std::endl;
-  //       ptd.tree_dump (std::clog, "", "DEBUG: ");
-  //     }
+    // if (is_debug ())
+    //   {
+    //     std::clog << datatools::utils::io::debug
+    //               << "snemo::analysis::processing::"
+    //               << "snemo_bb0nu_halflife_limit_module::process: "
+    //               << "Event header : " << std::endl;
+    //     eh.tree_dump (std::clog, "", "DEBUG: ");
+    //     std::clog << datatools::utils::io::debug
+    //               << "snemo::analysis::processing::"
+    //               << "snemo_bb0nu_halflife_limit_module::process: "
+    //               << "Particle track data : " << std::endl;
+    //     ptd.tree_dump (std::clog, "", "DEBUG: ");
+    //   }
 
-  //   // Particle Counters
-  //   size_t nelectron  = 0;
-  //   size_t npositron  = 0;
-  //   size_t nundefined = 0;
+    // // Particle Counters
+    // size_t nelectron  = 0;
+    // size_t npositron  = 0;
+    // size_t nundefined = 0;
 
-  //   // Calibrated energies
-  //   double total_energy = 0.0;
+    // // Calibrated energies
+    // double total_energy = 0.0;
 
-  //   // Store geom_id to avoid double inclusion of energy deposited
-  //   std::set<geomtools::geom_id> gids;
+    // // Store geom_id to avoid double inclusion of energy deposited
+    // std::set<geomtools::geom_id> gids;
 
-  //   // Loop over all saved particles
-  //   const sam::particle_track_data::particle_collection_type & the_particles
-  //     = ptd.get_particles ();
+    // // Loop over all saved particles
+    // const sam::particle_track_data::particle_collection_type & the_particles
+    //   = ptd.get_particles ();
 
-  //   for (sam::particle_track_data::particle_collection_type::const_iterator
-  //          iparticle = the_particles.begin ();
-  //        iparticle != the_particles.end ();
-  //        ++iparticle)
-  //     {
-  //       const sam::particle_track & a_particle = iparticle->get ();
+    // for (sam::particle_track_data::particle_collection_type::const_iterator
+    //        iparticle = the_particles.begin ();
+    //      iparticle != the_particles.end ();
+    //      ++iparticle)
+    //   {
+    //     const sam::particle_track & a_particle = iparticle->get ();
 
-  //       if (!a_particle.has_associated_calorimeters ()) continue;
+    //     if (!a_particle.has_associated_calorimeters ()) continue;
 
-  //       const sam::particle_track::calorimeter_collection_type & the_calorimeters
-  //         = a_particle.get_associated_calorimeters ();
+    //     const sam::particle_track::calorimeter_collection_type & the_calorimeters
+    //       = a_particle.get_associated_calorimeters ();
 
-  //       if (the_calorimeters.size () > 2)
-  //         {
-  //           if (is_debug ())
-  //             {
-  //               std::clog << datatools::utils::io::debug
-  //                         << "snemo::analysis::processing::"
-  //                         << "snemo_bb0nu_halflife_limit_module::process: "
-  //                         << "The particle is associated to more than 2 calorimeters !"
-  //                         << std::endl;
-  //             }
-  //           continue;
-  //         }
+    //     if (the_calorimeters.size () > 2)
+    //       {
+    //         if (is_debug ())
+    //           {
+    //             std::clog << datatools::utils::io::debug
+    //                       << "snemo::analysis::processing::"
+    //                       << "snemo_bb0nu_halflife_limit_module::process: "
+    //                       << "The particle is associated to more than 2 calorimeters !"
+    //                       << std::endl;
+    //           }
+    //         continue;
+    //       }
 
-  //       for (size_t i = 0; i < the_calorimeters.size (); ++i)
-  //         {
-  //           const geomtools::geom_id & gid = the_calorimeters.at (i).get ().get_geom_id ();
-  //           if (gids.find (gid) != gids.end ())
-  //             continue;
+    //     for (size_t i = 0; i < the_calorimeters.size (); ++i)
+    //       {
+    //         const geomtools::geom_id & gid = the_calorimeters.at (i).get ().get_geom_id ();
+    //         if (gids.find (gid) != gids.end ())
+    //           continue;
 
-  //           gids.insert (gid);
-  //           total_energy += the_calorimeters.at (i).get ().get_energy ();
-  //         }
+    //         gids.insert (gid);
+    //         total_energy += the_calorimeters.at (i).get ().get_energy ();
+    //       }
 
-  //       if      (a_particle.get_charge () == sam::particle_track::negative) nelectron++;
-  //       else if (a_particle.get_charge () == sam::particle_track::positive) npositron++;
-  //       else nundefined++;
-  //     }
+    //     if      (a_particle.get_charge () == sam::particle_track::negative) nelectron++;
+    //     else if (a_particle.get_charge () == sam::particle_track::positive) npositron++;
+    //     else nundefined++;
+    //   }
 
-  //   // Build unique key for histogram map:
-  //   std::ostringstream key;
+    // // Build unique key for histogram map:
+    // std::ostringstream key;
 
-  //   // Retrieving info from header bank:
-  //   const datatools::utils::properties & eh_properties = eh.get_properties ();
+    // // Retrieving info from header bank:
+    // const datatools::utils::properties & eh_properties = eh.get_properties ();
 
-  //   for (std::vector<std::string>::const_iterator ifield = _key_fields_.begin ();
-  //        ifield != _key_fields_.end (); ++ifield)
-  //     {
-  //       const std::string & a_field = *ifield;
-  //       if (!eh_properties.has_key (a_field))
-  //         {
-  //           std::clog << datatools::utils::io::warning
-  //                     << "snemo::analysis::processing::"
-  //                     << "snemo_bb0nu_halflife_limit_module::process: "
-  //                     << "No properties with key '" << a_field << "' "
-  //                     << "has been found in event header !"
-  //                     << std::endl;
-  //           continue;
-  //         }
+    // for (std::vector<std::string>::const_iterator ifield = _key_fields_.begin ();
+    //      ifield != _key_fields_.end (); ++ifield)
+    //   {
+    //     const std::string & a_field = *ifield;
+    //     if (!eh_properties.has_key (a_field))
+    //       {
+    //         std::clog << datatools::utils::io::warning
+    //                   << "snemo::analysis::processing::"
+    //                   << "snemo_bb0nu_halflife_limit_module::process: "
+    //                   << "No properties with key '" << a_field << "' "
+    //                   << "has been found in event header !"
+    //                   << std::endl;
+    //         continue;
+    //       }
 
-  //       if (eh_properties.is_vector (a_field))
-  //         {
-  //           std::clog << datatools::utils::io::warning
-  //                     << "snemo::analysis::processing::"
-  //                     << "snemo_bb0nu_halflife_limit_module::process: "
-  //                     << "Stored properties '" << a_field << "' "
-  //                     << "must be scalar !"
-  //                     << std::endl;
-  //           continue;
-  //         }
+    //     if (eh_properties.is_vector (a_field))
+    //       {
+    //         std::clog << datatools::utils::io::warning
+    //                   << "snemo::analysis::processing::"
+    //                   << "snemo_bb0nu_halflife_limit_module::process: "
+    //                   << "Stored properties '" << a_field << "' "
+    //                   << "must be scalar !"
+    //                   << std::endl;
+    //         continue;
+    //       }
 
-  //       if (eh_properties.is_boolean (a_field))
-  //         {
-  //           key << eh_properties.fetch_boolean (a_field);
-  //         }
-  //       else if (eh_properties.is_integer (a_field))
-  //         {
-  //           key << eh_properties.fetch_integer(a_field);
-  //         }
-  //       else if (eh_properties.is_real (a_field))
-  //         {
-  //           key << eh_properties.fetch_real (a_field);
-  //         }
-  //       else if (eh_properties.is_string (a_field))
-  //         {
-  //           key << eh_properties.fetch_string (a_field);
-  //         }
+    //     if (eh_properties.is_boolean (a_field))
+    //       {
+    //         key << eh_properties.fetch_boolean (a_field);
+    //       }
+    //     else if (eh_properties.is_integer (a_field))
+    //       {
+    //         key << eh_properties.fetch_integer(a_field);
+    //       }
+    //     else if (eh_properties.is_real (a_field))
+    //       {
+    //         key << eh_properties.fetch_real (a_field);
+    //       }
+    //     else if (eh_properties.is_string (a_field))
+    //       {
+    //         key << eh_properties.fetch_string (a_field);
+    //       }
 
-  //       // Add a dash separator between field
-  //       key << " - ";
-  //     }
+    //     // Add a dash separator between field
+    //     key << " - ";
+    //   }
 
-  //   if (nelectron == 2)                        key << "2 electrons";
-  //   // else if (npositron == 1 && nelectron == 1) key << "1 electron/1 positron";
-  //   // else                                       key << "others";
+    // if (nelectron == 2)                        key << "2 electrons";
+    // // else if (npositron == 1 && nelectron == 1) key << "1 electron/1 positron";
+    // // else                                       key << "others";
 
-  //   // if (nelectron == 2 || (npositron == 1 && nelectron == 1))
-  //   //   {
-  //   //     key << "2 electrons";
-  //   //   }
-  //   // else return STOP;
+    // // if (nelectron == 2 || (npositron == 1 && nelectron == 1))
+    // //   {
+    // //     key << "2 electrons";
+    // //   }
+    // // else return STOP;
 
-  //   // Arbitrary selection of "two-particles" channel
-  //   if (nelectron != 2) return STOP;
+    // // Arbitrary selection of "two-particles" channel
+    // if (nelectron != 2) return STOP;
 
-  //   // Getting histogram pool
-  //   mygsl::histogram_pool & a_pool = grab_histogram_pool ();
+    // // Getting histogram pool
+    // mygsl::histogram_pool & a_pool = grab_histogram_pool ();
 
-  //   const std::string & key_str = key.str ();
-  //   if (!a_pool.has (key_str))
-  //     {
-  //       mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "energy");
-  //       datatools::utils::properties hconfig;
-  //       hconfig.store_string ("mode", "mimic");
-  //       hconfig.store_string ("mimic.histogram_1d", "energy_template");
-  //       mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
-  //     }
+    // const std::string & key_str = key.str ();
+    // if (!a_pool.has (key_str))
+    //   {
+    //     mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "energy");
+    //     datatools::utils::properties hconfig;
+    //     hconfig.store_string ("mode", "mimic");
+    //     hconfig.store_string ("mimic.histogram_1d", "energy_template");
+    //     mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
+    //   }
 
-  //   // Getting the current histogram
-  //   mygsl::histogram_1d & a_histo = a_pool.grab_1d (key_str);
-  //   a_histo.fill (total_energy);
+    // // Getting the current histogram
+    // mygsl::histogram_1d & a_histo = a_pool.grab_1d (key_str);
+    // a_histo.fill (total_energy);
 
-  //   // Compute normalization factor given the total number of
-  //   // events generated and the weight of each event
-  //   double weight = 1.0;
-  //   if (eh_properties.has_key ("analysis.total_number_of_event"))
-  //     {
-  //       weight /= eh_properties.fetch_integer ("analysis.total_number_of_event");
-  //     }
-  //   if (eh_properties.has_key (snemo::core::utils::sd_utils::EVENT_GENBB_WEIGHT))
-  //     {
-  //       weight /= 1.0/eh_properties.fetch_real (snemo::core::utils::sd_utils::EVENT_GENBB_WEIGHT);
-  //     }
+    // // Compute normalization factor given the total number of
+    // // events generated and the weight of each event
+    // double weight = 1.0;
+    // if (eh_properties.has_key ("analysis.total_number_of_event"))
+    //   {
+    //     weight /= eh_properties.fetch_integer ("analysis.total_number_of_event");
+    //   }
+    // if (eh_properties.has_key (snemo::core::utils::sd_utils::EVENT_GENBB_WEIGHT))
+    //   {
+    //     weight /= 1.0/eh_properties.fetch_real (snemo::core::utils::sd_utils::EVENT_GENBB_WEIGHT);
+    //   }
 
-  //   // Store the weight (which is fortunately a global properties
-  //   // of histogram and not of bin) into histogram properties
-  //   if (!a_histo.get_auxiliaries ().has_key ("weight"))
-  //     {
-  //       a_histo.grab_auxiliaries ().update ("weight", weight);
-  //     }
+    // // Store the weight (which is fortunately a global properties
+    // // of histogram and not of bin) into histogram properties
+    // if (!a_histo.get_auxiliaries ().has_key ("weight"))
+    //   {
+    //     a_histo.grab_auxiliaries ().update ("weight", weight);
+    //   }
 
-  //   return dpp::PROCESS_SUCCESS;
-  // }
+    return dpp::PROCESS_SUCCESS;
+  }
 
   void snemo_bb0nu_halflife_limit_module::_compute_efficiency_ (){}
   // {
