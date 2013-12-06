@@ -609,83 +609,82 @@ namespace analysis {
   void snemo_bb0nu_halflife_limit_module::dump_result (std::ostream      & out_,
                                                        const std::string & title_,
                                                        const std::string & indent_,
-                                                       bool inherit_) const {}
-  // {
-  //   std::string indent;
-  //   if (! indent_.empty ())
-  //     {
-  //       indent = indent_;
-  //     }
-  //   if ( !title_.empty () )
-  //     {
-  //       out_ << indent << title_ << std::endl;
-  //     }
-  //   namespace du = datatools::utils;
+                                                       bool inherit_) const
+  {
+    std::string indent;
+    if (! indent_.empty ())
+      {
+        indent = indent_;
+      }
+    if ( !title_.empty () )
+      {
+        out_ << indent << title_ << std::endl;
+      }
 
-  //   {
-  //     // Experiment setup:
-  //     out_ << indent << du::i_tree_dumpable::tag
-  //          << "Experimental setup : " << std::endl;
-  //     out_ << indent << du::i_tree_dumpable::skip_tag << du::i_tree_dumpable::tag
-  //          << "Isotope mass number : "
-  //          << _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole
-  //          << std::endl;
-  //     out_ << indent << du::i_tree_dumpable::skip_tag << du::i_tree_dumpable::tag
-  //          << "Isotope total mass : " << _experiment_conditions_.isotope_mass / CLHEP::kg
-  //          << " kg" << std::endl;
-  //     out_ << indent << du::i_tree_dumpable::skip_tag << du::i_tree_dumpable::tag
-  //          << "Isotope bb2nu halflife : " << _experiment_conditions_.isotope_bb2nu_halflife
-  //          << " yr" << std::endl;
-  //     out_ << indent << du::i_tree_dumpable::skip_tag << du::i_tree_dumpable::last_tag
-  //          << "Exposure time : " << _experiment_conditions_.exposure_time
-  //          << " yr" << std::endl;
-  //   }
+    {
+      // Experiment setup:
+      out_ << indent << datatools::i_tree_dumpable::tag
+           << "Experimental setup : " << std::endl;
+      out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::tag
+           << "Isotope mass number : "
+           << _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole
+           << std::endl;
+      out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::tag
+           << "Isotope total mass : " << _experiment_conditions_.isotope_mass / CLHEP::kg
+           << " kg" << std::endl;
+      out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::tag
+           << "Isotope bb2nu halflife : " << _experiment_conditions_.isotope_bb2nu_halflife
+           << " yr" << std::endl;
+      out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::last_tag
+           << "Exposure time : " << _experiment_conditions_.exposure_time
+           << " yr" << std::endl;
+    }
 
-  //   {
-  //     // Histogram :
-  //     out_ << indent << du::i_tree_dumpable::tag
-  //          << "Particle energy histograms : ";
-  //     if (_histogram_pool_->empty ())
-  //       out_ << "<empty>";
-  //     else
-  //       out_ << _histogram_pool_->size ();
-  //     out_ << std::endl;;
+    {
+      // Histogram :
+      out_ << indent << datatools::i_tree_dumpable::tag
+           << "Particle energy histograms : ";
+      if (_histogram_pool_->empty ())
+        out_ << "<empty>";
+      else
+        out_ << _histogram_pool_->size ();
+      out_ << std::endl;;
 
-  //     std::vector<std::string> hnames;
-  //     _histogram_pool_->names (hnames);
-  //     for (std::vector<std::string>::const_iterator i = hnames.begin ();
-  //          i != hnames.end (); ++i)
-  //       {
-  //         const std::string & a_name = *i;
-  //         if (a_name.find ("template") != std::string::npos) continue;
+      std::vector<std::string> hnames;
+      _histogram_pool_->names (hnames);
+      for (std::vector<std::string>::const_iterator i = hnames.begin ();
+           i != hnames.end (); ++i)
+        {
+          const std::string & a_name = *i;
+          if (a_name.find ("template") != std::string::npos) continue;
 
-  //         std::vector<std::string>::const_iterator j = i;
-  //         out_ << indent;
-  //         std::ostringstream indent_oss;
-  //         if (++j == hnames.end ())
-  //           {
-  //             out_  << du::i_tree_dumpable::last_tag;
-  //             indent_oss << indent << du::i_tree_dumpable::last_skip_tag;
-  //           }
-  //         else
-  //           {
-  //             out_ << du::i_tree_dumpable::tag;
-  //             indent_oss << indent << du::i_tree_dumpable::skip_tag;
-  //           }
+          std::vector<std::string>::const_iterator j = i;
+          out_ << indent;
+          std::ostringstream indent_oss;
+          if (++j == hnames.end ())
+            {
+              out_  << datatools::i_tree_dumpable::last_tag;
+              indent_oss << indent << datatools::i_tree_dumpable::last_skip_tag;
+            }
+          else
+            {
+              out_ << datatools::i_tree_dumpable::tag;
+              indent_oss << indent << datatools::i_tree_dumpable::skip_tag;
+            }
 
-  //         out_ << "Label " << a_name << std::endl;
-  //         const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d (a_name);
-  //         a_histogram.tree_dump (out_, "", indent_oss.str (), inherit_);
+          out_ << "Label " << a_name << std::endl;
+          const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d (a_name);
+          a_histogram.tree_dump (out_, "", indent_oss.str (), inherit_);
 
-  //         if (is_debug ())
-  //           {
-  //             a_histogram.print (std::clog);
-  //           }
-  //       }
-  //   }
+          if (is_debug ())
+            {
+              a_histogram.print (std::clog);
+            }
+        }
+    }
 
-  //   return;
-  // }
+    return;
+  }
 
 } // namespace analysis
 
