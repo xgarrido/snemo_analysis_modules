@@ -30,11 +30,11 @@
  *
  */
 
-#ifndef SNEMO_ANALYSIS_PROCESSING_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
-#define SNEMO_ANALYSIS_PROCESSING_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H 1
+#ifndef ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_
+#define ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_ 1
 
-#include <sncore/processing/base_module.h>    // data processing module abstract base class
-#include <sncore/processing/module_macros.h>  // useful macros concerning data processing modules
+// Data processing module abstract base class
+#include <dpp/base_module.h>
 
 #include <map>
 #include <string>
@@ -44,94 +44,72 @@ namespace mygsl {
   class histogram_pool;
 }
 
-namespace snemo {
+namespace analysis {
 
-  namespace analysis {
+  DPP_MODULE_CLASS_DECLARE (snemo_bb0nu_halflife_limit_module)
+  {
+  public:
 
-    namespace processing {
+    struct experiment_entry_type
+    {
+      double isotope_mass_number;
+      double isotope_mass;
+      double isotope_bb2nu_halflife;
+      double exposure_time;
+    };
 
-      SNEMO_MODULE_CLASS_DECLARE (snemo_bb0nu_halflife_limit_module)
-      {
-      public:
+  public:
 
-        struct experiment_entry_type
-        {
-          double isotope_mass_number;
-          double isotope_mass;
-          double isotope_bb2nu_halflife;
-          double exposure_time;
-        };
+    void set_histogram_pool (mygsl::histogram_pool & pool_);
 
-      public:
-        static const std::string DEFAULT_EH_LABEL;
-        static const std::string DEFAULT_PTD_LABEL;
+    mygsl::histogram_pool & grab_histogram_pool ();
 
-        void set_EH_bank_label (const std::string & EH_label_);
+    void dump_result (std::ostream      & out_    = std::clog,
+                      const std::string & title_  = "",
+                      const std::string & indent_ = "",
+                      bool inherit_               = false) const;
 
-        const std::string & get_EH_bank_label () const;
+    // Macro to automate the public interface of the module (including ctor/dtor) :
+    DPP_MODULE_INTERFACE_CTOR_DTOR (snemo_bb0nu_halflife_limit_module);
 
-        void set_PTD_bank_label (const std::string & PTD_label);
+  protected:
 
-        const std::string & get_PTD_bank_label () const;
+    // Give default values to specific class members.
+    void _set_defaults ();
 
-        void set_Histo_service_label (const std::string & Histo_label);
+  private:
 
-        const std::string & get_Histo_service_label () const;
+    // Compute topology channel efficiencies.
+    void _compute_efficiency_ ();
 
-        void set_histogram_pool (mygsl::histogram_pool & pool_);
+    // Compute topology channel efficiencies.
+    void _compute_halflife_ ();
 
-        mygsl::histogram_pool & grab_histogram_pool ();
+  private:
 
-        // Macro to automate the public interface of the module (including ctor/dtor) :
-        SNEMO_MODULE_INTERFACE_CTOR_DTOR (snemo_bb0nu_halflife_limit_module);
+    // The label/name of the 'event header' bank accessible from the event record :
+    std::string _EH_bank_label_;
 
-      private:
+    // The label/name of the 'particle track' bank accessible from the event record :
+    std::string _PTD_bank_label_;
 
-        // Give default values to specific class members.
-        void _init_defaults_ ();
+    // The key fields from 'event header' bank to build the histogram key:
+    std::vector<std::string> _key_fields_;
 
-        // Compute topology channel efficiencies.
-        void _compute_efficiency_ ();
+    // The histogram pool :
+    mygsl::histogram_pool * _histogram_pool_;
 
-        // Compute topology channel efficiencies.
-        void _compute_halflife_ ();
+    // The experiment running condition
+    experiment_entry_type _experiment_conditions_;
 
-        void _dump_result_ (std::ostream      & out_    = std::clog,
-                            const std::string & title_  = "",
-                            const std::string & indent_ = "",
-                            bool inherit_               = false) const;
-      private:
+    // Macro to automate the registration of the module :
+    DPP_MODULE_REGISTRATION_INTERFACE (snemo_bb0nu_halflife_limit_module);
 
-        // The label/name of the 'event header' bank accessible from the event record :
-        std::string _EH_bank_label_;
+  };
 
-        // The label/name of the 'particle track' bank accessible from the event record :
-        std::string _PTD_bank_label_;
+} // namespace analysis
 
-        // The label/name of the 'Histogram' service :
-        std::string _Histo_service_label_;
-
-        // The key fields from 'event header' bank to build the histogram key:
-        std::vector<std::string> _key_fields_;
-
-        // The histogram pool :
-        mygsl::histogram_pool * _histogram_pool_;
-
-        // The experiment running condition
-        experiment_entry_type _experiment_conditions_;
-
-        // Macro to automate the registration of the module :
-        SNEMO_MODULE_REGISTRATION_INTERFACE (snemo_bb0nu_halflife_limit_module);
-
-      };
-
-    } // namespace processing
-
-  } // namespace analysis
-
-} // namespace snemo
-
-#endif // SNEMO_ANALYSIS_PROCESSING_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
+#endif // DPP_ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
 
 // end of snemo_bb0nu_halflife_limit_module.h
 /*
