@@ -87,12 +87,6 @@ namespace analysis {
 
   private:
 
-    // The label/name of the 'event header' bank accessible from the event record :
-    std::string _EH_bank_label_;
-
-    // The label/name of the 'particle track' bank accessible from the event record :
-    std::string _PTD_bank_label_;
-
     // The key fields from 'event header' bank to build the histogram key:
     std::vector<std::string> _key_fields_;
 
@@ -109,7 +103,7 @@ namespace analysis {
 
 } // namespace analysis
 
-#endif // DPP_ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
+#endif // DPP_ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_
 
 // end of snemo_bb0nu_halflife_limit_module.h
 /*
