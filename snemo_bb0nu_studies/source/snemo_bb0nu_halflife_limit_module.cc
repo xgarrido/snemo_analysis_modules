@@ -17,7 +17,7 @@
 #include <snanalysis/models/particle_track_data.h>
 
 // Feldman-Cousins calculation
-//#include <snanalysis/tools/root_tools.h>
+// #include <snanalysis/tools/root_tools.h>
 
 // Service manager
 #include <datatools/service_manager.h>
@@ -282,12 +282,12 @@ namespace analysis {
     // Add charge multiplicity
     key << nelectron << "e-" << npositron << "e+" << nundefined << "u";
 
-    // Arbitrary selection of "two-particles" channel
-    if (nelectron != 2)
-      {
-        DT_LOG_WARNING (get_logging_priority (), "Selecting only two-eletrons events!");
-        return dpp::PROCESS_STOP;
-      }
+    // // Arbitrary selection of "two-particles" channel
+    // if (nelectron != 2)
+    //   {
+    //     DT_LOG_WARNING (get_logging_priority (), "Selecting only two-electrons events!");
+    //     return dpp::PROCESS_STOP;
+    //   }
 
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool ();
@@ -318,8 +318,8 @@ namespace analysis {
         weight /= 1.0/eh_properties.fetch_real (mctools::event_utils::EVENT_GENBB_WEIGHT);
       }
 
-    // Store the weight (which is fortunately a global properties
-    // of histogram and not of bin) into histogram properties
+    // Store the weight (which is fortunately a global properties of histogram
+    // and not of bin) into histogram properties
     if (!a_histo.get_auxiliaries ().has_key ("weight"))
       {
         a_histo.grab_auxiliaries ().update ("weight", weight);
@@ -328,283 +328,234 @@ namespace analysis {
     return dpp::PROCESS_SUCCESS;
   }
 
-  void snemo_bb0nu_halflife_limit_module::_compute_efficiency_ (){}
-  // {
-  //   // Getting histogram pool
-  //   mygsl::histogram_pool & a_pool = grab_histogram_pool ();
+  void snemo_bb0nu_halflife_limit_module::_compute_efficiency_ ()
+  {
+    // Getting histogram pool
+    mygsl::histogram_pool & a_pool = grab_histogram_pool ();
 
-  //   // Get names of all 1D histograms saved
-  //   std::vector<std::string> hnames;
-  //   a_pool.names (hnames, "group=energy");
+    // Get names of all saved 1D histograms belonging to 'energy' group
+    std::vector<std::string> hnames;
+    a_pool.names (hnames, "group=energy");
 
-  //   if (hnames.empty ())
-  //     {
-  //       std::clog << datatools::utils::io::warning
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::_compute_efficiency_: "
-  //                 << "No energy histograms have been stored !"
-  //                 << std::endl;
-  //       return;
-  //     }
+    if (hnames.empty ())
+      {
+        DT_LOG_WARNING (get_logging_priority (), "No 'energy' histograms have been stored !");
+        return;
+      }
 
-  //   // Calculate signal to halflife limit constant
-  //   const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
-  //   const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
-  //   const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
-  //   const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
-  //   const double kbg = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time / isotope_molar_mass / isotope_bb2nu_halflife;
+    // Calculate signal to halflife limit constant
+    const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
+    const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
+    const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
+    const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
+    const double kbg
+      = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time
+      / isotope_molar_mass / isotope_bb2nu_halflife;
 
-  //   // Sum of number of events
-  //   std::map<std::string, double> m_event;
-  //   for (std::vector<std::string>::const_iterator
-  //          iname = hnames.begin ();
-  //        iname != hnames.end (); ++iname)
-  //     {
-  //       const std::string & a_name = *iname;
-  //       if (! a_pool.has_1d (a_name))
-  //         {
-  //           std::ostringstream message;
-  //           message << "snemo::analysis::processing::"
-  //                   << "snemo_bb0nu_halflife_limit_module::_compute_efficiency_"
-  //                   << "Histogram '" << a_name << "' is not 1D histogram !";
-  //           throw std::logic_error (message.str ());
-  //         }
-  //       const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
+    // Sum of number of events
+    std::map<std::string, double> m_event;
+    for (std::vector<std::string>::const_iterator
+           iname = hnames.begin ();
+         iname != hnames.end (); ++iname)
+      {
+        const std::string & a_name = *iname;
+        DT_THROW_IF(! a_pool.has_1d (a_name), std::logic_error,
+                    "Histogram '" << a_name << "' is not 1D histogram !");
+        const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
 
-  //       // Loop over bin content
-  //       for (size_t i = 0; i < a_histogram.bins (); ++i)
-  //         {
-  //           const double sum   = a_histogram.sum () + a_histogram.overflow ();
-  //           const double value = a_histogram.get (i);
+        // Loop over bin content
+        for (size_t i = 0; i < a_histogram.bins (); ++i)
+          {
+            const double sum   = a_histogram.sum () + a_histogram.overflow ();
+            const double value = a_histogram.get (i);
 
-  //           if (! datatools::utils::is_valid (value))
-  //             {
-  //               std::clog << datatools::utils::io::warning
-  //                         << "snemo::analysis::processing::"
-  //                         << "snemo_bb0nu_halflife_limit_module::_compute_efficiency_: "
-  //                         << "Skipping non valid value !"
-  //                         << std::endl;
-  //               continue;
-  //             }
+            if (! datatools::is_valid (value))
+              {
+                DT_LOG_WARNING (get_logging_priority (), "Skipping non valid value !");
+                continue;
+              }
 
-  //           // Retrieve histogram weight
-  //           double weight = 1.0;
-  //           if (a_histogram.get_auxiliaries ().has_key ("weight"))
-  //             {
-  //               weight = a_histogram.get_auxiliaries ().fetch_real ("weight");
-  //             }
+            // Retrieve histogram weight
+            double weight = 1.0;
+            if (a_histogram.get_auxiliaries ().has_key ("weight"))
+              {
+                weight = a_histogram.get_auxiliaries ().fetch_real ("weight");
+              }
 
-  //           // Compute fraction of event for each histogram bin
-  //           const double efficiency = (sum - m_event[a_name]) * weight;
-  //           m_event[a_name] += value;
+            // Compute fraction of event for each histogram bin
+            const double efficiency = (sum - m_event[a_name]) * weight;
+            m_event[a_name] += value;
 
-  //           if (! datatools::utils::is_valid (efficiency))
-  //             {
-  //               std::clog << datatools::utils::io::warning
-  //                         << "snemo::analysis::processing::"
-  //                         << "snemo_bb0nu_halflife_limit_module::_compute_efficiency_: "
-  //                         << "Skipping non valid efficiency computation !"
-  //                         << std::endl;
-  //               continue;
-  //             }
+            if (! datatools::is_valid (efficiency))
+              {
+                DT_LOG_WARNING (get_logging_priority (), "Skipping non valid efficiency computation !");
+                continue;
+              }
 
-  //           // Adding histogram efficiency
-  //           const std::string & key_str = a_name + " - efficiency";
-  //           if (!a_pool.has (key_str))
-  //             {
-  //               mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "efficiency");
-  //               datatools::utils::properties hconfig;
-  //               hconfig.store_string ("mode", "mimic");
-  //               hconfig.store_string ("mimic.histogram_1d", "efficiency_template");
-  //               mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
-  //             }
+            // Adding histogram efficiency
+            const std::string & key_str = a_name + " - efficiency";
+            if (!a_pool.has (key_str))
+              {
+                mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "efficiency");
+                datatools::properties hconfig;
+                hconfig.store_string ("mode", "mimic");
+                hconfig.store_string ("mimic.histogram_1d", "efficiency_template");
+                mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
+              }
 
-  //           // Getting the current histogram
-  //           mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d (key_str);
-  //           a_new_histogram.set (i, efficiency);
+            // Getting & updating the current histogram
+            mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d (key_str);
+            a_new_histogram.set (i, efficiency);
 
-  //           // Flag signal/background histogram
-  //           datatools::utils::properties & a_aux = a_new_histogram.grab_auxiliaries ();
-  //           if (a_name.find ("bb0nu") != std::string::npos)
-  //             {
-  //               if (! a_aux.has_flag ("__signal")) a_aux.update_flag ("__signal");
-  //             }
-  //           else
-  //             {
-  //               if (! a_aux.has_flag ("__background")) a_aux.update_flag ("__background");
-  //             }
+            // Flag signal/background histogram
+            datatools::properties & a_aux = a_new_histogram.grab_auxiliaries ();
+            if (a_name.find ("bb0nu") != std::string::npos)
+              {
+                a_aux.update_flag ("__signal");
+              }
+            else
+              {
+                a_aux.update_flag ("__background");
+              }
 
-  //           // Extra stuff : store a string containing the
-  //           // background counts given the experiment setup (for
-  //           // plotting purpose)
-  //           if (a_name.find ("bb2nu") != std::string::npos)
-  //             {
-  //               const std::pair<double, double> x = a_new_histogram.get_range (i);
-  //               const double nbg_count = kbg * efficiency;
+            // Extra stuff : store a string containing the background counts
+            // given the experiment setup (for plotting purpose)
+            if (a_name.find ("bb2nu") != std::string::npos)
+              {
+                const std::pair<double, double> x = a_new_histogram.get_range (i);
+                const double nbg_count = kbg * efficiency;
 
-  //               if (nbg_count > 10.0 || nbg_count <= 0.0) continue;
+                if (nbg_count > 10.0 || nbg_count <= 0.0) continue;
 
-  //               std::ostringstream text;
-  //               text << (x.first + x.second)/2.0 << " " << efficiency << " ";
-  //               if (nbg_count > 1.0) text << std::floor (nbg_count);
-  //               else                 text << std::setprecision (2) << std::fixed << nbg_count;
+                std::ostringstream text;
+                text << (x.first + x.second)/2.0 << " " << efficiency << " ";
+                if (nbg_count > 1.0) text << std::floor (nbg_count);
+                else                 text << std::setprecision (2) << std::fixed << nbg_count;
 
-  //               std::ostringstream label;
-  //               label << "__display_text_" << i;
-  //               a_aux.update (label.str (), text.str ());
-  //             }
-  //         } // end of bin content
-  //     }// end of histogram loop
+                std::ostringstream label;
+                label << "__display_text_" << i;
+                a_aux.update (label.str (), text.str ());
+              }
+          } // end of bin content
+      }// end of histogram loop
 
-  //   return;
-  // }
+    return;
+  }
 
-  void snemo_bb0nu_halflife_limit_module::_compute_halflife_ (){}
-  // {
-  //   // Getting histogram pool
-  //   mygsl::histogram_pool & a_pool = grab_histogram_pool ();
+  void snemo_bb0nu_halflife_limit_module::_compute_halflife_ ()
+  {
+    // Getting histogram pool
+    mygsl::histogram_pool & a_pool = grab_histogram_pool ();
 
-  //   // Get names of all 1D histograms saved
-  //   std::vector<std::string> hnames;
-  //   a_pool.names (hnames, "group=efficiency");
-  //   if (hnames.empty ())
-  //     {
-  //       std::clog << datatools::utils::io::warning
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::_compute_halflife_: "
-  //                 << "No efficiency histograms have been stored !"
-  //                 << std::endl;
-  //       return;
-  //     }
+    // Get names of all saved 1D histograms belonging to 'efficiency' group
+    std::vector<std::string> hnames;
+    a_pool.names (hnames, "group=efficiency");
+    if (hnames.empty ())
+      {
+        DT_LOG_WARNING (get_logging_priority (), "No 'efficiency' histograms have been stored !");
+        return;
+      }
 
-  //   // Get names of 'signal' histograms
-  //   std::vector<std::string> signal_names;
-  //   a_pool.names (signal_names, "flag=__signal");
-  //   if (signal_names.empty ())
-  //     {
-  //       std::clog << datatools::utils::io::warning
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::_compute_halflife_: "
-  //                 << "No 'signal' histograms have been stored !"
-  //                 << std::endl;
-  //       return;
-  //     }
-  //   // Get names of 'background' histograms
-  //   std::vector<std::string> bkg_names;
-  //   a_pool.names (bkg_names, "flag=__background");
-  //   if (bkg_names.empty ())
-  //     {
-  //       std::clog << datatools::utils::io::warning
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::_compute_halflife_: "
-  //                 << "No 'background' histograms have been stored !"
-  //                 << std::endl;
-  //       return;
-  //     }
+    // Get names of 'signal' histograms
+    std::vector<std::string> signal_names;
+    a_pool.names (signal_names, "flag=__signal");
+    if (signal_names.empty ())
+      {
+        DT_LOG_WARNING (get_logging_priority (), "No 'signal' histograms have been stored !");
+        return;
+      }
+    // Get names of 'background' histograms
+    std::vector<std::string> bkg_names;
+    a_pool.names (bkg_names, "flag=__background");
+    if (bkg_names.empty ())
+      {
+        DT_LOG_WARNING (get_logging_priority (), "No 'background' histograms have been stored !");
+        return;
+      }
 
-  //   // Calculate signal to halflife limit constant
-  //   const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
-  //   const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
-  //   const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
-  //   const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
-  //   const double kbg = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time / isotope_molar_mass / isotope_bb2nu_halflife;
+    // Calculate signal to halflife limit constant
+    const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
+    const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
+    const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
+    const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
+    const double kbg
+      = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time
+      / isotope_molar_mass / isotope_bb2nu_halflife;
 
-  //   // Loop over 'background' histograms
-  //   // Save the total number of events
-  //   std::vector<double> vbkg_counts;
-  //   for (std::vector<std::string>::const_iterator
-  //          iname = bkg_names.begin ();
-  //        iname != bkg_names.end (); ++iname)
-  //     {
-  //       const std::string & a_name = *iname;
-  //       if (! a_pool.has_1d (a_name))
-  //         {
-  //           std::ostringstream message;
-  //           message << "snemo::analysis::processing::"
-  //                   << "snemo_bb0nu_halflife_limit_module::_compute_halflife_"
-  //                   << "Histogram '" << a_name << "' is not 1D histogram !";
-  //           throw std::logic_error (message.str ());
-  //         }
-  //       if (a_pool.get_group (a_name) != "efficiency")
-  //         {
-  //           std::cerr << datatools::utils::io::error
-  //                     << "snemo::analysis::processing::"
-  //                     << "snemo_bb0nu_halflife_limit_module::_compute_halflife_: "
-  //                     << "Histogram '" << a_name << "' does not belongs to 'efficiency' group"
-  //                     << std::endl;
-  //           continue;
-  //         }
-  //       const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
-  //       // Loop over bin content
-  //       for (size_t i = 0; i < a_histogram.bins (); ++i)
-  //         {
-  //           const double value = a_histogram.get (i);
-  //           if (iname == bkg_names.begin ()) vbkg_counts.push_back (value);
-  //           else                             vbkg_counts[i] += value;
-  //         }
-  //     }
+    // Loop over 'background' histograms
+    // Save the total number of events
+    std::vector<double> vbkg_counts;
+    for (std::vector<std::string>::const_iterator
+           iname = bkg_names.begin ();
+         iname != bkg_names.end (); ++iname)
+      {
+        const std::string & a_name = *iname;
+        DT_THROW_IF (! a_pool.has_1d (a_name), std::logic_error,
+                     "Histogram '" << a_name << "' is not 1D histogram !");
+        if (a_pool.get_group (a_name) != "efficiency")
+          {
+            DT_LOG_ERROR (get_logging_priority (),
+                          "Histogram '" << a_name << "' does not belongs to 'efficiency' group !");
+            continue;
+          }
+        const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
+        // Loop over bin content
+        for (size_t i = 0; i < a_histogram.bins (); ++i)
+          {
+            const double value = a_histogram.get (i);
+            if (iname == bkg_names.begin ()) vbkg_counts.push_back (value);
+            else                             vbkg_counts[i] += value;
+          }
+      }// end of background loop
 
-  //   // Loop over 'signal' histograms
-  //   for (std::vector<std::string>::const_iterator
-  //          iname = signal_names.begin ();
-  //        iname != signal_names.end (); ++iname)
-  //     {
-  //       double best_halflife_limit = 0.0;
-  //       const std::string & a_name = *iname;
-  //       if (! a_pool.has_1d (a_name))
-  //         {
-  //           std::ostringstream message;
-  //           message << "snemo::analysis::processing::"
-  //                   << "snemo_bb0nu_halflife_limit_module::_compute_halflife_"
-  //                   << "Histogram '" << a_name << "' is not 1D histogram !";
-  //           throw std::logic_error (message.str ());
-  //         }
-  //       if (a_pool.get_group (a_name) != "efficiency")
-  //         {
-  //           std::cerr << datatools::utils::io::error
-  //                     << "snemo::analysis::processing::"
-  //                     << "snemo_bb0nu_halflife_limit_module::_compute_halflife_: "
-  //                     << "Histogram '" << a_name << "' does not belongs to 'efficiency' group"
-  //                     << std::endl;
-  //           continue;
-  //         }
-  //       const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
-  //       // Loop over bin content
-  //       for (size_t i = 0; i < a_histogram.bins (); ++i)
-  //         {
-  //           const double value = a_histogram.get (i);
+    // Loop over 'signal' histograms
+    for (std::vector<std::string>::const_iterator
+           iname = signal_names.begin ();
+         iname != signal_names.end (); ++iname)
+      {
+        double best_halflife_limit = 0.0;
+        const std::string & a_name = *iname;
+        DT_THROW_IF(! a_pool.has_1d (a_name), std::logic_error,
+                    "Histogram '" << a_name << "' is not 1D histogram !");
+        if (a_pool.get_group (a_name) != "efficiency")
+          {
+            DT_LOG_ERROR (get_logging_priority (),
+                          "Histogram '" << a_name << "' does not belongs to 'efficiency' group !");
+            continue;
+          }
+        const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
+        // Loop over bin content
+        for (size_t i = 0; i < a_histogram.bins (); ++i)
+          {
+            const double value = a_histogram.get (i);
 
-  //           // Compute the number of event excluded for the same energy bin
-  //           const double nbkg = kbg * vbkg_counts.at (i);
-  //           const double nexcluded = snemo::analysis::tool::get_number_of_excluded_events (nbkg);
-  //           const double halflife = value / nexcluded * kbg * isotope_bb2nu_halflife;
+            // Compute the number of event excluded for the same energy bin
+            const double nbkg = kbg * vbkg_counts.at (i);
+            // const double nexcluded = snemo::analysis::tool::get_number_of_excluded_events (nbkg);
+            // const double halflife = value / nexcluded * kbg * isotope_bb2nu_halflife;
 
-  //           // Keeping larger limit
-  //           best_halflife_limit = std::max (best_halflife_limit, halflife);
+            // // Keeping larger limit
+            // best_halflife_limit = std::max (best_halflife_limit, halflife);
 
-  //           // Adding histogram halflife
-  //           const std::string & key_str = a_name + " - halflife";
-  //           if (!a_pool.has (key_str))
-  //             {
-  //               mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "halflife");
-  //               datatools::utils::properties hconfig;
-  //               hconfig.store_string ("mode", "mimic");
-  //               hconfig.store_string ("mimic.histogram_1d", "halflife_template");
-  //               mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
-  //             }
+            // // Adding histogram halflife
+            // const std::string & key_str = a_name + " - halflife";
+            // if (!a_pool.has (key_str))
+            //   {
+            //     mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "halflife");
+            //     datatools::properties hconfig;
+            //     hconfig.store_string ("mode", "mimic");
+            //     hconfig.store_string ("mimic.histogram_1d", "halflife_template");
+            //     mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
+            //   }
 
-  //           // Getting the current histogram
-  //           mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d (key_str);
-  //           a_new_histogram.set (i, halflife);
-  //         }
-  //       std::clog << datatools::utils::io::notice
-  //                 << "snemo::analysis::processing::"
-  //                 << "snemo_bb0nu_halflife_limit_module::_compute_halflife_: "
-  //                 << "Best halflife limit for bb0nu process is " << best_halflife_limit
-  //                 << " yr" << std::endl;
-
-  //     }
-  // }
+            // // Getting the current histogram
+            // mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d (key_str);
+            // a_new_histogram.set (i, halflife);
+          }
+        DT_LOG_NOTICE (get_logging_priority (),
+                       "Best halflife limit for bb0nu process is " << best_halflife_limit << " yr");
+      }// end of signal loop
+  }
 
   void snemo_bb0nu_halflife_limit_module::dump_result (std::ostream      & out_,
                                                        const std::string & title_,
