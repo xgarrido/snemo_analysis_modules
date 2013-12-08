@@ -16,9 +16,6 @@
 #include <snanalysis/models/data_model.h>
 #include <snanalysis/models/particle_track_data.h>
 
-// Feldman-Cousins calculation
-// #include <snanalysis/tools/root_tools.h>
-
 // Service manager
 #include <datatools/service_manager.h>
 
@@ -33,6 +30,29 @@ namespace analysis {
   // Registration instantiation macro :
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_bb0nu_halflife_limit_module,
                                     "analysis::snemo_bb0nu_halflife_limit_module");
+
+  // Continuous FeldmanCousin functions computed by M. Bongrand
+  // <bongrand@lal.in2p3.fr>
+  double get_number_of_excluded_events (const double number_of_events_)
+  {
+    double number_of_excluded_events = 0.0;
+
+    if ( number_of_events_ < 29.0 )
+      {
+        double x = number_of_events_;
+
+        number_of_excluded_events =
+          2.5617 + 0.747661 * x - 0.0666176 * pow (x,2)
+          + 0.00432457 * pow (x,3) - 0.000139343 * pow (x,4)
+          + 1.71509e-06 * pow (x,5);
+      }
+    else
+      {
+        number_of_excluded_events = 1.64 * sqrt (number_of_events_);
+      }
+
+    return number_of_excluded_events;
+  }
 
   // Set the histogram pool used by the module :
   void snemo_bb0nu_halflife_limit_module::set_histogram_pool (mygsl::histogram_pool & pool_)
@@ -531,26 +551,26 @@ namespace analysis {
 
             // Compute the number of event excluded for the same energy bin
             const double nbkg = kbg * vbkg_counts.at (i);
-            // const double nexcluded = snemo::analysis::tool::get_number_of_excluded_events (nbkg);
-            // const double halflife = value / nexcluded * kbg * isotope_bb2nu_halflife;
+            const double nexcluded = analysis::get_number_of_excluded_events (nbkg);
+            const double halflife = value / nexcluded * kbg * isotope_bb2nu_halflife;
 
-            // // Keeping larger limit
-            // best_halflife_limit = std::max (best_halflife_limit, halflife);
+            // Keeping larger limit
+            best_halflife_limit = std::max (best_halflife_limit, halflife);
 
-            // // Adding histogram halflife
-            // const std::string & key_str = a_name + " - halflife";
-            // if (!a_pool.has (key_str))
-            //   {
-            //     mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "halflife");
-            //     datatools::properties hconfig;
-            //     hconfig.store_string ("mode", "mimic");
-            //     hconfig.store_string ("mimic.histogram_1d", "halflife_template");
-            //     mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
-            //   }
+            // Adding histogram halflife
+            const std::string & key_str = a_name + " - halflife";
+            if (!a_pool.has (key_str))
+              {
+                mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "halflife");
+                datatools::properties hconfig;
+                hconfig.store_string ("mode", "mimic");
+                hconfig.store_string ("mimic.histogram_1d", "halflife_template");
+                mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
+              }
 
-            // // Getting the current histogram
-            // mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d (key_str);
-            // a_new_histogram.set (i, halflife);
+            // Getting the current histogram
+            mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d (key_str);
+            a_new_histogram.set (i, halflife);
           }
         DT_LOG_NOTICE (get_logging_priority (),
                        "Best halflife limit for bb0nu process is " << best_halflife_limit << " yr");
