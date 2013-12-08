@@ -6,23 +6,21 @@
 
 * Introduction
 
-This repository holds a SN@ilWare configuration to run SuperNEMO simulations and
-to produce several "control" plots. It provides one SN@ilWare module which
-automatically plot physical quantities from different data banks. For example,
-it shows the distribution of the number of Geiger hits from the =simulated_data=
-bank and from the =calibrated_data= bank. The purpose of this module is to have
-some fundamental and key plots to check differences between software releases,
-new software implementations and so on.
+This repository holds a SN@ilWare configuration + source code to calculate \beta\beta0\nu
+sensitivity for SuperNEMO experiment. Given 2\beta simulations (maybe data one day)
+from 0\nu double decay and background simulations (2\nu,\nbsp^{208}Tl,\nbsp^{214}Bi...), the
+module =snemo_bb0nu_halflife_limit= calculates signal/background efficiencies
+and then determines the best sensitivity.
 
 The current version is hosted at
-[[https://github.com/xgarrido/snemo_simulation_modules/snemo_control_plot]] under
+[[https://github.com/xgarrido/snemo_simulation_modules/snemo_bb0nu_studies]] under
 =git= version control. You can clone this repository by doing
 
 #+BEGIN_SRC sh
   git clone https://github.com/xgarrido/snemo_simulation_modules/snemo_bb0nu_studies snemo_bb0nu_studies
 #+END_SRC
 
-This will create a directory =snemo_control_plot= in the working directory
+This will create a directory =snemo_bb0nu_studies= in the working directory
 containing all the source files needed to configure and to setup SN@ilWare
 programs.
 
@@ -31,10 +29,10 @@ programs.
 The code is organised as follow :
 
 - =README.org= :: This file holds the pipeline configuration + the documentation
-                  on how to use the =snemo_control_plot= module.
+                  on how to use the =snemo_bb0nu_studies= module.
 - =Makefile= :: The =Makefile= allows to generate the pipeline configuration by
                 parsing and tangling this file /i.e./ =README.org= (see below).
-- =source= :: This directory holds the source code of the =snemo_control_plot=
+- =source= :: This directory holds the source code of the =snemo_bb0nu_studies=
               module. It also has a =CMakeLists.txt= file in order to compile,
               build and install all the software pieces through =cmake= rules.
 
@@ -65,14 +63,14 @@ responsible for a given task. Modules and services are declared in Section
 and the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given
 by F. Mauger.
 
-The =@SNEMO_CONTROL_PLOT_DIR@= corresponds to the directory where configuration
+The =@SNEMO_BB0NU_STUDIES_DIR@= corresponds to the directory where configuration
 files are going to be stored. This variable which varies from one installation
 to the other, is automatically change when the tangle process occurs. This is
 done /via/ the =Makefile= which parse and replace this variable.
 
 ** Module manager
 :PROPERTIES:
-:TANGLE:   config/pipeline/module_manager.conf
+:TANGLE: config/pipeline/module_manager.conf
 :END:
 This file is the main and central piece of code for loading all modules/services
 needed by =dpp_processing= binary. It provides links to module files and
@@ -93,19 +91,19 @@ service files.
 #+BEGIN_SRC sh
   #@description The configuration file of the embedded service manager
   service_manager.configuration : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/service_manager.conf"
+      "@SNEMO_BB0NU_STUDIES_DIR@/service_manager.conf"
 #+END_SRC
 
 *** Configuration files for modules
 #+BEGIN_SRC sh
   #@description The configuration files for modules
   modules.configuration_files : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/snemo_bb0nu_studies_modules.conf"
+      "@SNEMO_BB0NU_STUDIES_DIR@/snemo_bb0nu_studies_modules.conf"
 #+END_SRC
 
 ** Service manager
 :PROPERTIES:
-:TANGLE:   config/pipeline/service_manager.conf
+:TANGLE: config/pipeline/service_manager.conf
 :END:
 *** Logging priority
 #+BEGIN_SRC sh
@@ -124,7 +122,7 @@ service files.
 #+BEGIN_SRC sh
   #@description The list of files that describe services
   services.configuration_files : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/services.conf"
+      "@SNEMO_BB0NU_STUDIES_DIR@/services.conf"
 #+END_SRC
 
 * SuperNEMO \beta\beta0\nu modules
@@ -163,6 +161,40 @@ Set the same histogram service label as defined [[Histogram service][here]]
 #+BEGIN_SRC sh
   #@description The Histogram Service label
   Histo_label : string = "Histo"
+#+END_SRC
+
+*** Building histogram keys
+The key fields are used to build different identifiants for histogram
+dictionnary. The basic idea is to have this information inside =event_header=
+and use it to build a =string= key. The program is then quite dynamic in the
+sense that 0\nu halflife calculation can be done for different study purpose (just
+change the =key_fields=).
+#+BEGIN_SRC sh
+  #@description The key fields from 'Event Header' bank to build a unique key for histogram
+  key_fields : string[1] = \
+      "analysis.decay_process"
+#+END_SRC
+
+*** Exprimental setup
+Here we define the experimental conditions basically which isotope, mass, 2\beta
+halflife, exposure are used.
+
+**** Isotope values
+#+BEGIN_SRC sh
+  #@description The atomic mass number of the isotope
+  experiment.isotope_mass_number : integer = 82
+
+  #@description The total mass of the isotope
+  experiment.isotope_mass : real as mass = 5 kg
+
+  #@description The bb2nu halflife of the isotope
+  experiment.isotope_bb2nu_halflife : real = 9.0e19 #year
+#+END_SRC
+
+**** Experiment exposure
+#+BEGIN_SRC sh
+  #@description The exposure time of the experiment
+  experiment.exposure_time : real = 2.0 #year
 #+END_SRC
 
 ** Histogram declarations
@@ -219,10 +251,9 @@ histograms:
   max : real = 3200.0
 #+END_SRC
 
-
 * Services
 :PROPERTIES:
-:TANGLE:   config/pipeline/services.conf
+:TANGLE: config/pipeline/services.conf
 :END:
 
 A service generally hosts a specific resource that can be shared by many other
@@ -276,15 +307,15 @@ Embedded histograms are declared into a dedicated file defines in
 #+BEGIN_SRC sh
   #@description The main configuration file for the embedded histogram manager
   pool.histo.setups : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/histogram_templates.conf"
+      "@SNEMO_BB0NU_STUDIES_DIR@/histogram_templates.conf"
 #+END_SRC
 
 Finally, all histograms created can be stored inside ROOT files or XML archives.
 #+BEGIN_SRC sh
   #@description The ouput file where to store the histograms
   output_files : string[2] as path =                        \
-      "/tmp/${USER}/snemo.d/snemo_control_plot_histos.root" \
-      "/tmp/${USER}/snemo.d/snemo_control_plot_histos.xml"
+      "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.root" \
+      "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"
 #+END_SRC
 
 * Running SN@ilWare processing chain
@@ -294,11 +325,11 @@ may use the dedicated =Makefile= to generate the pipeline configuration. Just
 run =make= within this working directory.
 
 ** Source code compilation
-Second, you need to compile the =snemo_control_plot= module files. The build
+Second, you need to compile the =snemo_bb0nu_studies= module files. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
 setup the dependences. Nevertheless, this implies that you have already and
 correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadfael]], [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux][Bayeux]] and Falaise. Then, you can configure, build
-and install the =snemo_control_plot= module by doing
+and install the =snemo_bb0nu_studies= module by doing
 #+BEGIN_SRC sh
   mkdir {build,install} && cd build
   cmake                                               \
@@ -309,25 +340,32 @@ and install the =snemo_control_plot= module by doing
   cd ..
 #+END_SRC
 
-** Use and execute =snemo_control_plot= module
+** Use and execute =snemo_bb0nu_studies= module
 After a successful build, you will get an =install= directory holding the
-=libsnemo_control_plot.so= file. Assuming you are under =bash= shell, you will
+=libsnemo_bb0nu_studies.so= file. Assuming you are under =bash= shell, you will
 need to add it to your =LD_LIBRARY_PATH= by doing
 #+BEGIN_SRC sh
   export LD_LIBRARY_PATH=${PWD}/install/lib:${LD_LIBRARY_PATH}
 #+END_SRC
 
+Another approach, maybe less intrusive, will be to set the =LD_LIBRARY_PATH=
+when running the =dpp_processing= binary. You can for example write something
+like
+#+BEGIN_SRC sh
+  LD_LIBRARY_PATH=${PWD}/install/lib:${LD_LIBRARY_PATH} dpp_processing ...
+#+END_SRC
+
 Running processing pipeline is done by the =dpp_processing= program provided by
 =dpp= library. Its call is pretty simple and only implies to have a module
 manager file and the name of the module to be run /i.e./
-=scp_module=. Nevertheless, you need to load the dynamically load the
-library(ies) which holds the needed modules.
+=bb0nu_halflife_limit_module=. Nevertheless, you need to load the dynamically
+load the library(ies) which holds the needed modules.
 
 #+BEGIN_SRC sh
   dpp_processing                                                       \
       --module-manager-config $PWD/config/pipeline/module_manager.conf \
-      --module scp_module                                              \
-      --load-dll snemo_control_plot                                    \
+      --module bb0nu_halflife_limit_module                             \
+      --load-dll snemo_bb0nu_studies                                   \
       --load-dll <library>_bio                                         \
       --input-file <path to a data record>
 #+END_SRC
@@ -335,14 +373,14 @@ library(ies) which holds the needed modules.
 =<library>_bio= represents libraries which holds event data models such as
 =mctools_bio= and =sncore_bio=. Regarding the input data file and its content,
 you will need to load both to be able to retrieve =simulated_data= bank
-(=mctools_bio=) or specific SuperNEMO banks (=sncore_bio=).
+(=mctools_bio=) or specific SuperNEMO banks (=sncore_bio= and =snanalysis_bio=).
 
-It will run the =scp_module= over the input file[3] and it will generate a ROOT
-file containing several histograms. This file is located by default, in
-=/tmp/${USER}/snemo.d= directory under the =snemo_control_plot_histos.root=
-name. You can change the output directory and output file name in [[Histogram
-service][this section]].
+It will run the =bb0nu_halflife_limit_module= over the input file[3] and it will
+generate a ROOT file containing several histograms. This file is located by
+default, in =/tmp/${USER}/snemo.d= directory under the
+=snemo_bb0nu_halflife_limit_histos.root= name. You can change the output
+directory and output file name in [[Histogram service][this section]].
 
 [3] here we assume that you already have generated a data record. The
-=snemo_control_plot= only generate the plot and does not neither simulation nor
-reconstruction.
+=bb0nu_halflife_limit_module= only generate the plot and does not do neither
+simulation nor reconstruction.
