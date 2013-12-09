@@ -19,8 +19,7 @@ The current version is hosted at
 =git= version control. You can clone this repository by doing
 
 #+BEGIN_SRC sh
-  git clone https://github.com/xgarrido/snemo_simulation_modules/snemo_control_plot \
-      snemo_control_plot
+  git clone https://github.com/xgarrido/snemo_simulation_modules/snemo_control_plot snemo_control_plot
 #+END_SRC
 
 This will create a directory =snemo_control_plot= in the working directory

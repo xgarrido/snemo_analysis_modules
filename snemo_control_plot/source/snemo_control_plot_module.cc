@@ -1,4 +1,3 @@
-// -*- mode: c++ ; -*-
 // snemo_control_plot_module.cc
 
 #include <stdexcept>
@@ -199,3 +198,10 @@ namespace analysis {
 } // namespace analysis
 
 // end of snemo_control_plot_module.cc
+/*
+** Local Variables: --
+** mode: c++ --
+** c-file-style: "gnu" --
+** tab-width: 2 --
+** End: --
+*/
