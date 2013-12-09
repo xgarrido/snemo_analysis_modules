@@ -196,7 +196,7 @@ Here, we just set up the module declaration.
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "warning"
+  logging.priority : string = "notice"
 #+END_SRC
 
 *** Histogram service label
@@ -214,7 +214,7 @@ sense that 0\nu halflife calculation can be done for different study purpose (ju
 change the =key_fields=).
 #+BEGIN_SRC sh
   #@description The key fields from 'Event Header' bank to build a unique key for histogram
-  key_fields : string[0] = \
+  key_fields : string[1] = \
       "analysis.decay_process"
 #+END_SRC
 
