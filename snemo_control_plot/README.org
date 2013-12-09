@@ -210,10 +210,10 @@ histograms all belong to the =__template= group.
   number_of_bins : integer = 100
 
   #@description The lower bound of the histogram
-  min : real = 0.0
+  min : real = -0.5
 
   #@description The upper bound of the histogram
-  max : real = 100.0
+  max : real = 99.5
 
   #@description The X axis label
   display.xaxis.label : string = "Ngg"
@@ -243,10 +243,10 @@ histograms all belong to the =__template= group.
   number_of_bins : integer = 10
 
   #@description The lower bound of the histogram
-  min : real = 0.0
+  min : real = -0.5
 
   #@description The upper bound of the histogram
-  max : real = 10.0
+  max : real = 9.5
 
   #@description The X axis label
   display.xaxis.label : string = "Ncalo"
@@ -283,10 +283,10 @@ histograms all belong to the =__template= group.
   number_of_bins : integer = 100
 
   #@description The lower bound of the histogram
-  min : real = 0.0
+  min : real = -0.5
 
   #@description The upper bound of the histogram
-  max : real = 100.0
+  max : real = 99.5
 
   #@description The X axis label
   display.xaxis.label : string = "N_{calib.}(tracker)"
@@ -316,10 +316,10 @@ histograms all belong to the =__template= group.
   number_of_bins : integer = 10
 
   #@description The lower bound of the histogram
-  min : real = 0.0
+  min : real = -0.5
 
   #@description The upper bound of the histogram
-  max : real = 10.0
+  max : real = 9.5
 
   #@description The X axis label
   display.xaxis.label : string = "N_{calib.}(calorimeter)"
