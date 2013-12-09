@@ -162,9 +162,11 @@ namespace analysis {
     _compute_halflife_ ();
 
     // Dump result
-    dump_result (std::clog,
-                 "snemo::analysis::processing::snemo_bb0nu_halflife_limit_module::_dump_result_: ",
-                 "NOTICE: ");
+    if (get_logging_priority () >= datatools::logger::PRIO_DEBUG)
+      {
+        DT_LOG_DEBUG (get_logging_priority (), "bb0nu dump: ");
+        dump_result ();
+      }
 
     // Tag the module as un-initialized :
     _set_initialized (false);
@@ -272,11 +274,12 @@ namespace analysis {
     // Retrieving info from header bank:
     const datatools::properties & eh_properties = eh.get_properties ();
 
-    for (std::vector<std::string>::const_iterator ifield = _key_fields_.begin ();
+    for (std::vector<std::string>::const_iterator
+           ifield = _key_fields_.begin ();
          ifield != _key_fields_.end (); ++ifield)
       {
         const std::string & a_field = *ifield;
-        if (!eh_properties.has_key (a_field))
+        if (! eh_properties.has_key (a_field))
           {
             DT_LOG_WARNING (get_logging_priority (),
                             "No properties with key '" << a_field << "' "
@@ -295,7 +298,7 @@ namespace analysis {
         else if (eh_properties.is_real (a_field))    key << eh_properties.fetch_real (a_field);
         else if (eh_properties.is_string (a_field))  key << eh_properties.fetch_string (a_field);
 
-        // Add a dash separator between field
+        // Add a dash separator between fields
         key << " - ";
       }
 
@@ -363,15 +366,6 @@ namespace analysis {
         return;
       }
 
-    // Calculate signal to halflife limit constant
-    const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
-    const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
-    const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
-    const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
-    const double kbg
-      = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time
-      / isotope_molar_mass / isotope_bb2nu_halflife;
-
     // Sum of number of events
     std::map<std::string, double> m_event;
     for (std::vector<std::string>::const_iterator
@@ -436,25 +430,6 @@ namespace analysis {
             else
               {
                 a_aux.update_flag ("__background");
-              }
-
-            // Extra stuff : store a string containing the background counts
-            // given the experiment setup (for plotting purpose)
-            if (a_name.find ("bb2nu") != std::string::npos)
-              {
-                const std::pair<double, double> x = a_new_histogram.get_range (i);
-                const double nbg_count = kbg * efficiency;
-
-                if (nbg_count > 10.0 || nbg_count <= 0.0) continue;
-
-                std::ostringstream text;
-                text << (x.first + x.second)/2.0 << " " << efficiency << " ";
-                if (nbg_count > 1.0) text << std::floor (nbg_count);
-                else                 text << std::setprecision (2) << std::fixed << nbg_count;
-
-                std::ostringstream label;
-                label << "__display_text_" << i;
-                a_aux.update (label.str (), text.str ());
               }
           } // end of bin content
       }// end of histogram loop
