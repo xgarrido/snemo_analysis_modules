@@ -31,6 +31,10 @@ namespace analysis {
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_bb0nu_halflife_limit_module,
                                     "analysis::snemo_bb0nu_halflife_limit_module");
 
+
+  // Character separator between key for histogram dict.
+  const char KEY_FIELD_SEPARATOR = '_';
+
   // Continuous FeldmanCousin functions computed by M. Bongrand
   // <bongrand@lal.in2p3.fr>
   double get_number_of_excluded_events (const double number_of_events_)
@@ -162,9 +166,9 @@ namespace analysis {
     _compute_halflife_ ();
 
     // Dump result
-    if (get_logging_priority () >= datatools::logger::PRIO_DEBUG)
+    if (get_logging_priority () >= datatools::logger::PRIO_NOTICE)
       {
-        DT_LOG_DEBUG (get_logging_priority (), "bb0nu dump: ");
+        DT_LOG_NOTICE (get_logging_priority (), "bb0nu dump: ");
         dump_result ();
       }
 
@@ -273,7 +277,6 @@ namespace analysis {
 
     // Retrieving info from header bank:
     const datatools::properties & eh_properties = eh.get_properties ();
-
     for (std::vector<std::string>::const_iterator
            ifield = _key_fields_.begin ();
          ifield != _key_fields_.end (); ++ifield)
@@ -298,19 +301,18 @@ namespace analysis {
         else if (eh_properties.is_real (a_field))    key << eh_properties.fetch_real (a_field);
         else if (eh_properties.is_string (a_field))  key << eh_properties.fetch_string (a_field);
 
-        // Add a dash separator between fields
-        key << " - ";
+        // Add a underscore separator between fields
+        key << KEY_FIELD_SEPARATOR;
       }
-
     // Add charge multiplicity
     key << nelectron << "e-" << npositron << "e+" << nundefined << "u";
 
-    // // Arbitrary selection of "two-particles" channel
-    // if (nelectron != 2)
-    //   {
-    //     DT_LOG_WARNING (get_logging_priority (), "Selecting only two-electrons events!");
-    //     return dpp::PROCESS_STOP;
-    //   }
+    // Arbitrary selection of "two-particles" channel
+    if (nelectron != 2)
+      {
+        DT_LOG_WARNING (get_logging_priority (), "Selecting only two-electrons events!");
+        return dpp::PROCESS_STOP;
+      }
 
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool ();
@@ -337,13 +339,11 @@ namespace analysis {
       }
     if (eh_properties.has_key (mctools::event_utils::EVENT_GENBB_WEIGHT))
       {
-        // TODO: WTF! Why not using *= operator
-        weight /= 1.0/eh_properties.fetch_real (mctools::event_utils::EVENT_GENBB_WEIGHT);
+        weight *= eh_properties.fetch_real (mctools::event_utils::EVENT_GENBB_WEIGHT);
       }
 
-    // Store the weight (which is fortunately a global properties of histogram
-    // and not of bin) into histogram properties
-    if (!a_histo.get_auxiliaries ().has_key ("weight"))
+    // Store the weight into histogram properties
+    if (! a_histo.get_auxiliaries ().has_key ("weight"))
       {
         a_histo.grab_auxiliaries ().update ("weight", weight);
       }
@@ -373,8 +373,8 @@ namespace analysis {
          iname != hnames.end (); ++iname)
       {
         const std::string & a_name = *iname;
-        DT_THROW_IF(! a_pool.has_1d (a_name), std::logic_error,
-                    "Histogram '" << a_name << "' is not 1D histogram !");
+        DT_THROW_IF (! a_pool.has_1d (a_name), std::logic_error,
+                     "Histogram '" << a_name << "' is not 1D histogram !");
         const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
 
         // Loop over bin content
@@ -407,7 +407,7 @@ namespace analysis {
               }
 
             // Adding histogram efficiency
-            const std::string & key_str = a_name + " - efficiency";
+            const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "efficiency";
             if (!a_pool.has (key_str))
               {
                 mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "efficiency");
@@ -533,7 +533,7 @@ namespace analysis {
             best_halflife_limit = std::max (best_halflife_limit, halflife);
 
             // Adding histogram halflife
-            const std::string & key_str = a_name + " - halflife";
+            const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "halflife";
             if (!a_pool.has (key_str))
               {
                 mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "halflife");
@@ -622,8 +622,9 @@ namespace analysis {
           const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d (a_name);
           a_histogram.tree_dump (out_, "", indent_oss.str (), inherit_);
 
-          if (is_debug ())
+          if (get_logging_priority () >= datatools::logger::PRIO_DEBUG)
             {
+              DT_LOG_DEBUG (get_logging_priority (), "Histogram " << a_name << " dump:");
               a_histogram.print (std::clog);
             }
         }

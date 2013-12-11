@@ -214,8 +214,9 @@ sense that 0\nu halflife calculation can be done for different study purpose (ju
 change the =key_fields=).
 #+BEGIN_SRC sh
   #@description The key fields from 'Event Header' bank to build a unique key for histogram
-  key_fields : string[1] = \
-      "analysis.decay_process"
+  key_fields : string[2] =     \
+      "analysis.decay_process" \
+      "analysis.source_isotope"
 #+END_SRC
 
 *** Exprimental setup
@@ -273,7 +274,7 @@ histograms:
   linear : boolean = 1
 
   #@description The X axis label
-  display.xaxis.label : string = "$\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}$"
+  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"
 
   #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
   display.xaxis.unit : string = "keV"
@@ -311,7 +312,7 @@ histograms:
   linear : boolean = 1
 
   #@description The X axis label
-  display.xaxis.label : string = "$\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}$"
+  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}"
 
   #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
   display.xaxis.unit : string = "keV"
@@ -350,7 +351,7 @@ histograms:
   linear : boolean = 1
 
   #@description The X axis label
-  display.xaxis.label : string = "$\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}$"
+  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}"
 
   #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
   display.xaxis.unit : string = "keV"
