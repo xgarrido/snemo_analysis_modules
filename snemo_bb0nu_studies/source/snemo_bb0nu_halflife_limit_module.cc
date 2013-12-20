@@ -84,10 +84,9 @@ namespace analysis {
   }
 
   // Initialization :
-  DPP_MODULE_INITIALIZE_IMPLEMENT_HEAD (snemo_bb0nu_halflife_limit_module,
-                                        config_,
-                                        service_manager_,
-                                        module_dict_)
+  void snemo_bb0nu_halflife_limit_module::initialize(const datatools::properties  & config_,
+                                                     datatools::service_manager   & service_manager_,
+                                                     dpp::module_handle_dict_type & module_dict_)
   {
     DT_THROW_IF (is_initialized (),
                  std::logic_error,
@@ -153,43 +152,48 @@ namespace analysis {
   }
 
   // Reset :
-  DPP_MODULE_RESET_IMPLEMENT_HEAD (snemo_bb0nu_halflife_limit_module)
+  void snemo_bb0nu_halflife_limit_module::reset()
   {
     DT_THROW_IF(! is_initialized (),
                 std::logic_error,
                 "Module '" << get_name () << "' is not initialized !");
 
     // Compute efficiency
-    _compute_efficiency_ ();
+    _compute_efficiency_();
 
     // Compute neutrinoless halflife limit
-    _compute_halflife_ ();
+    _compute_halflife_();
 
     // Dump result
-    if (get_logging_priority () >= datatools::logger::PRIO_NOTICE)
+    if (get_logging_priority() >= datatools::logger::PRIO_NOTICE)
       {
-        DT_LOG_NOTICE (get_logging_priority (), "bb0nu dump: ");
-        dump_result ();
+        DT_LOG_NOTICE(get_logging_priority (), "bb0nu dump: ");
+        dump_result();
       }
 
     // Tag the module as un-initialized :
-    _set_initialized (false);
-    _set_defaults ();
+    _set_initialized(false);
+    _set_defaults();
     return;
   }
 
   // Constructor :
-  DPP_MODULE_CONSTRUCTOR_IMPLEMENT_HEAD (snemo_bb0nu_halflife_limit_module, logging_priority)
+  snemo_bb0nu_halflife_limit_module::snemo_bb0nu_halflife_limit_module(datatools::logger::priority logging_priority_)
+    : dpp::base_module(logging_priority_)
   {
     _set_defaults ();
     return;
   }
 
   // Destructor :
-  DPP_MODULE_DEFAULT_DESTRUCTOR_IMPLEMENT (snemo_bb0nu_halflife_limit_module);
+  snemo_bb0nu_halflife_limit_module::~snemo_bb0nu_halflife_limit_module()
+  {
+    if (is_initialized()) snemo_bb0nu_halflife_limit_module::reset();
+    return;
+  }
 
   // Processing :
-  DPP_MODULE_PROCESS_IMPLEMENT_HEAD (snemo_bb0nu_halflife_limit_module, data_record_)
+  dpp::base_module::process_status snemo_bb0nu_halflife_limit_module::process(datatools::things & data_record_)
   {
     DT_THROW_IF (! is_initialized (), std::logic_error,
                  "Module '" << get_name () << "' is not initialized !");
@@ -201,7 +205,7 @@ namespace analysis {
       {
         DT_LOG_ERROR (get_logging_priority (), "Could not find any bank with label '"
                       << eh_label << "' !");
-        return dpp::PROCESS_STOP;
+        return dpp::base_module::PROCESS_STOP;
       }
     const snemo::core::model::event_header & eh
       = data_record_.get<snemo::core::model::event_header>(eh_label);
@@ -212,7 +216,7 @@ namespace analysis {
       {
         DT_LOG_ERROR (get_logging_priority (), "Could not find any bank with label '"
                       << ptd_label << "' !");
-        return dpp::PROCESS_STOP;
+        return dpp::base_module::PROCESS_STOP;
       }
     const snemo::analysis::model::particle_track_data & ptd
       = data_record_.get<snemo::analysis::model::particle_track_data>(ptd_label);
@@ -311,7 +315,7 @@ namespace analysis {
     if (nelectron != 2)
       {
         DT_LOG_WARNING (get_logging_priority (), "Selecting only two-electrons events!");
-        return dpp::PROCESS_STOP;
+        return dpp::base_module::PROCESS_STOP;
       }
 
     // Getting histogram pool
@@ -348,7 +352,7 @@ namespace analysis {
         a_histo.grab_auxiliaries ().update ("weight", weight);
       }
 
-    return dpp::PROCESS_SUCCESS;
+    return dpp::base_module::PROCESS_SUCCESS;
   }
 
   void snemo_bb0nu_halflife_limit_module::_compute_efficiency_ ()

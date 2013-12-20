@@ -196,7 +196,7 @@ Here, we just set up the module declaration.
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "notice"
+  logging.priority : string = "error"
 #+END_SRC
 
 *** Histogram service label

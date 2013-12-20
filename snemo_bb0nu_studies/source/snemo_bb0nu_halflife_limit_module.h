@@ -46,7 +46,7 @@ namespace mygsl {
 
 namespace analysis {
 
-  DPP_MODULE_CLASS_DECLARE (snemo_bb0nu_halflife_limit_module)
+  class snemo_bb0nu_halflife_limit_module : public dpp::base_module
   {
   public:
 
@@ -60,30 +60,46 @@ namespace analysis {
 
   public:
 
-    void set_histogram_pool (mygsl::histogram_pool & pool_);
+    /// Setting histogram pool
+    void set_histogram_pool(mygsl::histogram_pool & pool_);
 
-    mygsl::histogram_pool & grab_histogram_pool ();
+    /// Grabbing histogram pool
+    mygsl::histogram_pool & grab_histogram_pool();
+
+    /// Constructor
+    snemo_bb0nu_halflife_limit_module(datatools::logger::priority = datatools::logger::PRIO_FATAL);
+
+    /// Destructor
+    virtual ~snemo_bb0nu_halflife_limit_module();
+
+    /// Initialization
+    virtual void initialize(const datatools::properties  & setup_,
+                            datatools::service_manager   & service_manager_,
+                            dpp::module_handle_dict_type & module_dict_);
+
+    /// Reset
+    virtual void reset();
+
+    /// Data record processing
+    virtual process_status process(datatools::things & data_);
 
     void dump_result (std::ostream      & out_    = std::clog,
                       const std::string & title_  = "",
                       const std::string & indent_ = "",
                       bool inherit_               = false) const;
 
-    // Macro to automate the public interface of the module (including ctor/dtor) :
-    DPP_MODULE_INTERFACE_CTOR_DTOR (snemo_bb0nu_halflife_limit_module);
-
   protected:
 
-    // Give default values to specific class members.
-    void _set_defaults ();
+    /// Give default values to specific class members.
+    void _set_defaults();
 
   private:
 
-    // Compute topology channel efficiencies.
-    void _compute_efficiency_ ();
+    /// Compute topology channel efficiencies.
+    void _compute_efficiency_();
 
-    // Compute topology channel efficiencies.
-    void _compute_halflife_ ();
+    /// Compute topology channel efficiencies.
+    void _compute_halflife_();
 
   private:
 
@@ -103,7 +119,7 @@ namespace analysis {
 
 } // namespace analysis
 
-#endif // DPP_ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_
+#endif // ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_
 
 // end of snemo_bb0nu_halflife_limit_module.h
 /*
