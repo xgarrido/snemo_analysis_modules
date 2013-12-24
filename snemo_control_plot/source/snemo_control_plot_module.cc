@@ -27,102 +27,105 @@ namespace analysis {
                                     "analysis::snemo_control_plot_module");
 
   // Set the histogram pool used by the module :
-  void snemo_control_plot_module::set_histogram_pool (mygsl::histogram_pool & pool_)
+  void snemo_control_plot_module::set_histogram_pool(mygsl::histogram_pool & pool_)
   {
-    DT_THROW_IF (is_initialized (), std::logic_error,
-                 "Module '" << get_name () << "' is already initialized !");
+    DT_THROW_IF(is_initialized(), std::logic_error,
+                "Module '" << get_name() << "' is already initialized !");
     _histogram_pool_ = &pool_;
     return;
   }
 
   // Grab the histogram pool used by the module :
-  mygsl::histogram_pool & snemo_control_plot_module::grab_histogram_pool ()
+  mygsl::histogram_pool & snemo_control_plot_module::grab_histogram_pool()
   {
-    DT_THROW_IF (! is_initialized (), std::logic_error,
-                 "Module '" << get_name () << "' is not initialized !");
+    DT_THROW_IF (! is_initialized(), std::logic_error,
+                 "Module '" << get_name() << "' is not initialized !");
     return *_histogram_pool_;
   }
 
-  void snemo_control_plot_module::_set_defaults ()
+  void snemo_control_plot_module::_set_defaults()
   {
     _histogram_pool_ = 0;
     return;
   }
 
   // Initialization :
-  DPP_MODULE_INITIALIZE_IMPLEMENT_HEAD (snemo_control_plot_module,
-                                        config_,
-                                        service_manager_,
-                                        module_dict_)
+  void snemo_control_plot_module::initialize(const datatools::properties  & config_,
+                                             datatools::service_manager   & service_manager_,
+                                             dpp::module_handle_dict_type & module_dict_)
   {
-    DT_THROW_IF (is_initialized (),
-                 std::logic_error,
-                 "Module '" << get_name () << "' is already initialized ! ");
+    DT_THROW_IF(is_initialized(),
+                std::logic_error,
+                "Module '" << get_name() << "' is already initialized ! ");
 
-    dpp::base_module::_common_initialize (config_);
+    dpp::base_module::_common_initialize(config_);
 
     // Service label
     std::string histogram_label;
-    if (config_.has_key ("Histo_label"))
+    if (config_.has_key("Histo_label"))
       {
-        histogram_label = config_.fetch_string ("Histo_label");
+        histogram_label = config_.fetch_string("Histo_label");
       }
-
     if (! _histogram_pool_)
       {
-        DT_THROW_IF (histogram_label.empty (), std::logic_error,
-                     "Module '" << get_name () << "' has no valid 'Histo_label' property !");
+        DT_THROW_IF(histogram_label.empty(), std::logic_error,
+                    "Module '" << get_name() << "' has no valid 'Histo_label' property !");
 
-        DT_THROW_IF (! service_manager_.has (histogram_label) ||
-                     ! service_manager_.is_a<dpp::histogram_service> (histogram_label),
-                     std::logic_error,
-                     "Module '" << get_name () << "' has no '" << histogram_label << "' service !");
+        DT_THROW_IF(! service_manager_.has(histogram_label) ||
+                    ! service_manager_.is_a<dpp::histogram_service>(histogram_label),
+                    std::logic_error,
+                    "Module '" << get_name() << "' has no '" << histogram_label << "' service !");
         dpp::histogram_service & Histo
-          = service_manager_.get<dpp::histogram_service> (histogram_label);
-        set_histogram_pool (Histo.grab_pool ());
+          = service_manager_.get<dpp::histogram_service>(histogram_label);
+        set_histogram_pool (Histo.grab_pool());
       }
 
     // Tag the module as initialized :
-    _set_initialized (true);
+    _set_initialized(true);
     return;
   }
 
   // Reset :
-  DPP_MODULE_RESET_IMPLEMENT_HEAD (snemo_control_plot_module)
+  void snemo_control_plot_module::reset()
   {
-    DT_THROW_IF(! is_initialized (),
+    DT_THROW_IF(! is_initialized(),
                 std::logic_error,
-                "Module '" << get_name () << "' is not initialized !");
+                "Module '" << get_name() << "' is not initialized !");
 
     // Tag the module as un-initialized :
-    _set_initialized (false);
-    _set_defaults ();
+    _set_initialized(false);
+    _set_defaults();
     return;
   }
 
   // Constructor :
-  DPP_MODULE_CONSTRUCTOR_IMPLEMENT_HEAD (snemo_control_plot_module, logging_priority)
+  snemo_control_plot_module::snemo_control_plot_module(datatools::logger::priority logging_priority_)
+    : dpp::base_module(logging_priority_)
   {
-    _set_defaults ();
+    _set_defaults();
     return;
   }
 
   // Destructor :
-  DPP_MODULE_DEFAULT_DESTRUCTOR_IMPLEMENT (snemo_control_plot_module);
+  snemo_control_plot_module::~snemo_control_plot_module()
+  {
+    if (is_initialized()) snemo_control_plot_module::reset();
+    return;
+  }
 
   // Processing :
-  DPP_MODULE_PROCESS_IMPLEMENT_HEAD (snemo_control_plot_module, data_record_)
+  dpp::base_module::process_status snemo_control_plot_module::process(datatools::things & data_record_)
   {
-    DT_LOG_TRACE (get_logging_priority (), "Entering...");
-    DT_THROW_IF (! is_initialized (), std::logic_error,
-                 "Module '" << get_name () << "' is not initialized !");
+    DT_LOG_TRACE(get_logging_priority(), "Entering...");
+    DT_THROW_IF(! is_initialized(), std::logic_error,
+                "Module '" << get_name() << "' is not initialized !");
 
     // Filling the histograms :
-    _process_simulated_data  (data_record_);
-    _process_calibrated_data (data_record_);
+    _process_simulated_data(data_record_);
+    _process_calibrated_data(data_record_);
 
-    DT_LOG_TRACE (get_logging_priority (), "Exiting.");
-    return dpp::PROCESS_SUCCESS;
+    DT_LOG_TRACE(get_logging_priority(), "Exiting.");
+    return dpp::base_module::PROCESS_SUCCESS;
   }
 
   void snemo_control_plot_module::_process_simulated_data (const datatools::things & data_record_)

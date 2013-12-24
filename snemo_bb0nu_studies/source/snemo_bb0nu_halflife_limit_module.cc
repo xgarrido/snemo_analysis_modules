@@ -131,7 +131,6 @@ namespace analysis {
       {
         histogram_label = config_.fetch_string ("Histo_label");
       }
-
     if (! _histogram_pool_)
       {
         DT_THROW_IF (histogram_label.empty (), std::logic_error,

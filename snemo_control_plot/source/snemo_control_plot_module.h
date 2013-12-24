@@ -44,26 +44,42 @@ namespace mygsl {
 
 namespace analysis {
 
-  DPP_MODULE_CLASS_DECLARE (snemo_control_plot_module)
+  class snemo_control_plot_module : public dpp::base_module
   {
   public:
 
-    void set_histogram_pool (mygsl::histogram_pool & pool_);
+    /// Setting histogram pool
+    void set_histogram_pool(mygsl::histogram_pool & pool_);
 
-    mygsl::histogram_pool & grab_histogram_pool ();
+    /// Grabbing histogram pool
+    mygsl::histogram_pool & grab_histogram_pool();
 
-    // Macro to automate the public interface of the module (including ctor/dtor) :
-    DPP_MODULE_INTERFACE_CTOR_DTOR (snemo_control_plot_module);
+    /// Constructor
+    snemo_control_plot_module(datatools::logger::priority = datatools::logger::PRIO_FATAL);
+
+    /// Destructor
+    virtual ~snemo_control_plot_module();
+
+    /// Initialization
+    virtual void initialize(const datatools::properties  & setup_,
+                            datatools::service_manager   & service_manager_,
+                            dpp::module_handle_dict_type & module_dict_);
+
+    /// Reset
+    virtual void reset();
+
+    /// Data record processing
+    virtual process_status process(datatools::things & data_);
 
   protected:
 
-    // Give default values to specific class members.
+    /// Give default values to specific class members.
     void _set_defaults ();
 
-    // Generate plot for the 'simulated_data' bank
+    /// Generate plot for the 'simulated_data' bank
     void _process_simulated_data (const datatools::things & data_record_);
 
-    // Generate plot for the 'calibrated_data' bank
+    /// Generate plot for the 'calibrated_data' bank
     void _process_calibrated_data (const datatools::things & data_record_);
 
   private:
