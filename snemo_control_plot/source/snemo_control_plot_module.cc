@@ -10,6 +10,7 @@
 #include <sncore/models/data_model.h>
 #include <mctools/simulated_data.h>
 #include <sncore/models/calibrated_data.h>
+#include <sncore/models/tracker_clustering_data.h>
 
 // Service manager
 #include <datatools/service_manager.h>
@@ -123,12 +124,13 @@ namespace analysis {
     // Filling the histograms :
     _process_simulated_data(data_record_);
     _process_calibrated_data(data_record_);
+    _process_tracker_clustering_data(data_record_);
 
     DT_LOG_TRACE(get_logging_priority(), "Exiting.");
     return dpp::base_module::PROCESS_SUCCESS;
   }
 
-  void snemo_control_plot_module::_process_simulated_data (const datatools::things & data_record_)
+  void snemo_control_plot_module::_process_simulated_data(const datatools::things & data_record_)
   {
     // Check if some 'simulated_data' are available in the data model:
     const std::string sd_label = snemo::core::model::data_info::SIMULATED_DATA_LABEL;
@@ -163,7 +165,7 @@ namespace analysis {
     return;
   }
 
-  void snemo_control_plot_module::_process_calibrated_data (const datatools::things & data_record_)
+  void snemo_control_plot_module::_process_calibrated_data(const datatools::things & data_record_)
   {
     // Check if some 'simulated_data' are available in the data model:
     const std::string cd_label = snemo::core::model::data_info::CALIBRATED_DATA_LABEL;
@@ -193,6 +195,33 @@ namespace analysis {
         size_t ncalos = 0;
         if (cd.has_calibrated_calorimeter_hits ()) ncalos += cd.calibrated_calorimeter_hits ().size ();
         h1d.fill (ncalos);
+      }
+
+    return;
+  }
+
+  void snemo_control_plot_module::_process_tracker_clustering_data(const datatools::things & data_record_)
+  {
+    // Check if some 'simulated_data' are available in the data model:
+    const std::string tcd_label = snemo::core::model::data_info::TRACKER_CLUSTERING_DATA_LABEL;
+    if (! data_record_.has(tcd_label))
+      {
+        DT_LOG_DEBUG(get_logging_priority(), "Missing tracker clustering data to be processed !");
+        return;
+      }
+    // Grab the 'simulated_data' entry from the data model :
+    const snemo::core::model::tracker_clustering_data & tcd
+      = data_record_.get<snemo::core::model::tracker_clustering_data>(tcd_label);
+
+    DT_LOG_DEBUG(get_logging_priority(), "Tracker clustering data : ");
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) tcd.tree_dump(std::clog);
+
+    if (_histogram_pool_->has_1d("TCD::nclusters"))
+      {
+        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("TCD::nclusters");
+        size_t nclusters = 0;
+        if (tcd.has_default_solution()) nclusters += tcd.get_default_solution().get_clusters().size();
+        h1d.fill(nclusters);
       }
 
     return;

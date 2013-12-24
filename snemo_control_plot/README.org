@@ -164,7 +164,6 @@ named =snemo_bb0nu_studies=. The following table sets the libraries
 |---------------------|
 | mctools_bio         |
 | sncore_bio          |
-| snanalysis_bio      |
 |---------------------|
 
 #+BEGIN_SRC sh :noweb yes
@@ -250,7 +249,7 @@ histograms all belong to the =__template= group.
   linear : boolean = 1
 
   #@description The number of bins
-  number_of_bins : integer = 100
+  number_of_bins : integer = 50
 
   #@description The lower bound of the histogram
   min : real = -0.5
@@ -323,7 +322,7 @@ histograms all belong to the =__template= group.
   linear : boolean = 1
 
   #@description The number of bins
-  number_of_bins : integer = 100
+  number_of_bins : integer = 25
 
   #@description The lower bound of the histogram
   min : real = -0.5
@@ -376,6 +375,41 @@ histograms all belong to the =__template= group.
   #@description Display color
   display.color : string = "blue"
 #+END_SRC
+
+*** Tracker clustering data bank histograms
+**** Number of clusters
+#+BEGIN_SRC sh
+  [name="TCD::nclusters" type="mygsl::histogram_1d"]
+  #@config The histogram of the number of tracker clusters
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of tracker clusters"
+
+  #@description The group of the histogram (optional)
+  group : string = "TCD::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 9.5
+
+  #@description The lower bound of the histogram
+  min : real = -0.5
+
+  #@description The upper bound of the histogram
+  max : real = 10.5
+
+  #@description The X axis label
+  display.xaxis.label : string = "N_\text{cluster}"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+
 
 * Services
 :PROPERTIES:
