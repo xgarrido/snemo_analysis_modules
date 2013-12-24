@@ -127,9 +127,52 @@ service files.
       "@SNEMO_CONTROL_PLOT_DIR@/services.conf"
 #+END_SRC
 
-* SuperNEMO control plot modules
+** DLL loader
+*** Code generator
+:PROPERTIES:
+:TANGLE: no
+:RESULTS: output
+:END:
+This skeleton code ease the declaration of dll loader since it
+receives a table list and builds the corresponding =dlls.conf= file.
 
-The next item holds the configuration for the SuperNEMO control plot module. The
+#+NAME: dll_loader
+#+HEADERS: :var list=""
+#+BEGIN_SRC sh
+  echo '#@description A sample list of setups'
+  echo '#@key_label   "name"'
+  echo '#@meta_label  "filename"'
+  for i in $list
+  do
+      dll=$(echo $i | sed '/(/ s/("\|")//g')
+      echo '[name="'$dll'" filename=""]'
+      echo '#config The '$dll' library'
+      echo 'autoload : boolean = 1'
+      echo
+  done
+#+END_SRC
+*** Libraries
+:PROPERTIES:
+:TANGLE: config/pipeline/dlls.conf
+:END:
+This part set the different libraries to be loaded at runtime. This is needed
+since event data models are defined in other libraries than the one currently
+named =snemo_bb0nu_studies=. The following table sets the libraries
+
+#+CAPTION: Libraries to be used by =snemo_bb0nu_studies= modules
+#+TBLNAME: dll_libraries :results none
+|---------------------|
+| mctools_bio         |
+| sncore_bio          |
+| snanalysis_bio      |
+|---------------------|
+
+#+BEGIN_SRC sh :noweb yes
+  <<dll_loader(dll_libraries[*,0])>>
+#+END_SRC
+* SuperNEMO \beta\beta0\nu modules
+
+The next item holds the configuration for the SuperNEMO \beta\beta modules. The
 second item is related to histogram declarations.
 
 ** Module declaration
@@ -289,7 +332,7 @@ histograms all belong to the =__template= group.
   max : real = 99.5
 
   #@description The X axis label
-  display.xaxis.label : string = "N_{calib.}(tracker)"
+  display.xaxis.label : string = "N_\text{calib.}(tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -322,7 +365,7 @@ histograms all belong to the =__template= group.
   max : real = 9.5
 
   #@description The X axis label
-  display.xaxis.label : string = "N_{calib.}(calorimeter)"
+  display.xaxis.label : string = "N_\text{calib.}(calorimeter)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
