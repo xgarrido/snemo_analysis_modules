@@ -395,13 +395,13 @@ histograms all belong to the =__template= group.
   linear : boolean = 1
 
   #@description The number of bins
-  number_of_bins : integer = 9.5
+  number_of_bins : integer = 10
 
   #@description The lower bound of the histogram
   min : real = -0.5
 
   #@description The upper bound of the histogram
-  max : real = 10.5
+  max : real = 9.5
 
   #@description The X axis label
   display.xaxis.label : string = "N_\text{cluster}"
