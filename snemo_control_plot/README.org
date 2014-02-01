@@ -72,6 +72,7 @@ done /via/ the =Makefile= which parse and replace this variable.
 
 ** Module manager
 :PROPERTIES:
+:MKDIRP: yes
 :TANGLE: config/pipeline/module_manager.conf
 :END:
 This file is the main and central piece of code for loading all modules/services
@@ -160,7 +161,7 @@ since event data models are defined in other libraries than the one currently
 named =snemo_bb0nu_studies=. The following table sets the libraries
 
 #+CAPTION: Libraries to be used by =snemo_bb0nu_studies= modules
-#+TBLNAME: dll_libraries :results none
+#+TBLNAME: dll_libraries
 |---------------------|
 | mctools_bio         |
 | sncore_bio          |
@@ -410,7 +411,6 @@ histograms all belong to the =__template= group.
   display.yaxis.label : string = "Counts"
 #+END_SRC
 
-
 * Services
 :PROPERTIES:
 :TANGLE: config/pipeline/services.conf
@@ -473,7 +473,7 @@ Embedded histograms are declared into a dedicated file defines in
 Finally, all histograms created can be stored inside ROOT files or XML archives.
 #+BEGIN_SRC sh
   #@description The ouput file where to store the histograms
-  output_files : string[2] as path =                        \
+  output_files : string[1] as path =                        \
       "/tmp/${USER}/snemo.d/snemo_control_plot_histos.root" \
       "/tmp/${USER}/snemo.d/snemo_control_plot_histos.xml"
 #+END_SRC

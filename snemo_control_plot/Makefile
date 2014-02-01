@@ -14,7 +14,6 @@ all: $(files_tangle)
 
 .%.tangle: %.org
 	@echo "NOTICE: Tangling $<..."
-	@mkdir -p config/pipeline
 	@$(BATCH) --visit "$<" --funcall org-babel-tangle
 	@(cd config/pipeline && sed -i -e 's#@SNEMO_CONTROL_PLOT_DIR@#'`pwd`'#g' *.*)
 	@touch $@

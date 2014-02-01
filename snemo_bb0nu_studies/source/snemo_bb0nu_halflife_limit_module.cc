@@ -164,7 +164,7 @@ namespace analysis {
     _compute_halflife_();
 
     // Dump result
-    if (get_logging_priority() >= datatools::logger::PRIO_NOTICE)
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG)
       {
         DT_LOG_NOTICE(get_logging_priority (), "bb0nu dump: ");
         dump_result();
@@ -314,7 +314,7 @@ namespace analysis {
     if (nelectron != 2)
       {
         DT_LOG_WARNING (get_logging_priority (), "Selecting only two-electrons events!");
-        return dpp::base_module::PROCESS_STOP;
+        return dpp::base_module::PROCESS_CONTINUE;
       }
 
     // Getting histogram pool
