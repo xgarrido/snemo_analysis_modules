@@ -1,0 +1,389 @@
+#+TITLE:  SuperNEMO - Geant4 Validation
+#+AUTHOR: Xavier Garrido
+#+DATE:   2014-02-01
+#+OPTIONS: ^:{}
+#+STARTUP: entitiespretty
+
+* Introduction
+
+This repository holds a configuration to study Geant4 simulation and to plot
+relevant physical quantities in order to check Geant4 reliability.
+
+The current version is hosted at
+[[https://github.com/xgarrido/snemo_simulation_modules/geant4_validation]] under
+=git= version control. You can clone this repository by doing
+
+#+BEGIN_SRC sh
+  git clone https://github.com/xgarrido/snemo_simulation_modules/geant4_validation geant4_validation
+#+END_SRC
+
+This will create a directory =geant4_validation= in the working directory
+containing all the source files needed to configure and to setup SN@ilWare
+programs.
+
+* Content
+
+The code is organised as follow :
+
+- =README.org= :: This file holds the pipeline configuration + the documentation
+                  on how to use the =geant4_validation= module.
+- =Makefile= :: The =Makefile= allows to generate the pipeline configuration by
+                parsing and tangling this file /i.e./ =README.org= (see below).
+- =source= :: This directory holds the source code of the =geant4_validation=
+              module. It also has a =CMakeLists.txt= file in order to compile,
+              build and install all the software pieces through =cmake= rules.
+
+The =README.org= file is organised using [[http://orgmode.org/worg/org-contrib/babel/index.html][org-babel]] and its ability to execute
+source code. It requires then a recent installation of emacs[1] which bundles
+=org=. Without entering into too much details regarding =org-babel= abilities,
+the basic idea is to give a "literate" way to navigate through the different
+sections, each of them representing a part of the pipeline
+configuration. Moreover, using =org= folding/unfolding capability, item can be
+hide and the user can focus on relevant parts.
+
+To export the different configuration files, you can run =org-babel-tangle=
+which will tangle each code block into the given file[2] or use the associated
+=Makefile=. The author recommends to use the =Makefile= since the tangling
+process is asynchronous and thus, does not freeze your emacs (=org-babel-tangle=
+"occupies" emacs during its execution).
+
+[1] At the time of writing this document, emacs version is 24.3.1
+[2] Emacs lisp function can be run using =ALT-x= command and typing the function
+name.
+
+* Pipeline general configuration
+
+SN@ilWare implements the concept of data processing pipeline. An event record
+object is passed through a chain of data processing modules, each of them being
+responsible for a given task. Modules and services are declared in Section
+[[Modules]] and Section [[Services]]. For more details on running SuperNEMO simulations
+and the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given
+by F. Mauger.
+
+The =@GEANT4_VALIDATION_DIR@= corresponds to the directory where configuration
+files are going to be stored. This variable which varies from one installation
+to the other, is automatically change when the tangle process occurs. This is
+done /via/ the =Makefile= which parse and replace this variable.
+
+** Module manager
+:PROPERTIES:
+:TANGLE: config/pipeline/module_manager.conf
+:END:
+This file is the main and central piece of code for loading all modules/services
+needed by =dpp_processing= binary. It provides links to module files and
+service files.
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Module manager logging priority
+  logging.priority : string = "warning"
+
+  #@description Embedded module factory debug flag
+  factory.debug : boolean = 0
+
+  #@description Embedded module factory 'no preload' flag
+  factory.no_preload : boolean = 0
+#+END_SRC
+
+*** Service manager configuration
+#+BEGIN_SRC sh
+  #@description The configuration file of the embedded service manager
+  service_manager.configuration : string[1] as path = \
+      "@GEANT4_VALIDATION_DIR@/service_manager.conf"
+#+END_SRC
+
+*** Configuration files for modules
+#+BEGIN_SRC sh
+  #@description The configuration files for modules
+  modules.configuration_files : string[1] as path = \
+      "@GEANT4_VALIDATION_DIR@/geant4_validation_modules.conf"
+#+END_SRC
+
+** Service manager
+:PROPERTIES:
+:TANGLE: config/pipeline/service_manager.conf
+:END:
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Service manager logging priority
+  logging.priority : string = "warning"
+#+END_SRC
+*** Name & description
+#+BEGIN_SRC sh
+  #@description The name of the service manager
+  name : string = "sn_service_manager"
+
+  #@description The description of the service manager
+  description : string = "A SuperNEMO service manager"
+#+END_SRC
+*** List of service files
+#+BEGIN_SRC sh
+  #@description The list of files that describe services
+  services.configuration_files : string[1] as path = \
+      "@GEANT4_VALIDATION_DIR@/services.conf"
+#+END_SRC
+
+** DLL loader
+*** Code generator
+:PROPERTIES:
+:TANGLE: no
+:RESULTS: output
+:END:
+This skeleton code ease the declaration of dll loader since it
+receives a table list and builds the corresponding =dlls.conf= file.
+
+#+NAME: dll_loader
+#+HEADERS: :var list=""
+#+BEGIN_SRC sh
+  echo '#@description A sample list of setups'
+  echo '#@key_label   "name"'
+  echo '#@meta_label  "filename"'
+  for i in $list
+  do
+      dll=$(echo $i | sed '/(/ s/("\|")//g')
+      echo '[name="'$dll'" filename=""]'
+      echo '#config The '$dll' library'
+      echo 'autoload : boolean = 1'
+      echo
+  done
+#+END_SRC
+*** Libraries
+:PROPERTIES:
+:TANGLE: config/pipeline/dlls.conf
+:END:
+This part set the different libraries to be loaded at runtime. This is needed
+since event data models are defined in other libraries than the one currently
+named =geant4_validation=. The following table sets the libraries
+
+#+CAPTION: Libraries to be used by =geant4_validation= modules
+#+TBLNAME: dll_libraries :results none
+|---------------------|
+| mctools_bio         |
+|---------------------|
+
+#+BEGIN_SRC sh :noweb yes
+  <<dll_loader(dll_libraries[*,0])>>
+#+END_SRC
+* Geant4 validation modules
+
+The next item holds the configuration for validating Geant4 setup. The second
+item is related to histogram declarations.
+
+** Module declaration
+:PROPERTIES:
+:TANGLE: config/pipeline/geant4_validation_modules.conf
+:END:
+
+Here, we just set up the module declaration.
+
+*** File preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+*** Declaration & description
+#+BEGIN_SRC sh
+  [name="geant4_validation_module" type="analysis::geant4_validation_module"]
+
+  #@description A module to study and to validate Geant4 setup
+#+END_SRC
+
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority
+  logging.priority : string = "notice"
+#+END_SRC
+
+*** Histogram service label
+Set the same histogram service label as defined [[Histogram service][here]]
+#+BEGIN_SRC sh
+  #@description The Histogram Service label
+  Histo_label : string = "Histo"
+#+END_SRC
+
+** Histogram declarations
+:PROPERTIES:
+:TANGLE: config/pipeline/histogram_templates.conf
+:END:
+
+The histogram declarations /i.e./ name, boundaries, binning... are set in this
+section which is organized by data bank related plots. There are two kinds of
+histograms:
+- /template/ histogram which may be used by several data bank.
+
+*** Mandatory preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+
+*** Energy template
+#+BEGIN_SRC sh
+  [name="energy_template" type="mygsl::histogram_1d"]
+  #@description The title of the histogram (optional)
+  title : string = ""
+
+  #@description The group of the histogram (optional)
+  group : string = "__template"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The X axis label
+  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"
+
+  #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
+  display.xaxis.unit : string = "keV"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "dN/dE [A.U.]"
+
+  #@description The number of bins
+  number_of_bins : integer = 25
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "keV"
+
+  #@description The lower bound of the histogram
+  min : real = 2000.0
+
+  #@description The upper bound of the histogram
+  max : real = 3200.0
+#+END_SRC
+
+* Services
+:PROPERTIES:
+:TANGLE: config/pipeline/services.conf
+:END:
+
+A service generally hosts a specific resource that can be shared by many other
+software components, including other services or data processing modules (see
+[[https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice][SN@ilWare FAQ]]).
+
+** Preamble
+
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+
+** Context service
+
+#+BEGIN_SRC sh
+  [name="Ctx" type="dpp::context_service"]
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description File from which the context is to be loaded at program start
+  load.file : string as path  = "/tmp/${USER}/snemo.d/snemo_context.conf"
+
+  #@description File to store the context at program termination
+  store.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_end.conf"
+
+  #@description Flag to backup the former context load file
+  backup.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_bak.conf"
+#+END_SRC
+
+** Histogram service
+
+The histogram service provides an esay way to handle histogram plot from
+different modules (mainly plot modules). It provides a service where 1D or 2D
+histograms can be added to a histogram dictionnary.
+
+#+BEGIN_SRC sh
+  [name="Histo" type="dpp::histogram_service"]
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description The description string of the embedded pool of histograms
+  pool.description : string = "Geant4 histograms"
+#+END_SRC
+
+#+BEGIN_SRC sh
+  #@description The main configuration file for the embedded histogram manager
+  pool.histo.setups : string[1] as path = \
+      "@GEANT4_VALIDATION_DIR@/histogram_templates.conf"
+#+END_SRC
+
+Finally, all histograms created can be stored inside ROOT files or XML archives.
+#+BEGIN_SRC sh
+  #@description The ouput file where to store the histograms
+  output_files : string[2] as path =                        \
+      "/tmp/${USER}/snemo.d/geant4_validation_histos.root" \
+      "/tmp/${USER}/snemo.d/geant4_vlaidation_histos.xml"
+#+END_SRC
+
+* Running SN@ilWare processing chain
+** Tangling configuration
+First, you need to tangle this file. As explained in the [[Content][Content]] section, you
+may use the dedicated =Makefile= to generate the pipeline configuration. Just
+run =make= within this working directory.
+
+** Source code compilation
+Second, you need to compile the =geant4_validation= module files. The build
+system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
+setup the dependences. Nevertheless, this implies that you have already and
+correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadfael]], [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux][Bayeux]] and Falaise. Then, you can configure, build
+and install the =geant4_validation= module by doing
+#+BEGIN_SRC sh
+  mkdir {build,install} && cd build
+  cmake                                               \
+      -DCMAKE_PREFIX_PATH="<path to Falaise install>" \
+      -DCMAKE_INSTALL_PREFIX=../install               \
+      ../source
+  make install
+  cd ..
+#+END_SRC
+
+** Use and execute =geant4_validation= module
+After a successful build, you will get an =install= directory holding the
+=libgeant4_validation.so= file. Assuming you are under =bash= shell, you will
+need to add it to your =LD_LIBRARY_PATH= by doing
+#+BEGIN_SRC sh
+  export LD_LIBRARY_PATH=${PWD}/install/lib:${LD_LIBRARY_PATH}
+#+END_SRC
+
+Another approach, maybe less intrusive, will be to set the =LD_LIBRARY_PATH=
+when running the =dpp_processing= binary. You can for example write something
+like
+#+BEGIN_SRC sh
+  LD_LIBRARY_PATH=${PWD}/install/lib:${LD_LIBRARY_PATH} dpp_processing ...
+#+END_SRC
+
+Running processing pipeline is done by the =dpp_processing= program provided by
+=dpp= library. Its call is pretty simple and only implies to have a module
+manager file and the name of the module to be run /i.e./
+=geant4_validation_module=. Nevertheless, you need to dynamically load the
+library(ies) which holds the needed modules.
+
+#+BEGIN_SRC sh
+  dpp_processing                                                       \
+      --module-manager-config $PWD/config/pipeline/module_manager.conf \
+      --module geant4_validation_module                                \
+      --load-dll geant4_validation                                     \
+      --load-dll <library>_bio
+#+END_SRC
+
+=<library>_bio= represents libraries which holds event data models such as
+=mctools_bio=. You can use the =dlls.conf= file built in section [[DLL loader]] by
+writing
+
+#+BEGIN_SRC sh
+  dpp_processing                                                       \
+      --module-manager-config $PWD/config/pipeline/module_manager.conf \
+      --module geant4_validation_module                                \
+      --load-dll geant4_validation                                     \
+      --dll-config $PWD/config/pipeline/dlls.conf
+#+END_SRC
+
+It will run the =geant4_validation_module= and it will generate a ROOT file
+containing several histograms. This file is located by default, in
+=/tmp/${USER}/snemo.d= directory under the =geant4_validation_histos.root=
+name. You can change the output directory and output file name in [[Histogram service][this section]].
