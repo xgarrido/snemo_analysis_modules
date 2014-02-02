@@ -197,11 +197,10 @@ The geometry factory holds all the files needed for the geometry construction.
 **** Geometry files
 #+BEGIN_SRC sh
   #@description List of files describing the geometry models
-  factory.geom_files : string[4] as path =         \
+  factory.geom_files : string[3] as path =         \
     "@GEANT4_VALIDATION_DIR@$/optical_module.geom" \
     "@GEANT4_VALIDATION_DIR@/source.geom"          \
-    "@GEANT4_VALIDATION_DIR@/lab.geom"             \
-    "@GEANT4_VALIDATION_DIR@/world.geom"
+    "@GEANT4_VALIDATION_DIR@/lab_world.geom"
 #+END_SRC
 
 *** ID manager
@@ -241,6 +240,37 @@ volume.
       "@GEANT4_VALIDATION_DIR@/magnetic_field_plugin.conf"
 #+END_SRC
 
+** Geometry models
+*** Optical module
+:PROPERTIES:
+:TANGLE: config/geometry/optical_module.geom
+:END:
+**** Preamble
+#+BEGIN_SRC sh
+  #@description List of geometry models
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+*** Source
+:PROPERTIES:
+:TANGLE: config/geometry/source.geom
+:END:
+**** Preamble
+#+BEGIN_SRC sh
+  #@description List of geometry models
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+*** Laboratory & world volume
+:PROPERTIES:
+:TANGLE: config/geometry/lab_world.geom
+:END:
+**** Preamble
+#+BEGIN_SRC sh
+  #@description List of geometry models
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
 * Geant4 validation modules
 
 The next item holds the configuration for validating Geant4 setup. The second
