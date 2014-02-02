@@ -730,6 +730,150 @@ We finally define mapping ids
   #@key_label   "name"
   #@meta_label  "type"
 #+END_SRC
+**** Absorber
+#+BEGIN_SRC sh
+  [name="thin_absorber.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the thin_absorber front of the detector
+
+  #@description The name of the 3D shape
+  shape_type :   string =  "box"
+
+  #@description The X dimension
+  x   : real as length = 100.0 mm
+
+  #@description The Y dimension
+  y   : real as length = 100.0 mm
+
+  #@description The Z dimension
+  z   : real as length = 50 um
+
+  #@description The name of the material
+  material.ref      : string  = "copper"
+#+END_SRC
+**** Black box
+#+BEGIN_SRC sh
+  [name="black_box.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the light guide
+
+  #@description The default implicit length unit
+  length_unit : string = "mm"
+
+  #@description The name of the 3D shape
+  shape_type : string = "polyhedra"
+
+  #@description The polyhedra build mode
+  build_mode : string = "points"
+
+  #@description The polyhedra number of sides
+  sides        : integer = 4
+
+  #@description The list of Z coordinates for the shape
+  list_of_z    : real [2] =   -125.     +125.
+
+  #@description The list of inner radius coordinates for the shape
+  list_of_rmin : real [2] =    51.      51.
+
+  #@description The list of outer radius coordinates for the shape
+  list_of_rmax : real [2] =    53.      53.
+
+  #@description The name of the material
+  material.ref : string  = "inox"
+#+END_SRC
+**** Lab. model
+#+BEGIN_SRC sh
+  [name="lab.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the laboratory experimental area
+
+  #@description The name of the 3D shape of the lab area
+  shape_type  : string = "box"
+
+  #@description The X dimension of the box
+  x           : real as length = 900.0 mm
+
+  #@description The Y dimension of the box
+  y           : real as length = 450.0 mm
+
+  #@description The Z dimension of the box
+  z           : real as length = 450.0 mm
+
+  #@description The name of the material that fills the lab atmosphere
+  material.ref : string = "lab_medium"
+
+  #@description The list of daughter volumes by labels
+  internal_item.labels : string[4] = "source" "detector" "box" "absorber0"
+
+  #@description The model of the "source" daughter volume
+  internal_item.model.source        : string  = "source.model"
+
+  #@description The placement of the "source" daughter volume
+  internal_item.placement.source    : string  = "20 0 0 (cm) / y +90 (degree)"
+
+  #@description The model of the "detector" daughter volume
+  internal_item.model.detector      : string  = "optical_module.model"
+
+  #@description The placement of the "detector" daughter volume
+  internal_item.placement.detector  : string  = "-20 0 0 (cm) / y +90 (degree) "
+
+  #@description The model of the "box" daughter volume
+  internal_item.model.box           : string  = "black_box.model"
+
+  #@description The placement of the "box" daughter volume
+  internal_item.placement.box       : string  = "-24 0 0 (cm) @  0 90 45 (degree) "
+
+  #@description The model of the "absorber0" daughter volume
+  internal_item.model.absorber0     : string  = "thin_absorber.model"
+
+  #@description The placement of the "absorber0" daughter volume
+  internal_item.placement.absorber0 : string  = "0 0 0 (cm) @  0 90 0 (degree) "
+
+  #@description The mapping directives for the "source" daughter volume
+  mapping.daughter_id.source   : string  = "[source.gc:position=0]"
+
+  #@description The mapping directives for the "detector" daughter volume
+  mapping.daughter_id.detector : string  = "[optical_module.gc:detector=0]"
+#+END_SRC
+**** World volume
+#+BEGIN_SRC sh
+  [name="world" type="geomtools::simple_world_model"]
+
+  #@config configuration parameters for the world logical volume
+
+  #@description The world volume X dimension (box)
+  world.x         : real as length  = 1000.0 mm
+
+  #@description The world volume Y dimension (box)
+  world.y         : real as length = 500.0 mm
+
+  #@description The world volume Z dimension (box)
+  world.z         : real as length = 500.0 mm
+
+  #@description The name of the model that represents the experimental setup daughter volume
+  setup.model     : string = "lab.model"
+
+  #@description The setup placement phi angle
+  setup.phi       : real as angle = 0.0 degree
+
+  #@description The setup placement theta angle
+  setup.theta     : real as angle = 0.0 degree
+
+  #@description The setup placement X coordinate
+  setup.x         : real as length = 0.0 mm
+
+  #@description The setup placement Y coordinate
+  setup.y         : real as length = 0.0 mm
+
+  #@description The setup placement Z coordinate
+  setup.z         : real as length = 0.0 mm
+
+  #@description The name of the material that fills the world volume
+  material.ref    : string = "vacuum"
+
+  #@description The mapping directives for the 'setup' daughter volume
+  mapping.daughter_id.setup : string  = "[lab.gc:area=0]"
+#+END_SRC
 * Geant4 validation modules
 
 The next item holds the configuration for validating Geant4 setup. The second
