@@ -17,6 +17,7 @@ all: $(files_tangle)
 	@mkdir -p config/pipeline
 	@$(BATCH) --visit "$<" --funcall org-babel-tangle
 	@(cd config/pipeline && sed -i -e 's#@GEANT4_VALIDATION_DIR@#'`pwd`'#g' *.*)
+	@(cd config/geometry && sed -i -e 's#@GEANT4_VALIDATION_DIR@#'`pwd`'#g' *.*)
 	@touch $@
 
 clean:
