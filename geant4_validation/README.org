@@ -636,6 +636,90 @@ light guide \to scintillator block \to the last layer of mylar
   #@key_label   "name"
   #@meta_label  "type"
 #+END_SRC
+**** Film model
+#+BEGIN_SRC sh
+  [name="source_film.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the source film
+
+  #@description The name of the 3D shape of the source film
+  shape_type  : string = "cylinder"
+
+  #@description The R dimension (radius) of the cylinder source film
+  r : real as length = 9.5 mm
+
+  #@description The Z dimension (thickness) of the cylinder source film
+  z : real as length = 5 um
+
+  #@description The name of the material of the source film
+  material.ref : string = "mylar"
+#+END_SRC
+**** Source support model
+#+BEGIN_SRC sh
+  [name="source_support.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the source support
+
+  #@description The name of the 3D shape of the source support ring
+  shape_type  : string = "tube"
+
+  #@description The inner R dimension (inner radius) of the source support ring
+  inner_r     : real as length = 10.0 mm
+
+  #@description The outer R dimension (inner radius) of the source support ring
+  outer_r     : real as length = 12.0 mm
+
+  #@description The Z dimension (thickness) of the source support ring
+  z           : real as length = 5.0 mm
+
+  #@description The name of the material of the source support ring
+  material.ref : string = "aluminium"
+#+END_SRC
+
+**** Source model
+The source model will used the two previous models by placing them "internally"
+to a larger cylinder. We first declare the holding volume
+#+BEGIN_SRC sh
+  [name="source.model" type="geomtools::simple_shaped_model"]
+
+  #@description The name of the 3D shape of the source cylindric envelope
+  shape_type  : string = "cylinder"
+
+  #@description The R dimension (radius) of the source cylindric envelope
+  r : real as length = 12.0 mm
+
+  #@description The Z dimension (thickness) of the source cylindric envelope
+  z : real as length = 5.0 mm
+
+  #@description The name of the material
+  material.ref : string  = "lab_medium"
+#+END_SRC
+and then place inside, the "support" and "film" models
+#+BEGIN_SRC sh
+  #@description The list of daughter volumes by label
+  internal_item.labels : string[2] = "support" "film"
+
+  #@description The model of the "support" daughter volume
+  internal_item.model.support : string  = "source_support.model"
+
+  #@description The placement of the "support" daughter volume
+  internal_item.placement.support : string  = "0 0 0 (mm)"
+
+  #@description The model of the "film" daughter volume
+  internal_item.model.film : string  = "source_film.model"
+
+  #@description The placement of the "film" daughter volume
+  internal_item.placement.film : string  = "0 0 0 (mm)"
+#+END_SRC
+
+We finally define mapping ids
+#+BEGIN_SRC sh
+  #@description The mapping directives for the "film" daughter volume
+  mapping.daughter_id.film : string  = "[source_film.gc]"
+
+  #@description The mapping directives for the "support" daughter volume
+  mapping.daughter_id.support : string  = "[source_support.gc]"
+#+END_SRC
 *** Laboratory & world volume
 :PROPERTIES:
 :TANGLE: config/geometry/lab_world.geom
