@@ -198,7 +198,7 @@ The geometry factory holds all the files needed for the geometry construction.
 #+BEGIN_SRC sh
   #@description List of files describing the geometry models
   factory.geom_files : string[3] as path =         \
-    "@GEANT4_VALIDATION_DIR@$/optical_module.geom" \
+    "@GEANT4_VALIDATION_DIR@/optical_module.geom"  \
     "@GEANT4_VALIDATION_DIR@/source.geom"          \
     "@GEANT4_VALIDATION_DIR@/lab_world.geom"
 #+END_SRC
@@ -874,6 +874,191 @@ We finally define mapping ids
   #@description The mapping directives for the 'setup' daughter volume
   mapping.daughter_id.setup : string  = "[lab.gc:area=0]"
 #+END_SRC
+** Mapping categories
+:PROPERTIES:
+:TANGLE: config/geometry/categories.lis
+:END:
+#+BEGIN_SRC sh
+  #@description A list of geometry ID categories/types
+  #@key_label   "category"
+  #@meta_label  "type"
+
+
+  ##################################################################
+  # This is the mandatory top-level geometry category.
+  # One should always provide it :
+  [category="world" type="0"]
+
+  #@config The geometry category of the top-level world volume
+
+  #@description The world's GID address is characterized by its 'world' number
+  addresses : string[1] = "world"
+
+
+  ##################################################################
+  # This geometry category addresses an experimental area volume :
+  [category="lab.gc"  type="100"]
+
+  #@config The geometry category of the experimental area volume (lab)
+
+  #@description A lab's GID address is charaterized by its 'area' number
+  addresses : string[1] = "area"
+
+
+  ################################################################
+  # This geometry category addresses a calibration source object :
+  [category="source.gc" type="1000"]
+
+  #@config The geometry category of a calibration source
+
+  #@description The GID address of a calibration source is defined by its 'position' number
+  addresses : string[1] = "position"
+
+
+  ##############################################################################
+  # This geometry category addresses the support frame of a calibration source :
+  [category="source_support.gc" type="1010"]
+
+  #@config The geometry category of a calibration source support
+
+  #@description The GID address of a source support inherits the GID address of the source
+  inherits : string = "source.gc"
+
+
+  #################################################################
+  # This geometry category addresses of a calibration source film :
+  [category="source_film.gc" type="1020"]
+
+  #@config The geometry category of a calibration source film
+
+  #@description The GID address of a source film inherits the GID address of the source
+  inherits : string = "source.gc"
+
+
+  ######################################################
+  # This geometry category addresses an optical module :
+  [category="optical_module.gc" type="2020"]
+
+  #@config The geometry category of a calibration source film
+
+  #@description The GID address of a column is defined by its 'detector' number
+  addresses : string[1] = "detector"
+
+
+  #################################################################################
+  #  This geometry category addresses the scintillator block of an optical module :
+  [category="scin_block.gc" type="2030"]
+
+  #@config The geometry category of the scintillator block of an optical module
+
+  #@description The GID address of a scin block inherits the GID address of the optical module
+  inherits : string = "optical_module.gc"
+
+
+  ###############################################
+  [category="scin_block_wrapping.gc" type="2031"]
+
+  #@config The geometry category of a wrapping film around a scintillator block
+
+  #@description The GID address of a wrapping film extends GID address of the scintillator block
+  extends : string[1] = "scin_block.gc"
+
+  #@description The 'side' number extend the mother scintillator block GID address
+  by       : string[1] = "side"
+
+
+  #######################################
+  [category="light_guide.gc" type="2032"]
+
+  #@config The geometry category of the light guide
+
+  #@description The GID address of a light guide inherits the GID address of the optical module
+  inherits : string[1] = "optical_module.gc"
+#+END_SRC
+** Materials plugins
+:PROPERTIES:
+:TANGLE: config/geometry/materials_plugin.conf
+:END:
+
+We use the definitions of isotopes, elements and materials from the installed
+materials library. Here the =materials_aliases= definition are locally defined
+to change the source foil isotope.
+*** Plugin declaration
+#+BEGIN_SRC sh
+  #@description The geometry manager plugin for materials
+
+  #@key_label  "name"
+  #@meta_label "type"
+
+  [name="materials_driver" type="geomtools::materials_plugin"]
+#+END_SRC
+
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority
+  logging.priority : string = "warning"
+#+END_SRC
+
+*** Files
+#+BEGIN_SRC sh
+  #@description List of files describing the materials
+  materials.files : string[4] as path =   \
+      "@materials:data/std_isotopes.def"  \
+      "@materials:data/std_elements.def"  \
+      "@materials:data/std_materials.def" \
+      "@GEANT4_VALIDATION_DIR@/materials_aliases.def"
+#+END_SRC
+*** Material aliases
+:PROPERTIES:
+:TANGLE: config/geometry/materials_aliases.def
+:END:
+#+BEGIN_SRC sh
+  #@description A sample list of aliases for standard materials
+  #@key_label   "name"
+  #@meta_label  "type"
+
+  [name="air" type="alias"]
+  #@description The alias for air
+  material : string = "std::air"
+
+  [name="aluminium" type="alias"]
+  #@description The alias for aluminium
+  material : string = "std::aluminium"
+
+  [name="inox" type="alias"]
+  #@description The alias for inox
+  material : string = "std::inox"
+
+  [name="copper" type="alias"]
+  #@description The alias for copper
+  material : string = "std::copper"
+
+  [name="mylar" type="alias"]
+  #@description The alias for mylar
+  material : string = "std::mylar"
+
+  [name="plexiglass" type="alias"]
+  #@description The alias for plexiglass
+  material : string = "std::plexiglass"
+
+  [name="polystyrene" type="alias"]
+  #@description The alias for polystyrene
+  material : string = "std::polystyrene"
+
+  [name="glass" type="alias"]
+  #@description The alias for pyrex
+  material : string = "std::pyrex"
+
+  [name="vacuum" type="alias"]
+  #@description The alias for vacuum
+  material : string = "std::vacuum"
+
+  [name="lab_medium" type="alias"]
+  #@description The alias for air
+  material : string = "std::air"
+  #material : string = "std::vacuum"
+#+END_SRC
+
 * Geant4 validation modules
 
 The next item holds the configuration for validating Geant4 setup. The second
