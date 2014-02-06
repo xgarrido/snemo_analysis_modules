@@ -127,9 +127,9 @@ volume.
 #+END_SRC
 
 ** Geometry models
-*** Optical module
+*** Source model
 :PROPERTIES:
-:TANGLE: config/geometry/optical_module.geom
+:TANGLE: config/geometry/sources.geom
 :END:
 **** Preamble
 #+BEGIN_SRC sh
@@ -137,476 +137,173 @@ volume.
   #@key_label   "name"
   #@meta_label  "type"
 #+END_SRC
-**** Wrapping model
-***** z-position (front) wrapping
+**** Petri box
 #+BEGIN_SRC sh
-  [name="zpos_wrapping.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the wrapping in front of the scintillator block
-
-  #@description The name of the 3D shape
-  shape_type : string =  "box"
-
-  #@description The X dimension
-  x : real as length  = 100.0 mm
-
-  #@description The Y dimension
-  y : real as length  = 100.0 mm
-
-  #@description The Z dimension
-  z : real as length  = 12 um
-
-  #@description The name of the material
-  material.ref : string  = "mylar"
+  [name="petri_box.model" type="geomtools::simple_shaped_model"]
+  shape_type   : string = "cylinder"
+  r            : real as length = 2.4 cm
+  z            : real as length = 0.1 cm
+  material.ref : string = "std::plexiglass"
 #+END_SRC
-***** x-sides wrapping
-****** Model
-#+BEGIN_SRC sh
-  [name="x_sides_wrapping.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the wrapping on X sides of the scintillator block
-
-  #@description The name of the 3D shape
-  shape_type : string = "box"
-
-  #@description The X dimension
-  x : real as length = 40.0 mm
-
-  #@description The Y dimension
-  y : real as length = 100.0 mm
-
-  #@description The Z dimension
-  z : real as length = 12 um
-
-  #@description The name of the material
-  material.ref      : string  = "mylar"
-#+END_SRC
-****** Positionning
-#+BEGIN_SRC sh
-  [name="xpos_wrapping.model" type="geomtools::rotated_boxed_model"]
-
-  #@config The configuration parameters for the rotated wrapping film
-
-  #@description Rotation geometry model
-  rotated.model : string = "x_sides_wrapping.model"
-
-  #@description Rotated geometry model label
-  rotated.label : string = "side_wrapping"
-
-  #@description Rotation axis
-  rotated.axis  : string = "y"
-
-  #@description Rotation special angle
-  rotated.special_angle : string  = "90"
-
-  #@description The name of the material
-  material.ref      : string  = "lab_medium"
-#+END_SRC
-#+BEGIN_SRC sh
-  [name="xneg_wrapping.model" type="geomtools::rotated_boxed_model"]
-
-  #@config The configuration parameters for the rotated wrapping film
-
-  #@description Rotation axis
-  rotated.axis  : string = "y"
-
-  #@description Rotation special angle
-  rotated.special_angle : string  = "270"
-
-  #@description Rotation geometry model
-  rotated.model : string = "x_sides_wrapping.model"
-
-  #@description Rotated geometry model label
-  rotated.label : string = "side_wrapping"
-
-  #@description The name of the material
-  material.ref      : string  = "lab_medium"
-#+END_SRC
-
-***** y-sides wrapping
-****** Model
-#+BEGIN_SRC sh
-  [name="y_sides_wrapping.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the wrapping on Y sides of the scintillator block
-
-  #@description The name of the 3D shape
-  shape_type : string = "box"
-
-  #@description The X dimension
-  x : real as length = 100.0 mm
-
-  #@description The Y dimension
-  y : real as length = 40.0 mm
-
-  #@description The Z dimension
-  z : real as length = 12 um
-
-  #@description The name of the material
-  material.ref : string = "mylar"
-#+END_SRC
-****** Positionning
-#+BEGIN_SRC sh
-  [name="ypos_wrapping.model" type="geomtools::rotated_boxed_model"]
-
-  #@config The configuration parameters for the rotated wrapping film
-
-  #@description Rotation axis
-  rotated.axis  : string = "x"
-
-  #@description Rotation special angle
-  rotated.special_angle : string  = "90"
-
-  #@description Rotation geometry model
-  rotated.model : string = "y_sides_wrapping.model"
-
-  #@description Rotated geometry model label
-  rotated.label : string = "side_wrapping"
-
-  #@description The name of the material
-  material.ref      : string  = "lab_medium"
-#+END_SRC
-#+BEGIN_SRC sh
-  [name="yneg_wrapping.model" type="geomtools::rotated_boxed_model"]
-
-  #@config The configuration parameters for the rotated wrapping film
-
-  #@description Rotation axis
-  rotated.axis  : string = "x"
-
-  #@description Rotation special angle
-  rotated.special_angle : string  = "270"
-
-  #@description Rotation geometry model
-  rotated.model : string = "y_sides_wrapping.model"
-
-  #@description Rotated geometry model label
-  rotated.label : string = "side_wrapping"
-
-  #@description The name of the material
-  material.ref      : string  = "lab_medium"
-#+END_SRC
-**** Scintillator model
-***** Block model
-We first design the shape and the dimensions of the block
-#+BEGIN_SRC sh
-  [name="scintillator_block.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the scintillator block
-
-  #@description The name of the 3D shape
-  shape_type : string =  "box"
-
-  #@description The X dimension
-  x : real as length = 100.0 mm
-
-  #@description The Y dimension
-  y : real as length = 100.0 mm
-
-  #@description The Z dimension
-  z : real as length = 40.0 mm
-#+END_SRC
-
-Then we define a material
-#+BEGIN_SRC sh
-  #@description The name of the material
-  material.ref      : string = "polystyrene"
-#+END_SRC
-
-Finally, we attach to it a sensitive category to ease the interface between
-=mctools= and Geant4 digitization[fn:1]
-#+BEGIN_SRC sh
-  #@description The 'sensitive' category attached to this detector volume
-  sensitive.category : string  = "scin_SD"
-#+END_SRC
-***** Wrapped block model
-The wrapped model consists of wrapping with mylar the previous "nude" block. We
-then use a =surrounded_bowed_model= to place mylar on each scintillator faces.
-#+BEGIN_SRC sh
-  [name="wrapped_scintillator_block.model" type="geomtools::surrounded_boxed_model"]
-
-  #@config The configuration parameters for the wrapped scintillatorblock
-
-  #@description The name of the surrounded geometry model
-  surrounded.model         : string = "scintillator_block.model"
-
-  #@description The label associated to the surrounded geometry model
-  surrounded.label         : string = "scintillator_block"
-
-  #@description The name of the (z>0) side surrounding geometry model
-  surrounded.top_model     : string = "zpos_wrapping.model"
-
-  #@description The name of a  (x>0) side surrounding geometry model
-  surrounded.front_model   : string = "xpos_wrapping.model"
-
-  #@description The name of a  (x<0) side surrounding geometry model
-  surrounded.back_model    : string = "xneg_wrapping.model"
-
-  #@description The name of a  (y>0) side surrounding geometry model
-  surrounded.right_model   : string = "ypos_wrapping.model"
-
-  #@description The name of a  (y<0) side surrounding geometry model
-  surrounded.left_model    : string = "yneg_wrapping.model"
-
-  #@description The label of the (z>0) side surrounding geometry model
-  surrounded.top_label     : string = "top_wrapping"
-
-  #@description The label of a  (x>0) side surrounding geometry model
-  surrounded.front_label   : string = "front_wrapping"
-
-  #@description The label of a  (x<0) side surrounding geometry model
-  surrounded.back_label    : string = "back_wrapping"
-
-  #@description The label of a  (y>0) side surrounding geometry model
-  surrounded.right_label   : string = "right_wrapping"
-
-  #@description The label of a  (y<0) side surrounding geometry model
-  surrounded.left_label    : string = "left_wrapping"
-
-  #@description The name of the material
-  material.ref      : string  = "lab_medium"
-#+END_SRC
-
-Finally, we attach mapping id to the mother volume as well as its daughter
-/i.e./ mylar elements.
-#+BEGIN_SRC sh
-  #@description The mapping directive for the "scintillator_block" daughter volume
-  mapping.daughter_id.scintillator_block : string  = "[scin_block.gc]"
-
-  #@description The mapping directive for the "left_wrapping" daughter volume
-  mapping.daughter_id.front_wrapping     : string  = "[scin_block_wrapping.gc:side=0]"
-
-  #@description The mapping directive for the "right_wrapping" daughter volume
-  mapping.daughter_id.back_wrapping      : string  = "[scin_block_wrapping.gc:side=1]"
-
-  #@description The mapping directive for the "left_wrapping" daughter volume
-  mapping.daughter_id.left_wrapping      : string  = "[scin_block_wrapping.gc:side=2]"
-
-  #@description The mapping directive for the "right_wrapping" daughter volume
-  mapping.daughter_id.right_wrapping     : string  = "[scin_block_wrapping.gc:side=3]"
-
-  #@description The mapping directive for the "top_wrapping" daughter volume
-  mapping.daughter_id.top_wrapping       : string  = "[scin_block_wrapping.gc:side=5]"
-#+END_SRC
-**** Light guide model
-***** Basic light guide
-#+BEGIN_SRC sh
-  [name="light_guide.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the light guide
-
-  #@description The default implicit length unit
-  length_unit  : string = "mm"
-
-  #@description The name of the 3D shape
-  shape_type   : string = "polyhedra"
-
-  #@description The polyhedra build mode
-  build_mode   : string = "points"
-
-  #@description The polyhedra number of sides
-  sides        : integer = 4
-
-  #@description The list of Z coordinates for the shape
-  list_of_z    : real [3] =  -40.     +30.     +40.
-
-  #@description The list of inner radius coordinates for the shape
-  list_of_rmin : real [3] =    0.      0.       0.
-
-  #@description The list of outer radius coordinates for the shape
-  list_of_rmax : real [3] =    20.    50.     50.
-
-  #@description The name of the material
-  material.ref : string  = "plexiglass"
-#+END_SRC
-***** Rotated light guide
-#+BEGIN_SRC sh
-  ########################################################################
-  [name="rotated_light_guide.model" type="geomtools::rotated_boxed_model"]
-
-  #@config The configuration parameters for the rotated light guide
-
-  #@description The rotation axis
-  rotated.axis  : string = "z"
-
-  #@description The rotation angle
-  rotated.angle : real as angle = 45.0 degree
-
-  #@description The X dimension
-  x             : real as length = 100.0 mm
-
-  #@description The Y dimension
-  y             : real as length = 100.0 mm
-
-  #@description The name of the model to be rotated
-  rotated.model : string = "light_guide.model"
-
-  #@description The label associated to the rotated daughter model
-  rotated.label : string = "light_guide"
-
-  #@description The name of the material around the light guide to be rotated
-  material.ref  : string  = "lab_medium"
-#+END_SRC
-**** PMT model
-#+BEGIN_SRC sh
-  [name="pmt.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the photomultiplier tube
-
-  #@description The default implicit length unit
-  length_unit  : string   = "mm"
-
-  #@description The name of the 3D shape
-  shape_type   : string   = "polycone"
-
-  #@description The polycone build mode
-  build_mode   : string   = "points"
-
-  #@description The list of Z coordinates for the shape
-  list_of_z    : real [6] =  -50.0   -49.0  -48.99  +48.99  +49.0 +50.0
-
-  #@description The list of inner radius coordinates for the shape
-  list_of_rmin : real [6] =    0.      0.    19.     19.      0.    0.
-
-  #@description The list of outer radius coordinates for the shape
-  list_of_rmax : real [6] =    20.    20.    20.     20.     20.   20.
-
-  #@description The name of the material
-  material.ref : string  = "glass"
-#+END_SRC
-**** Optical module
-Given the previous model, we stack them to get a full optical module from PMT \to
-light guide \to scintillator block \to the last layer of mylar
-#+BEGIN_SRC sh
-  [name="optical_module.model" type="geomtools::stacked_model"]
-
-  #@config The configuration parameters for the optical module
-
-  #@description The stacking axis
-  stacked.axis            : string = "z"
-
-  #@description The number of stacked volumes
-  stacked.number_of_items : integer = 3
-
-  #@description The model of the stacked volume #2
-  stacked.model_2   : string  = "wrapped_scintillator_block.model"
-
-  #@description The label of the stacked volume #2
-  stacked.label_2   : string  = "scintillator_block"
-
-  #@description The model of the stacked volume #1
-  stacked.model_1   : string   = "rotated_light_guide.model"
-
-  #@description The label of the stacked volume #1
-  stacked.label_1   : string  = "light_guide"
-
-  #@description The model of the stacked volume #0
-  stacked.model_0   : string   = "pmt.model"
-
-  #@description The label of the stacked volume #0
-  stacked.label_0   : string  = "pmt"
-
-  #@description The name of the material
-  material.ref      : string    = "lab_medium"
-
-  #@description The mapping directive for the "light_guide" daughter volume
-  mapping.daughter_id.light_guide : string  = "[light_guide.gc]"
-#+END_SRC
-*** Source
-:PROPERTIES:
-:TANGLE: config/geometry/source.geom
-:END:
-**** Preamble
-#+BEGIN_SRC sh
-  #@description List of geometry models
-  #@key_label   "name"
-  #@meta_label  "type"
-#+END_SRC
-**** Film model
-#+BEGIN_SRC sh
-  [name="source_film.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the source film
-
-  #@description The name of the 3D shape of the source film
-  shape_type  : string = "cylinder"
-
-  #@description The R dimension (radius) of the cylinder source film
-  r : real as length = 9.5 mm
-
-  #@description The Z dimension (thickness) of the cylinder source film
-  z : real as length = 5 um
-
-  #@description The name of the material of the source film
-  material.ref : string = "mylar"
-#+END_SRC
-**** Source support model
-#+BEGIN_SRC sh
-  [name="source_support.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the source support
-
-  #@description The name of the 3D shape of the source support ring
-  shape_type  : string = "tube"
-
-  #@description The inner R dimension (inner radius) of the source support ring
-  inner_r     : real as length = 10.0 mm
-
-  #@description The outer R dimension (inner radius) of the source support ring
-  outer_r     : real as length = 12.0 mm
-
-  #@description The Z dimension (thickness) of the source support ring
-  z           : real as length = 5.0 mm
-
-  #@description The name of the material of the source support ring
-  material.ref : string = "aluminium"
-#+END_SRC
-
 **** Source model
-The source model will used the two previous models by placing them "internally"
-to a larger cylinder. We first declare the holding volume
+Use standard IEAE RGU-1
 #+BEGIN_SRC sh
   [name="source.model" type="geomtools::simple_shaped_model"]
-
-  #@description The name of the 3D shape of the source cylindric envelope
-  shape_type  : string = "cylinder"
-
-  #@description The R dimension (radius) of the source cylindric envelope
-  r : real as length = 12.0 mm
-
-  #@description The Z dimension (thickness) of the source cylindric envelope
-  z : real as length = 5.0 mm
-
-  #@description The name of the material
-  material.ref : string  = "lab_medium"
+  shape_type   : string =  "cylinder"
+  r            : real as length = 2.25 cm
+  z            : real as length = 0.3 cm
+  material.ref : string = "hpge::SiO2"
 #+END_SRC
-and then place inside, the "support" and "film" models
+*** HPGe planar model
+:PROPERTIES:
+:TANGLE: config/geometry/planar.geom
+:END:
+**** Preamble
 #+BEGIN_SRC sh
-  #@description The list of daughter volumes by label
-  internal_item.labels : string[2] = "support" "film"
-
-  #@description The model of the "support" daughter volume
-  internal_item.model.support : string  = "source_support.model"
-
-  #@description The placement of the "support" daughter volume
-  internal_item.placement.support : string  = "0 0 0 (mm)"
-
-  #@description The model of the "film" daughter volume
-  internal_item.model.film : string  = "source_film.model"
-
-  #@description The placement of the "film" daughter volume
-  internal_item.placement.film : string  = "0 0 0 (mm)"
+  #@description List of geometry models
+  #@key_label   "name"
+  #@meta_label  "type"
 #+END_SRC
-
-We finally define mapping ids
+**** Germanium model
 #+BEGIN_SRC sh
-  #@description The mapping directives for the "film" daughter volume
-  mapping.daughter_id.film : string  = "[source_film.gc]"
-
-  #@description The mapping directives for the "support" daughter volume
-  mapping.daughter_id.support : string  = "[source_support.gc]"
+  [name="germanium.model" type="geomtools::simple_shaped_model"]
+  shape_type         : string = "cylinder"
+  r                  : real as length = 3.985 cm
+  z                  : real as length = 3.170 cm
+  material.ref       : string = "hpge::germanium"
 #+END_SRC
-*** Laboratory & world volume
+**** Internal lead model
+#+BEGIN_SRC sh
+  [name="internal_lead.model" type="geomtools::simple_shaped_model"]
+  shape_type        : string = "cylinder"
+  r                 : real as length = 4.485 cm
+  z                 : real as length = 4.500 cm
+  material.ref      : string = "std::lead"
+#+END_SRC
+**** Contact lead
+#+BEGIN_SRC sh
+  [name="contact_lead.model" type="geomtools::simple_shaped_model"]
+  shape_type        : string = "tube"
+  outer_r           : real as length = 4.485 cm
+  inner_r           : real as length = 3.985 cm
+  z                 : real as length = 3.700 cm
+  material.ref      : string = "std::lead"
+#+END_SRC
+**** Support model
+#+BEGIN_SRC sh
+  [name="support.model" type="geomtools::simple_shaped_model"]
+  shape_type  : string = "polycone"
+  filled_mode : string = "by_envelope"
+  length_unit : string = "mm"
+
+  material.ref        : string = "std::aluminium"
+  material.filled.ref : string = "std::vacuum"
+
+  build_mode   : string = "points"
+  list_of_z    : real[4] = -42.5  -39.5000001 -39.5   +42.5
+  list_of_rmax : real[4] =  48.0   48.0        48.0    48.0
+  list_of_rmin : real[4] =   0.0    0.0        44.85   44.85
+
+  internal_item.filled.labels : string[3] = "germanium" "internal_lead" "contact_lead"
+
+  internal_item.filled.model.germanium         : string = "germanium.model"
+  internal_item.filled.placement.germanium     : string = "0. 0. 26.65 (mm)"
+  mapping.filled.daughter_id.germanium         : string = "[germanium.category]"
+
+  internal_item.filled.model.internal_lead     : string = "internal_lead.model"
+  internal_item.filled.placement.internal_lead : string = "0. 0. -17.0 (mm)"
+  mapping.filled.daughter_id.internal_lead     : string = "[internal_lead.category]"
+
+  internal_item.filled.model.contact_lead      : string = "contact_lead.model"
+  internal_item.filled.placement.contact_lead  : string = "0. 0. 24.0 (mm)"
+  mapping.filled.daughter_id.contact_lead      : string = "[contact_lead.category]"
+#+END_SRC
+**** Front window
+#+BEGIN_SRC sh
+  [name="front_window.model" type="geomtools::simple_shaped_model"]
+  shape_type        : string = "cylinder"
+  r                 : real as length = 6.70 cm
+  z                 : real as length = 0.18 cm
+  material.ref      : string = "std::aluminium"
+#+END_SRC
+**** Air gap
+#+BEGIN_SRC sh
+  [name="vacuum_gap.model" type="geomtools::simple_shaped_model"]
+  shape_type        : string = "cylinder"
+  r                 : real as length = 6.40 cm
+  z                 : real as length = 1.42 cm
+  material.ref      : string = "std::vacuum"
+#+END_SRC
+**** Support + window model
+#+BEGIN_SRC sh
+  [name="support_and_window.model" type="geomtools::stacked_model"]
+  material.ref  : string  = "std::vacuum"
+
+  stacked.axis  : string  = "z"
+  stacked.number_of_items  : integer = 3
+
+  stacked.model_0 : string = "support.model"
+  stacked.label_0 : string = "support"
+
+  stacked.model_1 : string = "vacuum_gap.model"
+  stacked.label_1 : string = "vacuum_gap"
+
+  stacked.model_2 : string = "front_window.model"
+  stacked.label_2 : string = "front_window"
+
+  mapping.daughter_id.support      : string = "[support.category]"
+  mapping.daughter_id.vacuum_gap   : string = "[vacuum_gap.category]"
+  mapping.daughter_id.front_window : string = "[front_window.category]"
+#+END_SRC
+**** Endcap model
+#+BEGIN_SRC sh
+  [name="endcap.model" type="geomtools::simple_shaped_model"]
+  shape_type        : string = "tube"
+  outer_r           : real as length =  6.70 cm
+  inner_r           : real as length =  6.40 cm
+  z                 : real as length = 19.84 mm
+#+END_SRC
+**** Detector model
+#+BEGIN_SRC sh
+  [name="detector.model" type="geomtools::simple_shaped_model"]
+  logging.priority  : string = "warning"
+  shape_type        : string = "cylinder"
+  r                 : real as length =  6.8 cm
+  z                 : real as length = 20.2 cm
+  material.ref      : string  = "std::air"
+
+  internal_item.labels : string[2]  = "support_and_window" "endcap"
+
+  internal_item.model.support_and_window     : string    = "support_and_window.model"
+  internal_item.placement.support_and_window : string    = "0 0 50.5 (mm) @ 0 0 0 (deg)"
+  mapping.daughter_id.support_and_window     : string    = "[support_and_window.category]"
+
+  internal_item.model.endcap                 : string    = "endcap.model"
+  internal_item.placement.endcap             : string    = "0 0 0 (mm) @ 0 0 0 (deg)"
+  mapping.daughter_id.endcap                 : string    = "[endcap.category]"
+#+END_SRC
+**** Full setup model
+#+BEGIN_SRC sh
+  [name="setup.model" type="geomtools::stacked_model"]
+  material.ref  : string  = "std::air"
+
+  stacked.axis            : string  = "z"
+  stacked.number_of_items : integer = 3
+
+  stacked.model_0 : string = "detector.model"
+  stacked.label_0 : string = "detector"
+
+  stacked.model_1 : string = "petri_boxmodel"
+  stacked.label_1 : string = "petri"
+
+  stacked.model_2 : string = "source.model"
+  stacked.label_2 : string = "source"
+
+  mapping.daughter_id.detector : string = "[detector.category]"
+  mapping.daughter_id.petri    : string = "[petri.category:boite=0]"
+  mapping.daughter_id.source   : string = "[source.category:source=0]"
+#+END_SRC
+*** World volume
 :PROPERTIES:
 :TANGLE: config/geometry/lab_world.geom
 :END:
@@ -616,111 +313,6 @@ We finally define mapping ids
   #@key_label   "name"
   #@meta_label  "type"
 #+END_SRC
-**** Absorber
-#+BEGIN_SRC sh
-  [name="thin_absorber.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the thin_absorber front of the detector
-
-  #@description The name of the 3D shape
-  shape_type :   string =  "box"
-
-  #@description The X dimension
-  x   : real as length = 100.0 mm
-
-  #@description The Y dimension
-  y   : real as length = 100.0 mm
-
-  #@description The Z dimension
-  z   : real as length = 50 um
-
-  #@description The name of the material
-  material.ref      : string  = "copper"
-#+END_SRC
-**** Black box
-#+BEGIN_SRC sh
-  [name="black_box.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the light guide
-
-  #@description The default implicit length unit
-  length_unit : string = "mm"
-
-  #@description The name of the 3D shape
-  shape_type : string = "polyhedra"
-
-  #@description The polyhedra build mode
-  build_mode : string = "points"
-
-  #@description The polyhedra number of sides
-  sides        : integer = 4
-
-  #@description The list of Z coordinates for the shape
-  list_of_z    : real [2] =   -125.     +125.
-
-  #@description The list of inner radius coordinates for the shape
-  list_of_rmin : real [2] =    51.      51.
-
-  #@description The list of outer radius coordinates for the shape
-  list_of_rmax : real [2] =    53.      53.
-
-  #@description The name of the material
-  material.ref : string  = "inox"
-#+END_SRC
-**** Lab. model
-#+BEGIN_SRC sh
-  [name="lab.model" type="geomtools::simple_shaped_model"]
-
-  #@config The configuration parameters for the laboratory experimental area
-
-  #@description The name of the 3D shape of the lab area
-  shape_type  : string = "box"
-
-  #@description The X dimension of the box
-  x           : real as length = 900.0 mm
-
-  #@description The Y dimension of the box
-  y           : real as length = 450.0 mm
-
-  #@description The Z dimension of the box
-  z           : real as length = 450.0 mm
-
-  #@description The name of the material that fills the lab atmosphere
-  material.ref : string = "lab_medium"
-
-  #@description The list of daughter volumes by labels
-  internal_item.labels : string[4] = "source" "detector" "box" "absorber0"
-
-  #@description The model of the "source" daughter volume
-  internal_item.model.source        : string  = "source.model"
-
-  #@description The placement of the "source" daughter volume
-  internal_item.placement.source    : string  = "20 0 0 (cm) / y +90 (degree)"
-
-  #@description The model of the "detector" daughter volume
-  internal_item.model.detector      : string  = "optical_module.model"
-
-  #@description The placement of the "detector" daughter volume
-  internal_item.placement.detector  : string  = "-20 0 0 (cm) / y +90 (degree) "
-
-  #@description The model of the "box" daughter volume
-  internal_item.model.box           : string  = "black_box.model"
-
-  #@description The placement of the "box" daughter volume
-  internal_item.placement.box       : string  = "-24 0 0 (cm) @  0 90 45 (degree) "
-
-  #@description The model of the "absorber0" daughter volume
-  internal_item.model.absorber0     : string  = "thin_absorber.model"
-
-  #@description The placement of the "absorber0" daughter volume
-  internal_item.placement.absorber0 : string  = "0 0 0 (cm) @  0 90 0 (degree) "
-
-  #@description The mapping directives for the "source" daughter volume
-  mapping.daughter_id.source   : string  = "[source.gc:position=0]"
-
-  #@description The mapping directives for the "detector" daughter volume
-  mapping.daughter_id.detector : string  = "[optical_module.gc:detector=0]"
-#+END_SRC
 **** World volume
 #+BEGIN_SRC sh
   [name="world" type="geomtools::simple_world_model"]
@@ -728,16 +320,16 @@ We finally define mapping ids
   #@config configuration parameters for the world logical volume
 
   #@description The world volume X dimension (box)
-  world.x         : real as length  = 1000.0 mm
+  world.x         : real as length = 300.0 mm
 
   #@description The world volume Y dimension (box)
-  world.y         : real as length = 500.0 mm
+  world.y         : real as length = 300.0 mm
 
   #@description The world volume Z dimension (box)
-  world.z         : real as length = 500.0 mm
+  world.z         : real as length = 800.0 mm
 
   #@description The name of the model that represents the experimental setup daughter volume
-  setup.model     : string = "lab.model"
+  setup.model     : string = "setup.model"
 
   #@description The setup placement phi angle
   setup.phi       : real as angle = 0.0 degree
@@ -755,10 +347,10 @@ We finally define mapping ids
   setup.z         : real as length = 0.0 mm
 
   #@description The name of the material that fills the world volume
-  material.ref    : string = "vacuum"
+  material.ref    : string = "std::vacuum"
 
   #@description The mapping directives for the 'setup' daughter volume
-  mapping.daughter_id.setup : string  = "[lab.gc:area=0]"
+  mapping.daughter_id.setup : string  = "[setup:volume=0]"
 #+END_SRC
 ** Mapping categories
 :PROPERTIES:
