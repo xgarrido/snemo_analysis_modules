@@ -87,7 +87,7 @@ The geometry factory holds all the files needed for the geometry construction.
   factory.geom_files : string[3] as path = \
     "@HPGE_SIMULATION_DIR@/sources.geom"   \
     "@HPGE_SIMULATION_DIR@/planar.geom"    \
-    "@HPGE_SIMULATION_DIR@/setup.geom"
+    "@HPGE_SIMULATION_DIR@/world.geom"
 #+END_SRC
 
 *** ID manager
@@ -262,6 +262,7 @@ Use standard IEAE RGU-1
   outer_r           : real as length =  6.70 cm
   inner_r           : real as length =  6.40 cm
   z                 : real as length = 19.84 mm
+  material.ref      : string = "std::aluminium"
 #+END_SRC
 **** Detector model
 #+BEGIN_SRC sh
@@ -293,19 +294,19 @@ Use standard IEAE RGU-1
   stacked.model_0 : string = "detector.model"
   stacked.label_0 : string = "detector"
 
-  stacked.model_1 : string = "petri_boxmodel"
+  stacked.model_1 : string = "petri_box.model"
   stacked.label_1 : string = "petri"
 
   stacked.model_2 : string = "source.model"
   stacked.label_2 : string = "source"
 
   mapping.daughter_id.detector : string = "[detector.category]"
-  mapping.daughter_id.petri    : string = "[petri.category:boite=0]"
+  mapping.daughter_id.petri    : string = "[petri.category:box=0]"
   mapping.daughter_id.source   : string = "[source.category:source=0]"
 #+END_SRC
 *** World volume
 :PROPERTIES:
-:TANGLE: config/geometry/lab_world.geom
+:TANGLE: config/geometry/world.geom
 :END:
 **** Preamble
 #+BEGIN_SRC sh
@@ -350,108 +351,55 @@ Use standard IEAE RGU-1
   material.ref    : string = "std::vacuum"
 
   #@description The mapping directives for the 'setup' daughter volume
-  mapping.daughter_id.setup : string  = "[setup:volume=0]"
+  mapping.daughter_id.setup : string  = "[setup.category:volume=0]"
 #+END_SRC
 ** Mapping categories
 :PROPERTIES:
 :TANGLE: config/geometry/categories.lis
 :END:
 #+BEGIN_SRC sh
-  #@description A list of geometry ID categories/types
+  #@description A sample list of geometry ID categories/types
   #@key_label   "category"
   #@meta_label  "type"
 
-
-  ##################################################################
-  # This is the mandatory top-level geometry category.
-  # One should always provide it :
-  [category="world" type="0"]
-
-  #@config The geometry category of the top-level world volume
-
-  #@description The world's GID address is characterized by its 'world' number
+  [category="world"           type="0"]
   addresses : string[1] = "world"
 
+  [category="setup.category" type="2000"]
+  addresses : string[1] = "volume"
 
-  ##################################################################
-  # This geometry category addresses an experimental area volume :
-  [category="lab.gc"  type="100"]
+  [category="detector.category" type="2100"]
+  inherits : string[1] = "setup.category"
 
-  #@config The geometry category of the experimental area volume (lab)
+  [category="source.category" type="2200"]
+  addresses : string[1] = "source"
 
-  #@description A lab's GID address is charaterized by its 'area' number
-  addresses : string[1] = "area"
+  [category="petri.category" type="2300"]
+  addresses : string[1] = "box"
 
+  [category="support_and_window.category" type="1001"]
+  inherits : string    = "detector.category"
 
-  ################################################################
-  # This geometry category addresses a calibration source object :
-  [category="source.gc" type="1000"]
+  [category="endcap.category" type="1002"]
+  inherits : string   = "detector.category"
 
-  #@config The geometry category of a calibration source
+  [category="support.category" type="1003"]
+  inherits : string    = "support_and_window.category"
 
-  #@description The GID address of a calibration source is defined by its 'position' number
-  addresses : string[1] = "position"
+  [category="front_window.category" type="1004"]
+  inherits : string   = "support_and_window.category"
 
+  [category="vacuum_gap.category" type="1005"]
+  inherits : string    = "support_and_window.category"
 
-  ##############################################################################
-  # This geometry category addresses the support frame of a calibration source :
-  [category="source_support.gc" type="1010"]
+  [category="germanium.category" type="1006"]
+  inherits : string   = "support.category"
 
-  #@config The geometry category of a calibration source support
+  [category="contact_lead.category" type="1007"]
+  inherits : string   = "support.category"
 
-  #@description The GID address of a source support inherits the GID address of the source
-  inherits : string = "source.gc"
-
-
-  #################################################################
-  # This geometry category addresses of a calibration source film :
-  [category="source_film.gc" type="1020"]
-
-  #@config The geometry category of a calibration source film
-
-  #@description The GID address of a source film inherits the GID address of the source
-  inherits : string = "source.gc"
-
-
-  ######################################################
-  # This geometry category addresses an optical module :
-  [category="optical_module.gc" type="2020"]
-
-  #@config The geometry category of a calibration source film
-
-  #@description The GID address of a column is defined by its 'detector' number
-  addresses : string[1] = "detector"
-
-
-  #################################################################################
-  #  This geometry category addresses the scintillator block of an optical module :
-  [category="scin_block.gc" type="2030"]
-
-  #@config The geometry category of the scintillator block of an optical module
-
-  #@description The GID address of a scin block inherits the GID address of the optical module
-  inherits : string = "optical_module.gc"
-
-
-  ###############################################
-  [category="scin_block_wrapping.gc" type="2031"]
-
-  #@config The geometry category of a wrapping film around a scintillator block
-
-  #@description The GID address of a wrapping film extends GID address of the scintillator block
-  extends : string[1] = "scin_block.gc"
-
-  #@description The 'side' number extend the mother scintillator block GID address
-  by       : string[1] = "side"
-
-
-  #######################################
-  [category="light_guide.gc" type="2032"]
-
-  #@config The geometry category of the light guide
-
-  #@description The GID address of a light guide inherits the GID address of the optical module
-  inherits : string[1] = "optical_module.gc"
+  [category="internal_lead.category" type="1008"]
+  inherits : string   = "support.category"
 #+END_SRC
 ** Materials plugin
 :PROPERTIES:
@@ -484,134 +432,59 @@ to change the source foil isotope.
       "@materials:data/std_isotopes.def"  \
       "@materials:data/std_elements.def"  \
       "@materials:data/std_materials.def" \
-      "@HPGE_SIMULATION_DIR@/materials_aliases.def"
+      "@HPGE_SIMULATION_DIR@/hpge_materials.def"
 #+END_SRC
 *** Material aliases
 :PROPERTIES:
-:TANGLE: config/geometry/materials_aliases.def
+:TANGLE: config/geometry/hpge_materials.def
 :END:
 #+BEGIN_SRC sh
-  #@description A sample list of aliases for standard materials
-  #@key_label   "name"
-  #@meta_label  "type"
+    #@description A list of materials for BiPo experiment
+    #@key_label   "name"
+    #@meta_label  "type"
 
-  [name="air" type="alias"]
-  #@description The alias for air
-  material : string = "std::air"
+    [name="Germanium" type="element"]
+    #@description The Ge natural element
+    z               : integer   = 32
+    isotope.names   : string[5] = "Ge-70" "Ge-72" "Ge-73"  "Ge-74"  "Ge-76"
+    isotope.weights : real[5]   = 0.209 0.275  0.077 0.363 0.076
 
-  [name="aluminium" type="alias"]
-  #@description The alias for aluminium
-  material : string = "std::aluminium"
 
-  [name="inox" type="alias"]
-  #@description The alias for inox
-  material : string = "std::inox"
+    [name="hpge::germanium" type="material"]
+    #@description natural Ge material
+    density        : real   = 5.323
+    density.unit   : string = "g/cm3"
+    state          : string = "solid"
+    composition.mode : string   = "fraction_mass"
+    composition.names         : string [1]  = "Germanium"
+    composition.fraction_mass : real   [1]  =  1.0
 
-  [name="copper" type="alias"]
-  #@description The alias for copper
-  material : string = "std::copper"
+    [name="hpge::SiO2" type="material"]
+    #@description silica material
+    density          : real   = 1.19
+    density.unit     : string = "g/cm3"
+    state            : string = "solid"
+  composition.mode            : string       = "number_of_atoms"
+  composition.names           : string  [2]  = "Silicium" "Oxygen"
+  composition.number_of_atoms : integer [2]  =     1       2
 
-  [name="mylar" type="alias"]
-  #@description The alias for mylar
-  material : string = "std::mylar"
+  [name="hpge::sodium" type="material"]
+  #@description Sodium material
+  density        : real   = 0.971
+  density.unit   : string = "g/cm3"
+  state          : string = "solid"
+  composition.mode          : string      = "fraction_mass"
+  composition.names         : string [1]  = "Sodium"
+  composition.fraction_mass : real   [1]  =   1.0
 
-  [name="plexiglass" type="alias"]
-  #@description The alias for plexiglass
-  material : string = "std::plexiglass"
-
-  [name="polystyrene" type="alias"]
-  #@description The alias for polystyrene
-  material : string = "std::polystyrene"
-
-  [name="glass" type="alias"]
-  #@description The alias for pyrex
-  material : string = "std::pyrex"
-
-  [name="vacuum" type="alias"]
-  #@description The alias for vacuum
-  material : string = "std::vacuum"
-
-  [name="lab_medium" type="alias"]
-  #@description The alias for air
-  material : string = "std::air"
-  #material : string = "std::vacuum"
-#+END_SRC
-
-** Magnetic field plugin
-:PROPERTIES:
-:TANGLE: config/geometry/magnetic_field_plugin.conf
-:END:
-*** Plugin declaration
-#+BEGIN_SRC sh
-  #@description The geometry manager plugin for emfield
-
-  #@key_label  "name"
-  #@meta_label "type"
-
-  [name="fields_driver" type="emfield::emfield_geom_plugin"]
-#+END_SRC
-
-*** Logging priority
-#+BEGIN_SRC sh
-  #@description Logging priority
-  logging.priority : string = "warning"
-#+END_SRC
-
-*** EM field manager configuration
-#+BEGIN_SRC sh
-  #@description Manager logging priority
-  manager.logging.priority : string = "warning"
-
-  #@description The name of the geometry service
-  manager.services.geometry : string = "Geo"
-
-  #@description List of EM fields definitions files
-  manager.field_definitions_filenames : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/magnetic_field_drivers.conf"
-#+END_SRC
-
-EM field defined within =manager.field_definitions_filenames= file can be set
-independently and at the same time for different G4 volumes. This association
-between volumes and field is done by the =geom_map= object of =emfield=
-component.
-#+BEGIN_SRC sh
-  #@description Flag to activate the geometry volume/field associations map
-  manager.build_geom_map : boolean = 1
-
-  #@description Manager logging priority
-  manager.geom_map.logging.priority : string = "warning"
-
-  #@description The list of EM fields associated to some logical volumes
-  manager.geom_map.associations.labels : string[1] = "lab"
-
-  #@description The logical model associated for the label 'tracker'
-  manager.geom_map.associations.lab.volume : string = "lab.model.log"
-
-  #@description The EM field associated for the label "tracker"
-  manager.geom_map.associations.lab.field_name : string = "B0"
-#+END_SRC
-
-*** Magnetic fields
-:PROPERTIES:
-:TANGLE: config/geometry/magnetic_field_drivers.conf
-:END:
-**** Preamble
-#+BEGIN_SRC sh
-  #@description Definition parameters for some electro-magnetic fields
-  #@key_label   "name"
-  #@meta_label  "type"
-#+END_SRC
-**** Constant magnetic field
-#+BEGIN_SRC sh
-  [name="B0" type="emfield::uniform_magnetic_field"]
-
-  #@config Configuration parameters for the magnetic field generated by a coil
-
-  #@description Default implicit magnetic field unit
-  magnetic_field.unit        : string  = "gauss"
-
-  #@description Coordinates of the static magnetic field (Bx, By, Bz)
-  magnetic_field.coordinates : real[3] = 0.0 0.0 25.0
+  [name="hpge::manganese" type="material"]
+  #@description Manganese material
+  density        : real   = 7.44
+  density.unit   : string = "g/cm3"
+  state          : string = "solid"
+  composition.mode          : string      = "fraction_mass"
+  composition.names         : string [1]  = "Sodium"
+  composition.fraction_mass : real   [1]  =   1.0
 #+END_SRC
 
 ** Visualization settings
@@ -641,41 +514,49 @@ component.
   [name="geometry_settings"]
 
   #@description List of volumes to take care.
-  volume_category_list : string[8] =                          \
-                                     "lab.gc"                 \
-                                     "light_guide.gc"         \
-                                     "optical_module.gc"      \
-                                     "scin_block.gc"          \
-                                     "scin_block_wrapping.gc" \
-                                     "source.gc"              \
-                                     "source_film.gc"         \
-                                     "source_support.gc"
+  volume_category_list : string[9] = \
+      "setup.category"               \
+      "endcap.category"              \
+      "source.category"              \
+      "petri.category"               \
+      "support.category"             \
+      "germanium.category"           \
+      "front_window.category"        \
+      "contact_lead.category"        \
+      "internal_lead.category"
 
   #@description Volume visibility (visible/invisible/disable)
-  lab.gc.visibility                 : string = "visible"
-  light_guide.gc.visibility         : string = "visible"
-  optical_module.gc.visibility      : string = "visible"
-  scin_block.gc.visibility          : string = "visible"
-  scin_block_wrapping.gc.visibility : string = "visible"
-  source.gc.visibility              : string = "visible"
-  source_film.gc.visibility         : string = "visible"
-  source_support.gc.visibility      : string = "visible"
+  setup.category.visibility         : string = "visible"
+  endcap.category.visibility        : string = "visible"
+  source.category.visibility        : string = "visible"
+  petri.category.visibility         : string = "visible"
+  support.category.visibility       : string = "visible"
+  germanium.category.visibility     : string = "visible"
+  front_window.category.visibility  : string = "visible"
+  contact_lead.category.visibility  : string = "visible"
+  internal_lead.category.visibility : string = "visible"
 
   #@description Volume color
-  lab.gc.color                 : integer[3] = 228 123 220
-  light_guide.gc.color         : integer[3] = 158 246 222
-  optical_module.gc.color      : integer[3] = 141  17  79
-  scin_block.gc.color          : integer[3] =  66  43 244
-  scin_block_wrapping.gc.color : integer[3] =  86 111 124
-  source.gc.color              : integer[3] = 236  33 141
-  source_film.gc.color         : integer[3] = 163  44  34
-  source_support.gc.color      : integer[3] =  90 156 254
+  setup.category.color         : integer[3] = 228 123 220
+  endcap.category.color        : integer[3] = 158 246 222
+  source.category.color        : integer[3] = 141  17  79
+  petri.category.color         : integer[3] =  66  43 244
+  support.category.color       : integer[3] =  86 111 124
+  germanium.category.color     : integer[3] = 236  33 141
+  front_window.category.color  : integer[3] = 163  44  34
+  contact_lead.category.color  : integer[3] =  90 156 254
+  internal_lead.category.color : integer[3] =  90 156 254
 #+END_SRC
 *** Particle settings
 #+BEGIN_SRC sh
-  [name="particle_settings"]
+    [name="particle_settings"]
 
-  #@description MC particle color
+    #@description MC particle color
+    gamma.color                : string = "kYellow"
+    electron.color             : string = "kBlue"
+    positron.color             : string = "kCyan"
+    alpha.color                : string = "kMagenta"
+    delta_ray_from_alpha.color : string = "kGreen"
 #+END_SRC
 *** Misc.
 #+BEGIN_SRC sh
