@@ -1,0 +1,1448 @@
+#+TITLE:  High Purity Germanium simulation
+#+AUTHOR: Xavier Garrido
+#+DATE:   2014-02-06
+#+OPTIONS: ^:{}
+#+STARTUP: entitiespretty
+
+* Introduction
+
+This repository holds a configuration to do High Purity Germanium (HPGe)
+simulations using Geant4 framework. It also contains a module to plot \gamma energy
+distribution from Germanium crystal.
+
+The current version is hosted at
+[[https://github.com/xgarrido/snemo_simulation_modules/hpge_simulation]] under
+=git= version control. You can clone this repository by doing
+
+#+BEGIN_SRC sh
+  git clone https://github.com/xgarrido/snemo_simulation_modules/hpge_simulation hpge_simulation
+#+END_SRC
+
+This will create a directory =hpge_validation= in the working directory
+containing all the source files needed to configure and to setup SN@ilWare
+programs.
+
+* Content
+
+The code is organised as follow :
+
+- =README.org= :: This file holds the pipeline configuration + the documentation
+                  on how to use the =hpge_simulation= module.
+- =Makefile= :: The =Makefile= allows to generate the pipeline configuration by
+                parsing and tangling this file /i.e./ =README.org= (see below).
+- =source= :: This directory holds the source code of the =hpge_simulation=
+              module. It also has a =CMakeLists.txt= file in order to compile,
+              build and install all the software pieces through =cmake= rules.
+
+The =README.org= file is organised using [[http://orgmode.org/worg/org-contrib/babel/index.html][org-babel]] and its ability to execute
+source code. It requires then a recent installation of emacs[1] which bundles
+=org=. Without entering into too much details regarding =org-babel= abilities,
+the basic idea is to give a "literate" way to navigate through the different
+sections, each of them representing a part of the pipeline
+configuration. Moreover, using =org= folding/unfolding capability, item can be
+hide and the user can focus on relevant parts.
+
+To export the different configuration files, you can run =org-babel-tangle=
+which will tangle each code block into the given file[2] or use the associated
+=Makefile=. The author recommends to use the =Makefile= since the tangling
+process is asynchronous and thus, does not freeze your emacs (=org-babel-tangle=
+"occupies" emacs during its execution).
+
+[1] At the time of writing this document, emacs version is 24.3.1
+[2] Emacs lisp function can be run using =ALT-x= command and typing the function
+name.
+* Geometry setup
+** Manager configuration
+:PROPERTIES:
+:MKDIRP: yes
+:TANGLE: config/geometry/manager.conf
+:END:
+*** Setup label, description and version
+#+BEGIN_SRC sh
+  #@description Setup label
+  setup_label : string = "hpge_simulation"
+
+  #@description Setup description
+  setup_description : string = "The HPGe planar geometry"
+
+  #@description Setup version
+  setup_version : string = "1.0"
+#+END_SRC
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority
+  logging.priority : string = "warning"
+#+END_SRC
+*** Geometry factory
+The geometry factory holds all the files needed for the geometry construction.
+**** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority of the embedded geometry model factory
+  factory.logging.priority : string = "warning"
+#+END_SRC
+
+**** Geometry files
+#+BEGIN_SRC sh
+  #@description List of files describing the geometry models
+  factory.geom_files : string[3] as path = \
+    "@HPGE_SIMULATION_DIR@/sources.geom"   \
+    "@HPGE_SIMULATION_DIR@/planar.geom"    \
+    "@HPGE_SIMULATION_DIR@/setup.geom"
+#+END_SRC
+
+*** ID manager
+**** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging flag of the embedded ID manager
+  id_mgr.logging.priority : string = "warning"
+#+END_SRC
+
+**** Category list
+Categories are used to assign a unique id number (integer) to a geometrical
+volume.
+#+BEGIN_SRC sh
+  #@description Source file of the geometry categories used by the ID manager
+  id_mgr.categories_list : string as path = \
+    "@HPGE_SIMULATION_DIR@/categories.lis"
+#+END_SRC
+*** Mapping configuration
+#+BEGIN_SRC sh
+  #@description Build the embedded default mapping dictionnary
+  build_mapping : boolean = 1
+
+  #@description Max depth of the mapping
+  mapping.max_depth : integer = 100
+#+END_SRC
+*** Plugins configuration
+#+BEGIN_SRC sh
+  #@description Plugins factory preload from system registration (default=0)
+  plugins.factory_no_preload : boolean = 0
+
+  #@description Plugins initialization at load (default=0)
+  plugins.force_initialization_at_load : boolean = 0
+
+  #@description Configuration files for geometry manager's plugins
+  plugins.configuration_files : string[1] as path = \
+      "@HPGE_SIMULATION_DIR@/materials_plugin.conf"
+#+END_SRC
+
+** Geometry models
+*** Optical module
+:PROPERTIES:
+:TANGLE: config/geometry/optical_module.geom
+:END:
+**** Preamble
+#+BEGIN_SRC sh
+  #@description List of geometry models
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+**** Wrapping model
+***** z-position (front) wrapping
+#+BEGIN_SRC sh
+  [name="zpos_wrapping.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the wrapping in front of the scintillator block
+
+  #@description The name of the 3D shape
+  shape_type : string =  "box"
+
+  #@description The X dimension
+  x : real as length  = 100.0 mm
+
+  #@description The Y dimension
+  y : real as length  = 100.0 mm
+
+  #@description The Z dimension
+  z : real as length  = 12 um
+
+  #@description The name of the material
+  material.ref : string  = "mylar"
+#+END_SRC
+***** x-sides wrapping
+****** Model
+#+BEGIN_SRC sh
+  [name="x_sides_wrapping.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the wrapping on X sides of the scintillator block
+
+  #@description The name of the 3D shape
+  shape_type : string = "box"
+
+  #@description The X dimension
+  x : real as length = 40.0 mm
+
+  #@description The Y dimension
+  y : real as length = 100.0 mm
+
+  #@description The Z dimension
+  z : real as length = 12 um
+
+  #@description The name of the material
+  material.ref      : string  = "mylar"
+#+END_SRC
+****** Positionning
+#+BEGIN_SRC sh
+  [name="xpos_wrapping.model" type="geomtools::rotated_boxed_model"]
+
+  #@config The configuration parameters for the rotated wrapping film
+
+  #@description Rotation geometry model
+  rotated.model : string = "x_sides_wrapping.model"
+
+  #@description Rotated geometry model label
+  rotated.label : string = "side_wrapping"
+
+  #@description Rotation axis
+  rotated.axis  : string = "y"
+
+  #@description Rotation special angle
+  rotated.special_angle : string  = "90"
+
+  #@description The name of the material
+  material.ref      : string  = "lab_medium"
+#+END_SRC
+#+BEGIN_SRC sh
+  [name="xneg_wrapping.model" type="geomtools::rotated_boxed_model"]
+
+  #@config The configuration parameters for the rotated wrapping film
+
+  #@description Rotation axis
+  rotated.axis  : string = "y"
+
+  #@description Rotation special angle
+  rotated.special_angle : string  = "270"
+
+  #@description Rotation geometry model
+  rotated.model : string = "x_sides_wrapping.model"
+
+  #@description Rotated geometry model label
+  rotated.label : string = "side_wrapping"
+
+  #@description The name of the material
+  material.ref      : string  = "lab_medium"
+#+END_SRC
+
+***** y-sides wrapping
+****** Model
+#+BEGIN_SRC sh
+  [name="y_sides_wrapping.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the wrapping on Y sides of the scintillator block
+
+  #@description The name of the 3D shape
+  shape_type : string = "box"
+
+  #@description The X dimension
+  x : real as length = 100.0 mm
+
+  #@description The Y dimension
+  y : real as length = 40.0 mm
+
+  #@description The Z dimension
+  z : real as length = 12 um
+
+  #@description The name of the material
+  material.ref : string = "mylar"
+#+END_SRC
+****** Positionning
+#+BEGIN_SRC sh
+  [name="ypos_wrapping.model" type="geomtools::rotated_boxed_model"]
+
+  #@config The configuration parameters for the rotated wrapping film
+
+  #@description Rotation axis
+  rotated.axis  : string = "x"
+
+  #@description Rotation special angle
+  rotated.special_angle : string  = "90"
+
+  #@description Rotation geometry model
+  rotated.model : string = "y_sides_wrapping.model"
+
+  #@description Rotated geometry model label
+  rotated.label : string = "side_wrapping"
+
+  #@description The name of the material
+  material.ref      : string  = "lab_medium"
+#+END_SRC
+#+BEGIN_SRC sh
+  [name="yneg_wrapping.model" type="geomtools::rotated_boxed_model"]
+
+  #@config The configuration parameters for the rotated wrapping film
+
+  #@description Rotation axis
+  rotated.axis  : string = "x"
+
+  #@description Rotation special angle
+  rotated.special_angle : string  = "270"
+
+  #@description Rotation geometry model
+  rotated.model : string = "y_sides_wrapping.model"
+
+  #@description Rotated geometry model label
+  rotated.label : string = "side_wrapping"
+
+  #@description The name of the material
+  material.ref      : string  = "lab_medium"
+#+END_SRC
+**** Scintillator model
+***** Block model
+We first design the shape and the dimensions of the block
+#+BEGIN_SRC sh
+  [name="scintillator_block.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the scintillator block
+
+  #@description The name of the 3D shape
+  shape_type : string =  "box"
+
+  #@description The X dimension
+  x : real as length = 100.0 mm
+
+  #@description The Y dimension
+  y : real as length = 100.0 mm
+
+  #@description The Z dimension
+  z : real as length = 40.0 mm
+#+END_SRC
+
+Then we define a material
+#+BEGIN_SRC sh
+  #@description The name of the material
+  material.ref      : string = "polystyrene"
+#+END_SRC
+
+Finally, we attach to it a sensitive category to ease the interface between
+=mctools= and Geant4 digitization[fn:1]
+#+BEGIN_SRC sh
+  #@description The 'sensitive' category attached to this detector volume
+  sensitive.category : string  = "scin_SD"
+#+END_SRC
+***** Wrapped block model
+The wrapped model consists of wrapping with mylar the previous "nude" block. We
+then use a =surrounded_bowed_model= to place mylar on each scintillator faces.
+#+BEGIN_SRC sh
+  [name="wrapped_scintillator_block.model" type="geomtools::surrounded_boxed_model"]
+
+  #@config The configuration parameters for the wrapped scintillatorblock
+
+  #@description The name of the surrounded geometry model
+  surrounded.model         : string = "scintillator_block.model"
+
+  #@description The label associated to the surrounded geometry model
+  surrounded.label         : string = "scintillator_block"
+
+  #@description The name of the (z>0) side surrounding geometry model
+  surrounded.top_model     : string = "zpos_wrapping.model"
+
+  #@description The name of a  (x>0) side surrounding geometry model
+  surrounded.front_model   : string = "xpos_wrapping.model"
+
+  #@description The name of a  (x<0) side surrounding geometry model
+  surrounded.back_model    : string = "xneg_wrapping.model"
+
+  #@description The name of a  (y>0) side surrounding geometry model
+  surrounded.right_model   : string = "ypos_wrapping.model"
+
+  #@description The name of a  (y<0) side surrounding geometry model
+  surrounded.left_model    : string = "yneg_wrapping.model"
+
+  #@description The label of the (z>0) side surrounding geometry model
+  surrounded.top_label     : string = "top_wrapping"
+
+  #@description The label of a  (x>0) side surrounding geometry model
+  surrounded.front_label   : string = "front_wrapping"
+
+  #@description The label of a  (x<0) side surrounding geometry model
+  surrounded.back_label    : string = "back_wrapping"
+
+  #@description The label of a  (y>0) side surrounding geometry model
+  surrounded.right_label   : string = "right_wrapping"
+
+  #@description The label of a  (y<0) side surrounding geometry model
+  surrounded.left_label    : string = "left_wrapping"
+
+  #@description The name of the material
+  material.ref      : string  = "lab_medium"
+#+END_SRC
+
+Finally, we attach mapping id to the mother volume as well as its daughter
+/i.e./ mylar elements.
+#+BEGIN_SRC sh
+  #@description The mapping directive for the "scintillator_block" daughter volume
+  mapping.daughter_id.scintillator_block : string  = "[scin_block.gc]"
+
+  #@description The mapping directive for the "left_wrapping" daughter volume
+  mapping.daughter_id.front_wrapping     : string  = "[scin_block_wrapping.gc:side=0]"
+
+  #@description The mapping directive for the "right_wrapping" daughter volume
+  mapping.daughter_id.back_wrapping      : string  = "[scin_block_wrapping.gc:side=1]"
+
+  #@description The mapping directive for the "left_wrapping" daughter volume
+  mapping.daughter_id.left_wrapping      : string  = "[scin_block_wrapping.gc:side=2]"
+
+  #@description The mapping directive for the "right_wrapping" daughter volume
+  mapping.daughter_id.right_wrapping     : string  = "[scin_block_wrapping.gc:side=3]"
+
+  #@description The mapping directive for the "top_wrapping" daughter volume
+  mapping.daughter_id.top_wrapping       : string  = "[scin_block_wrapping.gc:side=5]"
+#+END_SRC
+**** Light guide model
+***** Basic light guide
+#+BEGIN_SRC sh
+  [name="light_guide.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the light guide
+
+  #@description The default implicit length unit
+  length_unit  : string = "mm"
+
+  #@description The name of the 3D shape
+  shape_type   : string = "polyhedra"
+
+  #@description The polyhedra build mode
+  build_mode   : string = "points"
+
+  #@description The polyhedra number of sides
+  sides        : integer = 4
+
+  #@description The list of Z coordinates for the shape
+  list_of_z    : real [3] =  -40.     +30.     +40.
+
+  #@description The list of inner radius coordinates for the shape
+  list_of_rmin : real [3] =    0.      0.       0.
+
+  #@description The list of outer radius coordinates for the shape
+  list_of_rmax : real [3] =    20.    50.     50.
+
+  #@description The name of the material
+  material.ref : string  = "plexiglass"
+#+END_SRC
+***** Rotated light guide
+#+BEGIN_SRC sh
+  ########################################################################
+  [name="rotated_light_guide.model" type="geomtools::rotated_boxed_model"]
+
+  #@config The configuration parameters for the rotated light guide
+
+  #@description The rotation axis
+  rotated.axis  : string = "z"
+
+  #@description The rotation angle
+  rotated.angle : real as angle = 45.0 degree
+
+  #@description The X dimension
+  x             : real as length = 100.0 mm
+
+  #@description The Y dimension
+  y             : real as length = 100.0 mm
+
+  #@description The name of the model to be rotated
+  rotated.model : string = "light_guide.model"
+
+  #@description The label associated to the rotated daughter model
+  rotated.label : string = "light_guide"
+
+  #@description The name of the material around the light guide to be rotated
+  material.ref  : string  = "lab_medium"
+#+END_SRC
+**** PMT model
+#+BEGIN_SRC sh
+  [name="pmt.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the photomultiplier tube
+
+  #@description The default implicit length unit
+  length_unit  : string   = "mm"
+
+  #@description The name of the 3D shape
+  shape_type   : string   = "polycone"
+
+  #@description The polycone build mode
+  build_mode   : string   = "points"
+
+  #@description The list of Z coordinates for the shape
+  list_of_z    : real [6] =  -50.0   -49.0  -48.99  +48.99  +49.0 +50.0
+
+  #@description The list of inner radius coordinates for the shape
+  list_of_rmin : real [6] =    0.      0.    19.     19.      0.    0.
+
+  #@description The list of outer radius coordinates for the shape
+  list_of_rmax : real [6] =    20.    20.    20.     20.     20.   20.
+
+  #@description The name of the material
+  material.ref : string  = "glass"
+#+END_SRC
+**** Optical module
+Given the previous model, we stack them to get a full optical module from PMT \to
+light guide \to scintillator block \to the last layer of mylar
+#+BEGIN_SRC sh
+  [name="optical_module.model" type="geomtools::stacked_model"]
+
+  #@config The configuration parameters for the optical module
+
+  #@description The stacking axis
+  stacked.axis            : string = "z"
+
+  #@description The number of stacked volumes
+  stacked.number_of_items : integer = 3
+
+  #@description The model of the stacked volume #2
+  stacked.model_2   : string  = "wrapped_scintillator_block.model"
+
+  #@description The label of the stacked volume #2
+  stacked.label_2   : string  = "scintillator_block"
+
+  #@description The model of the stacked volume #1
+  stacked.model_1   : string   = "rotated_light_guide.model"
+
+  #@description The label of the stacked volume #1
+  stacked.label_1   : string  = "light_guide"
+
+  #@description The model of the stacked volume #0
+  stacked.model_0   : string   = "pmt.model"
+
+  #@description The label of the stacked volume #0
+  stacked.label_0   : string  = "pmt"
+
+  #@description The name of the material
+  material.ref      : string    = "lab_medium"
+
+  #@description The mapping directive for the "light_guide" daughter volume
+  mapping.daughter_id.light_guide : string  = "[light_guide.gc]"
+#+END_SRC
+*** Source
+:PROPERTIES:
+:TANGLE: config/geometry/source.geom
+:END:
+**** Preamble
+#+BEGIN_SRC sh
+  #@description List of geometry models
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+**** Film model
+#+BEGIN_SRC sh
+  [name="source_film.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the source film
+
+  #@description The name of the 3D shape of the source film
+  shape_type  : string = "cylinder"
+
+  #@description The R dimension (radius) of the cylinder source film
+  r : real as length = 9.5 mm
+
+  #@description The Z dimension (thickness) of the cylinder source film
+  z : real as length = 5 um
+
+  #@description The name of the material of the source film
+  material.ref : string = "mylar"
+#+END_SRC
+**** Source support model
+#+BEGIN_SRC sh
+  [name="source_support.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the source support
+
+  #@description The name of the 3D shape of the source support ring
+  shape_type  : string = "tube"
+
+  #@description The inner R dimension (inner radius) of the source support ring
+  inner_r     : real as length = 10.0 mm
+
+  #@description The outer R dimension (inner radius) of the source support ring
+  outer_r     : real as length = 12.0 mm
+
+  #@description The Z dimension (thickness) of the source support ring
+  z           : real as length = 5.0 mm
+
+  #@description The name of the material of the source support ring
+  material.ref : string = "aluminium"
+#+END_SRC
+
+**** Source model
+The source model will used the two previous models by placing them "internally"
+to a larger cylinder. We first declare the holding volume
+#+BEGIN_SRC sh
+  [name="source.model" type="geomtools::simple_shaped_model"]
+
+  #@description The name of the 3D shape of the source cylindric envelope
+  shape_type  : string = "cylinder"
+
+  #@description The R dimension (radius) of the source cylindric envelope
+  r : real as length = 12.0 mm
+
+  #@description The Z dimension (thickness) of the source cylindric envelope
+  z : real as length = 5.0 mm
+
+  #@description The name of the material
+  material.ref : string  = "lab_medium"
+#+END_SRC
+and then place inside, the "support" and "film" models
+#+BEGIN_SRC sh
+  #@description The list of daughter volumes by label
+  internal_item.labels : string[2] = "support" "film"
+
+  #@description The model of the "support" daughter volume
+  internal_item.model.support : string  = "source_support.model"
+
+  #@description The placement of the "support" daughter volume
+  internal_item.placement.support : string  = "0 0 0 (mm)"
+
+  #@description The model of the "film" daughter volume
+  internal_item.model.film : string  = "source_film.model"
+
+  #@description The placement of the "film" daughter volume
+  internal_item.placement.film : string  = "0 0 0 (mm)"
+#+END_SRC
+
+We finally define mapping ids
+#+BEGIN_SRC sh
+  #@description The mapping directives for the "film" daughter volume
+  mapping.daughter_id.film : string  = "[source_film.gc]"
+
+  #@description The mapping directives for the "support" daughter volume
+  mapping.daughter_id.support : string  = "[source_support.gc]"
+#+END_SRC
+*** Laboratory & world volume
+:PROPERTIES:
+:TANGLE: config/geometry/lab_world.geom
+:END:
+**** Preamble
+#+BEGIN_SRC sh
+  #@description List of geometry models
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+**** Absorber
+#+BEGIN_SRC sh
+  [name="thin_absorber.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the thin_absorber front of the detector
+
+  #@description The name of the 3D shape
+  shape_type :   string =  "box"
+
+  #@description The X dimension
+  x   : real as length = 100.0 mm
+
+  #@description The Y dimension
+  y   : real as length = 100.0 mm
+
+  #@description The Z dimension
+  z   : real as length = 50 um
+
+  #@description The name of the material
+  material.ref      : string  = "copper"
+#+END_SRC
+**** Black box
+#+BEGIN_SRC sh
+  [name="black_box.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the light guide
+
+  #@description The default implicit length unit
+  length_unit : string = "mm"
+
+  #@description The name of the 3D shape
+  shape_type : string = "polyhedra"
+
+  #@description The polyhedra build mode
+  build_mode : string = "points"
+
+  #@description The polyhedra number of sides
+  sides        : integer = 4
+
+  #@description The list of Z coordinates for the shape
+  list_of_z    : real [2] =   -125.     +125.
+
+  #@description The list of inner radius coordinates for the shape
+  list_of_rmin : real [2] =    51.      51.
+
+  #@description The list of outer radius coordinates for the shape
+  list_of_rmax : real [2] =    53.      53.
+
+  #@description The name of the material
+  material.ref : string  = "inox"
+#+END_SRC
+**** Lab. model
+#+BEGIN_SRC sh
+  [name="lab.model" type="geomtools::simple_shaped_model"]
+
+  #@config The configuration parameters for the laboratory experimental area
+
+  #@description The name of the 3D shape of the lab area
+  shape_type  : string = "box"
+
+  #@description The X dimension of the box
+  x           : real as length = 900.0 mm
+
+  #@description The Y dimension of the box
+  y           : real as length = 450.0 mm
+
+  #@description The Z dimension of the box
+  z           : real as length = 450.0 mm
+
+  #@description The name of the material that fills the lab atmosphere
+  material.ref : string = "lab_medium"
+
+  #@description The list of daughter volumes by labels
+  internal_item.labels : string[4] = "source" "detector" "box" "absorber0"
+
+  #@description The model of the "source" daughter volume
+  internal_item.model.source        : string  = "source.model"
+
+  #@description The placement of the "source" daughter volume
+  internal_item.placement.source    : string  = "20 0 0 (cm) / y +90 (degree)"
+
+  #@description The model of the "detector" daughter volume
+  internal_item.model.detector      : string  = "optical_module.model"
+
+  #@description The placement of the "detector" daughter volume
+  internal_item.placement.detector  : string  = "-20 0 0 (cm) / y +90 (degree) "
+
+  #@description The model of the "box" daughter volume
+  internal_item.model.box           : string  = "black_box.model"
+
+  #@description The placement of the "box" daughter volume
+  internal_item.placement.box       : string  = "-24 0 0 (cm) @  0 90 45 (degree) "
+
+  #@description The model of the "absorber0" daughter volume
+  internal_item.model.absorber0     : string  = "thin_absorber.model"
+
+  #@description The placement of the "absorber0" daughter volume
+  internal_item.placement.absorber0 : string  = "0 0 0 (cm) @  0 90 0 (degree) "
+
+  #@description The mapping directives for the "source" daughter volume
+  mapping.daughter_id.source   : string  = "[source.gc:position=0]"
+
+  #@description The mapping directives for the "detector" daughter volume
+  mapping.daughter_id.detector : string  = "[optical_module.gc:detector=0]"
+#+END_SRC
+**** World volume
+#+BEGIN_SRC sh
+  [name="world" type="geomtools::simple_world_model"]
+
+  #@config configuration parameters for the world logical volume
+
+  #@description The world volume X dimension (box)
+  world.x         : real as length  = 1000.0 mm
+
+  #@description The world volume Y dimension (box)
+  world.y         : real as length = 500.0 mm
+
+  #@description The world volume Z dimension (box)
+  world.z         : real as length = 500.0 mm
+
+  #@description The name of the model that represents the experimental setup daughter volume
+  setup.model     : string = "lab.model"
+
+  #@description The setup placement phi angle
+  setup.phi       : real as angle = 0.0 degree
+
+  #@description The setup placement theta angle
+  setup.theta     : real as angle = 0.0 degree
+
+  #@description The setup placement X coordinate
+  setup.x         : real as length = 0.0 mm
+
+  #@description The setup placement Y coordinate
+  setup.y         : real as length = 0.0 mm
+
+  #@description The setup placement Z coordinate
+  setup.z         : real as length = 0.0 mm
+
+  #@description The name of the material that fills the world volume
+  material.ref    : string = "vacuum"
+
+  #@description The mapping directives for the 'setup' daughter volume
+  mapping.daughter_id.setup : string  = "[lab.gc:area=0]"
+#+END_SRC
+** Mapping categories
+:PROPERTIES:
+:TANGLE: config/geometry/categories.lis
+:END:
+#+BEGIN_SRC sh
+  #@description A list of geometry ID categories/types
+  #@key_label   "category"
+  #@meta_label  "type"
+
+
+  ##################################################################
+  # This is the mandatory top-level geometry category.
+  # One should always provide it :
+  [category="world" type="0"]
+
+  #@config The geometry category of the top-level world volume
+
+  #@description The world's GID address is characterized by its 'world' number
+  addresses : string[1] = "world"
+
+
+  ##################################################################
+  # This geometry category addresses an experimental area volume :
+  [category="lab.gc"  type="100"]
+
+  #@config The geometry category of the experimental area volume (lab)
+
+  #@description A lab's GID address is charaterized by its 'area' number
+  addresses : string[1] = "area"
+
+
+  ################################################################
+  # This geometry category addresses a calibration source object :
+  [category="source.gc" type="1000"]
+
+  #@config The geometry category of a calibration source
+
+  #@description The GID address of a calibration source is defined by its 'position' number
+  addresses : string[1] = "position"
+
+
+  ##############################################################################
+  # This geometry category addresses the support frame of a calibration source :
+  [category="source_support.gc" type="1010"]
+
+  #@config The geometry category of a calibration source support
+
+  #@description The GID address of a source support inherits the GID address of the source
+  inherits : string = "source.gc"
+
+
+  #################################################################
+  # This geometry category addresses of a calibration source film :
+  [category="source_film.gc" type="1020"]
+
+  #@config The geometry category of a calibration source film
+
+  #@description The GID address of a source film inherits the GID address of the source
+  inherits : string = "source.gc"
+
+
+  ######################################################
+  # This geometry category addresses an optical module :
+  [category="optical_module.gc" type="2020"]
+
+  #@config The geometry category of a calibration source film
+
+  #@description The GID address of a column is defined by its 'detector' number
+  addresses : string[1] = "detector"
+
+
+  #################################################################################
+  #  This geometry category addresses the scintillator block of an optical module :
+  [category="scin_block.gc" type="2030"]
+
+  #@config The geometry category of the scintillator block of an optical module
+
+  #@description The GID address of a scin block inherits the GID address of the optical module
+  inherits : string = "optical_module.gc"
+
+
+  ###############################################
+  [category="scin_block_wrapping.gc" type="2031"]
+
+  #@config The geometry category of a wrapping film around a scintillator block
+
+  #@description The GID address of a wrapping film extends GID address of the scintillator block
+  extends : string[1] = "scin_block.gc"
+
+  #@description The 'side' number extend the mother scintillator block GID address
+  by       : string[1] = "side"
+
+
+  #######################################
+  [category="light_guide.gc" type="2032"]
+
+  #@config The geometry category of the light guide
+
+  #@description The GID address of a light guide inherits the GID address of the optical module
+  inherits : string[1] = "optical_module.gc"
+#+END_SRC
+** Materials plugin
+:PROPERTIES:
+:TANGLE: config/geometry/materials_plugin.conf
+:END:
+
+We use the definitions of isotopes, elements and materials from the installed
+materials library. Here the =materials_aliases= definition are locally defined
+to change the source foil isotope.
+*** Plugin declaration
+#+BEGIN_SRC sh
+  #@description The geometry manager plugin for materials
+
+  #@key_label  "name"
+  #@meta_label "type"
+
+  [name="materials_driver" type="geomtools::materials_plugin"]
+#+END_SRC
+
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority
+  logging.priority : string = "warning"
+#+END_SRC
+
+*** Files
+#+BEGIN_SRC sh
+  #@description List of files describing the materials
+  materials.files : string[4] as path =   \
+      "@materials:data/std_isotopes.def"  \
+      "@materials:data/std_elements.def"  \
+      "@materials:data/std_materials.def" \
+      "@HPGE_SIMULATION_DIR@/materials_aliases.def"
+#+END_SRC
+*** Material aliases
+:PROPERTIES:
+:TANGLE: config/geometry/materials_aliases.def
+:END:
+#+BEGIN_SRC sh
+  #@description A sample list of aliases for standard materials
+  #@key_label   "name"
+  #@meta_label  "type"
+
+  [name="air" type="alias"]
+  #@description The alias for air
+  material : string = "std::air"
+
+  [name="aluminium" type="alias"]
+  #@description The alias for aluminium
+  material : string = "std::aluminium"
+
+  [name="inox" type="alias"]
+  #@description The alias for inox
+  material : string = "std::inox"
+
+  [name="copper" type="alias"]
+  #@description The alias for copper
+  material : string = "std::copper"
+
+  [name="mylar" type="alias"]
+  #@description The alias for mylar
+  material : string = "std::mylar"
+
+  [name="plexiglass" type="alias"]
+  #@description The alias for plexiglass
+  material : string = "std::plexiglass"
+
+  [name="polystyrene" type="alias"]
+  #@description The alias for polystyrene
+  material : string = "std::polystyrene"
+
+  [name="glass" type="alias"]
+  #@description The alias for pyrex
+  material : string = "std::pyrex"
+
+  [name="vacuum" type="alias"]
+  #@description The alias for vacuum
+  material : string = "std::vacuum"
+
+  [name="lab_medium" type="alias"]
+  #@description The alias for air
+  material : string = "std::air"
+  #material : string = "std::vacuum"
+#+END_SRC
+
+** Magnetic field plugin
+:PROPERTIES:
+:TANGLE: config/geometry/magnetic_field_plugin.conf
+:END:
+*** Plugin declaration
+#+BEGIN_SRC sh
+  #@description The geometry manager plugin for emfield
+
+  #@key_label  "name"
+  #@meta_label "type"
+
+  [name="fields_driver" type="emfield::emfield_geom_plugin"]
+#+END_SRC
+
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority
+  logging.priority : string = "warning"
+#+END_SRC
+
+*** EM field manager configuration
+#+BEGIN_SRC sh
+  #@description Manager logging priority
+  manager.logging.priority : string = "warning"
+
+  #@description The name of the geometry service
+  manager.services.geometry : string = "Geo"
+
+  #@description List of EM fields definitions files
+  manager.field_definitions_filenames : string[1] as path = \
+      "@HPGE_SIMULATION_DIR@/magnetic_field_drivers.conf"
+#+END_SRC
+
+EM field defined within =manager.field_definitions_filenames= file can be set
+independently and at the same time for different G4 volumes. This association
+between volumes and field is done by the =geom_map= object of =emfield=
+component.
+#+BEGIN_SRC sh
+  #@description Flag to activate the geometry volume/field associations map
+  manager.build_geom_map : boolean = 1
+
+  #@description Manager logging priority
+  manager.geom_map.logging.priority : string = "warning"
+
+  #@description The list of EM fields associated to some logical volumes
+  manager.geom_map.associations.labels : string[1] = "lab"
+
+  #@description The logical model associated for the label 'tracker'
+  manager.geom_map.associations.lab.volume : string = "lab.model.log"
+
+  #@description The EM field associated for the label "tracker"
+  manager.geom_map.associations.lab.field_name : string = "B0"
+#+END_SRC
+
+*** Magnetic fields
+:PROPERTIES:
+:TANGLE: config/geometry/magnetic_field_drivers.conf
+:END:
+**** Preamble
+#+BEGIN_SRC sh
+  #@description Definition parameters for some electro-magnetic fields
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+**** Constant magnetic field
+#+BEGIN_SRC sh
+  [name="B0" type="emfield::uniform_magnetic_field"]
+
+  #@config Configuration parameters for the magnetic field generated by a coil
+
+  #@description Default implicit magnetic field unit
+  magnetic_field.unit        : string  = "gauss"
+
+  #@description Coordinates of the static magnetic field (Bx, By, Bz)
+  magnetic_field.coordinates : real[3] = 0.0 0.0 25.0
+#+END_SRC
+
+** Visualization settings
+:PROPERTIES:
+:MKDIRP: yes
+:TANGLE: config/visualization/hpge_simulation.sty
+:END:
+*** Browser settings
+#+BEGIN_SRC sh
+  [name="browser_settings"]
+
+  #@description Setup label.
+  setup_label : string = "hpge_simulation"
+
+  #@description Tab to view at startup.
+  # 0: 3D Display 1: Raw Data 2: Options, 3: Selection
+  startup_tab : integer = 0
+
+  # 0: Top view 1: Front view 2: Side view
+  startup_2d_view : integer = 0
+
+  #@description Background color of displays.
+  background_color : integer[3] =   0   0   0
+#+END_SRC
+*** Geometry settings
+#+BEGIN_SRC sh
+  [name="geometry_settings"]
+
+  #@description List of volumes to take care.
+  volume_category_list : string[8] =                          \
+                                     "lab.gc"                 \
+                                     "light_guide.gc"         \
+                                     "optical_module.gc"      \
+                                     "scin_block.gc"          \
+                                     "scin_block_wrapping.gc" \
+                                     "source.gc"              \
+                                     "source_film.gc"         \
+                                     "source_support.gc"
+
+  #@description Volume visibility (visible/invisible/disable)
+  lab.gc.visibility                 : string = "visible"
+  light_guide.gc.visibility         : string = "visible"
+  optical_module.gc.visibility      : string = "visible"
+  scin_block.gc.visibility          : string = "visible"
+  scin_block_wrapping.gc.visibility : string = "visible"
+  source.gc.visibility              : string = "visible"
+  source_film.gc.visibility         : string = "visible"
+  source_support.gc.visibility      : string = "visible"
+
+  #@description Volume color
+  lab.gc.color                 : integer[3] = 228 123 220
+  light_guide.gc.color         : integer[3] = 158 246 222
+  optical_module.gc.color      : integer[3] = 141  17  79
+  scin_block.gc.color          : integer[3] =  66  43 244
+  scin_block_wrapping.gc.color : integer[3] =  86 111 124
+  source.gc.color              : integer[3] = 236  33 141
+  source_film.gc.color         : integer[3] = 163  44  34
+  source_support.gc.color      : integer[3] =  90 156 254
+#+END_SRC
+*** Particle settings
+#+BEGIN_SRC sh
+  [name="particle_settings"]
+
+  #@description MC particle color
+#+END_SRC
+*** Misc.
+#+BEGIN_SRC sh
+  [name="miscellaneous"]
+
+  #@description MC line style
+  mc_line_style : integer = 1
+  mc_line_width : integer = 0
+
+  #@description Figure save options
+  save.directory : string = "."
+  save.extension : string = ".eps"
+  save.prefix    : string = "event_"
+#+END_SRC
+
+* Pipeline general configuration
+
+SN@ilWare implements the concept of data processing pipeline. An event record
+object is passed through a chain of data processing modules, each of them being
+responsible for a given task. Modules and services are declared in Section
+[[Modules]] and Section [[Services]]. For more details on running SuperNEMO simulations
+and the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given
+by F. Mauger.
+
+The =@HPGE_SIMULATION_DIR@= corresponds to the directory where configuration
+files are going to be stored. This variable which varies from one installation
+to the other, is automatically changed when the tangle process occurs. This is
+done /via/ the =Makefile= which parse and replace this variable.
+
+** Module manager
+:PROPERTIES:
+:MKDIRP: yes
+:TANGLE: config/pipeline/module_manager.conf
+:END:
+This file is the main and central piece of code for loading all modules/services
+needed by =dpp_processing= binary. It provides links to module files and
+service files.
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Module manager logging priority
+  logging.priority : string = "warning"
+
+  #@description Embedded module factory debug flag
+  factory.debug : boolean = 0
+
+  #@description Embedded module factory 'no preload' flag
+  factory.no_preload : boolean = 0
+#+END_SRC
+
+*** Service manager configuration
+#+BEGIN_SRC sh
+  #@description The configuration file of the embedded service manager
+  service_manager.configuration : string[1] as path = \
+      "@HPGE_SIMULATION_DIR@/service_manager.conf"
+#+END_SRC
+
+*** Configuration files for modules
+#+BEGIN_SRC sh
+  #@description The configuration files for modules
+  modules.configuration_files : string[1] as path = \
+      "@HPGE_SIMULATION_DIR@/hpge_simulation_modules.conf"
+#+END_SRC
+
+** Service manager
+:PROPERTIES:
+:TANGLE: config/pipeline/service_manager.conf
+:END:
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Service manager logging priority
+  logging.priority : string = "warning"
+#+END_SRC
+*** Name & description
+#+BEGIN_SRC sh
+  #@description The name of the service manager
+  name : string = "hpge_service_manager"
+
+  #@description The description of the service manager
+  description : string = "A HPGe service manager"
+#+END_SRC
+*** List of service files
+#+BEGIN_SRC sh
+  #@description The list of files that describe services
+  services.configuration_files : string[1] as path = \
+      "@HPGE_SIMULATION_DIR@/services.conf"
+#+END_SRC
+
+** DLL loader
+*** Code generator                                               :noexport:
+:PROPERTIES:
+:TANGLE: no
+:RESULTS: output
+:END:
+This skeleton code ease the declaration of dll loader since it
+receives a table list and builds the corresponding =dlls.conf= file.
+
+#+NAME: dll_loader
+#+HEADERS: :var list=""
+#+BEGIN_SRC sh
+  echo '#@description A sample list of setups'
+  echo '#@key_label   "name"'
+  echo '#@meta_label  "filename"'
+  for i in $list
+  do
+      dll=$(echo $i | sed '/(/ s/("\|")//g')
+      echo '[name="'$dll'" filename=""]'
+      echo '#config The '$dll' library'
+      echo 'autoload : boolean = 1'
+      echo
+  done
+#+END_SRC
+*** Libraries
+:PROPERTIES:
+:TANGLE: config/pipeline/dlls.conf
+:END:
+This part set the different libraries to be loaded at runtime. This is needed
+since event data models are defined in other libraries than the one currently
+named =hpge_simulation=. The following table sets the libraries
+
+#+CAPTION: Libraries to be used by =hpge_simulation= modules
+#+TBLNAME: dll_libraries :results none
+|---------------------|
+| mctools_bio         |
+|---------------------|
+
+#+BEGIN_SRC sh :noweb yes
+  <<dll_loader(dll_libraries[*,0])>>
+#+END_SRC
+* Geant4 validation modules
+
+The next item holds the configuration for validating Geant4 setup. The second
+item is related to histogram declarations.
+
+** Module declaration
+:PROPERTIES:
+:TANGLE: config/pipeline/hpge_simulation_modules.conf
+:END:
+
+Here, we just set up the module declaration.
+
+*** File preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+*** Declaration & description
+#+BEGIN_SRC sh
+  [name="hpge_simulation_module" type="analysis::hpge_simulation_module"]
+
+  #@description A module to study and to validate Geant4 setup
+#+END_SRC
+
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority
+  logging.priority : string = "notice"
+#+END_SRC
+
+*** Histogram service label
+Set the same histogram service label as defined [[Histogram service][here]]
+#+BEGIN_SRC sh
+  #@description The Histogram Service label
+  Histo_label : string = "Histo"
+#+END_SRC
+
+** Histogram declarations
+:PROPERTIES:
+:TANGLE: config/pipeline/histogram_templates.conf
+:END:
+
+The histogram declarations /i.e./ name, boundaries, binning... are set in this
+section which is organized by data bank related plots. There are two kinds of
+histograms:
+- /template/ histogram which may be used by several data bank.
+
+*** Mandatory preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+
+*** Energy template
+#+BEGIN_SRC sh
+  [name="energy_template" type="mygsl::histogram_1d"]
+  #@description The title of the histogram (optional)
+  title : string = ""
+
+  #@description The group of the histogram (optional)
+  group : string = "__template"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The X axis label
+  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"
+
+  #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
+  display.xaxis.unit : string = "keV"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "dN/dE [A.U.]"
+
+  #@description The number of bins
+  number_of_bins : integer = 25
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "keV"
+
+  #@description The lower bound of the histogram
+  min : real = 2000.0
+
+  #@description The upper bound of the histogram
+  max : real = 3200.0
+#+END_SRC
+
+* Services
+:PROPERTIES:
+:TANGLE: config/pipeline/services.conf
+:END:
+
+A service generally hosts a specific resource that can be shared by many other
+software components, including other services or data processing modules (see
+[[https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice][SN@ilWare FAQ]]).
+
+** Preamble
+
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+
+** Context service
+
+#+BEGIN_SRC sh
+  [name="Ctx" type="dpp::context_service"]
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description File from which the context is to be loaded at program start
+  load.file : string as path  = "/tmp/${USER}/snemo.d/snemo_context.conf"
+
+  #@description File to store the context at program termination
+  store.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_end.conf"
+
+  #@description Flag to backup the former context load file
+  backup.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_bak.conf"
+#+END_SRC
+
+** Histogram service
+
+The histogram service provides an esay way to handle histogram plot from
+different modules (mainly plot modules). It provides a service where 1D or 2D
+histograms can be added to a histogram dictionnary.
+
+#+BEGIN_SRC sh
+  [name="Histo" type="dpp::histogram_service"]
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description The description string of the embedded pool of histograms
+  pool.description : string = "Geant4 histograms"
+#+END_SRC
+
+#+BEGIN_SRC sh
+  #@description The main configuration file for the embedded histogram manager
+  pool.histo.setups : string[1] as path = \
+      "@HPGE_SIMULATION_DIR@/histogram_templates.conf"
+#+END_SRC
+
+Finally, all histograms created can be stored inside ROOT files or XML archives.
+#+BEGIN_SRC sh
+  #@description The ouput file where to store the histograms
+  output_files : string[2] as path =                        \
+      "/tmp/${USER}/snemo.d/hpge_simulation_histos.root" \
+      "/tmp/${USER}/snemo.d/geant4_vlaidation_histos.xml"
+#+END_SRC
+
+* Running SN@ilWare processing chain
+** Tangling configuration
+First, you need to tangle this file. As explained in the [[Content][Content]] section, you
+may use the dedicated =Makefile= to generate the pipeline configuration. Just
+run =make= within this working directory.
+
+** Source code compilation
+Second, you need to compile the =hpge_simulation= module files. The build
+system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
+setup the dependences. Nevertheless, this implies that you have already and
+correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadfael]], [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux][Bayeux]] and Falaise. Then, you can configure, build
+and install the =hpge_simulation= module by doing
+#+BEGIN_SRC sh
+  mkdir {build,install} && cd build
+  cmake                                               \
+      -DCMAKE_PREFIX_PATH="<path to Falaise install>" \
+      -DCMAKE_INSTALL_PREFIX=../install               \
+      ../source
+  make install
+  cd ..
+#+END_SRC
+
+** Use and execute =hpge_simulation= module
+After a successful build, you will get an =install= directory holding the
+=libhpge_simulation.so= file. Assuming you are under =bash= shell, you will
+need to add it to your =LD_LIBRARY_PATH= by doing
+#+BEGIN_SRC sh
+  export LD_LIBRARY_PATH=${PWD}/install/lib:${LD_LIBRARY_PATH}
+#+END_SRC
+
+Another approach, maybe less intrusive, will be to set the =LD_LIBRARY_PATH=
+when running the =dpp_processing= binary. You can for example write something
+like
+#+BEGIN_SRC sh
+  LD_LIBRARY_PATH=${PWD}/install/lib:${LD_LIBRARY_PATH} dpp_processing ...
+#+END_SRC
+
+Running processing pipeline is done by the =dpp_processing= program provided by
+=dpp= library. Its call is pretty simple and only implies to have a module
+manager file and the name of the module to be run /i.e./
+=hpge_simulation_module=. Nevertheless, you need to dynamically load the
+library(ies) which holds the needed modules.
+
+#+BEGIN_SRC sh
+  dpp_processing                                                       \
+      --module-manager-config $PWD/config/pipeline/module_manager.conf \
+      --module hpge_simulation_module                                \
+      --load-dll hpge_simulation                                     \
+      --load-dll <library>_bio
+#+END_SRC
+
+=<library>_bio= represents libraries which holds event data models such as
+=mctools_bio=. You can use the =dlls.conf= file built in section [[DLL loader]] by
+writing
+
+#+BEGIN_SRC sh
+  dpp_processing                                                       \
+      --module-manager-config $PWD/config/pipeline/module_manager.conf \
+      --module hpge_simulation_module                                \
+      --load-dll hpge_simulation                                     \
+      --dll-config $PWD/config/pipeline/dlls.conf
+#+END_SRC
+
+It will run the =hpge_simulation_module= and it will generate a ROOT file
+containing several histograms. This file is located by default, in
+=/tmp/${USER}/snemo.d= directory under the =hpge_simulation_histos.root=
+name. You can change the output directory and output file name in [[Histogram
+service][this section]].
+
+* Footnotes
+
+[fn:1] We recommend that you name any sensitive category with the =_SD=
+ suffix. This is to ease the reading of other configuration files at the
+ simulation level (step hit processors). Also note that if you prefix the
+ sensitive category name with two underscores (example: =__test_SD=), then the
+ sensitive category is considered as "private" (non official) and may be
+ processed in some special way by the simulation engine.
