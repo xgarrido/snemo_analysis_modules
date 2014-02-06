@@ -1136,6 +1136,82 @@ component.
   magnetic_field.coordinates : real[3] = 0.0 0.0 25.0
 #+END_SRC
 
+** Visualization settings
+:PROPERTIES:
+:MKDIRP: yes
+:TANGLE: config/visualization/geant4_validation.sty
+:END:
+*** Browser settings
+#+BEGIN_SRC sh
+  [name="browser_settings"]
+
+  #@description Setup label.
+  setup_label : string = "geant4_validation"
+
+  #@description Tab to view at startup.
+  # 0: 3D Display 1: Raw Data 2: Options, 3: Selection
+  startup_tab : integer = 0
+
+  # 0: Top view 1: Front view 2: Side view
+  startup_2d_view : integer = 0
+
+  #@description Background color of displays.
+  background_color : integer[3] =   0   0   0
+#+END_SRC
+*** Geometry settings
+#+BEGIN_SRC sh
+  [name="geometry_settings"]
+
+  #@description List of volumes to take care.
+  volume_category_list : string[8] =                          \
+                                     "lab.gc"                 \
+                                     "light_guide.gc"         \
+                                     "optical_module.gc"      \
+                                     "scin_block.gc"          \
+                                     "scin_block_wrapping.gc" \
+                                     "source.gc"              \
+                                     "source_film.gc"         \
+                                     "source_support.gc"
+
+  #@description Volume visibility (visible/invisible/disable)
+  lab.gc.visibility                 : string = "visible"
+  light_guide.gc.visibility         : string = "visible"
+  optical_module.gc.visibility      : string = "visible"
+  scin_block.gc.visibility          : string = "visible"
+  scin_block_wrapping.gc.visibility : string = "visible"
+  source.gc.visibility              : string = "visible"
+  source_film.gc.visibility         : string = "visible"
+  source_support.gc.visibility      : string = "visible"
+
+  #@description Volume color
+  lab.gc.color                 : integer[3] = 228 123 220
+  light_guide.gc.color         : integer[3] = 158 246 222
+  optical_module.gc.color      : integer[3] = 141  17  79
+  scin_block.gc.color          : integer[3] =  66  43 244
+  scin_block_wrapping.gc.color : integer[3] =  86 111 124
+  source.gc.color              : integer[3] = 236  33 141
+  source_film.gc.color         : integer[3] = 163  44  34
+  source_support.gc.color      : integer[3] =  90 156 254
+#+END_SRC
+*** Particle settings
+#+BEGIN_SRC sh
+  [name="particle_settings"]
+
+  #@description MC particle color
+#+END_SRC
+*** Misc.
+#+BEGIN_SRC sh
+  [name="miscellaneous"]
+
+  #@description MC line style
+  mc_line_style : integer = 1
+  mc_line_width : integer = 0
+
+  #@description Figure save options
+  save.directory : string = "."
+  save.extension : string = ".eps"
+  save.prefix    : string = "event_"
+#+END_SRC
 * Geant4 validation modules
 
 The next item holds the configuration for validating Geant4 setup. The second
