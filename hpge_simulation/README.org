@@ -680,6 +680,7 @@ named =hpge_simulation=. The following table sets the libraries
 #+CAPTION: Libraries to be used by =hpge_simulation= modules
 #+TBLNAME: dll_libraries :results none
 |---------------------|
+| mctools_g4          |
 | mctools_bio         |
 |---------------------|
 
@@ -1135,6 +1136,17 @@ Generate vertex in the bulk volume of the sample
   energy                : real as energy = 1.0 GeV
   randomized_direction  : boolean = 1
 #+END_SRC
+** Analysis modules
+:PROPERTIES:
+:TANGLE: config/pipeline/analysis_modules.conf
+:END:
+*** File preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+
 ** Histogram declarations
 :PROPERTIES:
 :TANGLE: config/pipeline/histogram_templates.conf
