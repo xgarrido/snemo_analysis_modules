@@ -885,6 +885,40 @@ module configuration to analyse simulated data.
   #@description Primary generator action logging priority
   logging.priority : string = "warning"
  #+END_SRC
+**** Step hit processors
+:PROPERTIES:
+:TANGLE: config/simulation/step_hit_processor_factory.conf
+:END:
+***** Crystal hit processor
+#+BEGIN_SRC sh
+  [name="crystal.hit_processor" type="mctools::calorimeter_step_hit_processor"]
+
+  #@config The step hit processor for the crystal simulated hits
+
+  logging.priority      : string = "warning"
+  hit.category          : string = "scin.hit"
+  #hit.category          : string = "crystal.hit"
+  sensitive.category    : string = "germanium_SD"
+  mapping.category      : string = "germanium.category"
+
+  use_private_pool      : boolean = 1
+  private_pool_capacity : integer = 10
+
+  cluster.time_range    : real as time   = 1.0 ns
+  cluster.space_range   : real as length = 10.0 mm
+#+END_SRC
+***** Visualization hit processors
+#+BEGIN_SRC sh
+  [name="all.volumes.visu.hit_processor" type="mctools::push_all_step_hit_processor"]
+
+  #@config The step hit processor for collecting all the visu hits
+
+  logging.priority     : string  = "warning"
+  hit.category         : string  = "__visu.tracks"
+  sensitive.category   : string  = "__all.volumes.SD"
+  geometry.volumes.all : boolean = 1
+  #geometry.volumes.excluded : string[0] = "field_wire.model.log" "anode_wire.model.log"
+#+END_SRC
 *** Vertex generator
 #+BEGIN_SRC sh
   #@description The vertex generator PRNG label
