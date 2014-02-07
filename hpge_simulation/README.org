@@ -713,7 +713,7 @@ module configuration to analyse simulated data.
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "trace"
+  logging.priority : string = "warning"
 #+END_SRC
 
 *** Bank & service labels
@@ -872,6 +872,11 @@ module configuration to analyse simulated data.
   #@description If set, this flag forbids the generation of output files :
   file.no_save : boolean = 1
 
+  [name="event_action"]
+
+  #@description Logging priority :
+  logging.priority : string = "warning"
+
   [name="primary_generator_action"]
 
   #@description Primary generator action logging priority
@@ -892,6 +897,120 @@ module configuration to analyse simulated data.
   #@description Primary generator action logging priority
   logging.priority : string = "warning"
  #+END_SRC
+**** Physics list
+***** Particles
+:PROPERTIES:
+:TANGLE: config/simulation/physics_list_particles.conf
+:END:
+#+BEGIN_SRC sh
+  #@config Configuration parameters for the particles Geant4 physics constructor
+
+  #@description The activation flag for geantinos (neutral and charged, default: 0)
+  #use_geantinos               : boolean = 0
+
+  #@description The activation flag for optical photons (default: 0)
+  #use_optical_photons         : boolean = 0
+
+  #@description The activation flag for muon leptons (default: 0)
+  #use_muon_leptons         : boolean = 0
+
+  #@description The activation flag for tau leptons (default: 0)
+  #use_tau_leptons          : boolean = 0
+
+  #@description The activation flag for light mesons (default: 0)
+  #use_light_mesons         : boolean = 0
+
+  #@description The activation flag for charm mesons (default: 0)
+  #use_charm_mesons         : boolean = 0
+
+  #@description The activation flag for bottom mesons (default: 0)
+  #use_bottom_mesons        : boolean = 0
+
+  #@description The activation flag for nucleons (default: 1)
+  #use_nucleons             : boolean = 1
+
+  #@description The activation flag for strange baryons (default: 0)
+  #use_strange_baryons      : boolean = 0
+
+  #@description The activation flag for charm baryons (default: 0)
+  #use_charm_baryons        : boolean = 0
+
+  #@description The activation flag for bottom baryons (default: 0)
+  #use_bottom_baryons       : boolean = 0
+
+  #@description The activation flag for light nuclei (default: 1)
+  #use_light_nuclei         : boolean = 1
+
+  #@description The activation flag for light anti-nuclei (default: 0)
+  #use_light_anti_nuclei    : boolean = 0
+
+  #@description The activation flag for generic ion (default: 0)
+  use_generic_ion          : boolean = 1
+#+END_SRC
+***** EM processes
+:PROPERTIES:
+:TANGLE:   config/simulation/physics_list_em_processes.conf
+:END:
+#+BEGIN_SRC sh
+  #@config Configuration parameters for the electro-magnetic Geant4 physics constructor
+
+  #@description Electro-magntox interaction model (value in: "standard", "low_energy", "penelope")
+  #em.model : string = "standard"
+
+  #@description The activation flag for electron/positron energy loss process
+  #em.electron.energy_loss         : boolean = 1
+
+  #@description The activation flag for electron/positron multiple scaterring process
+  #em.electron.multiple_scaterring : boolean = 1
+
+  #@description The activation flag for electron/positron bremsstrahlung process
+  #em.electron.bremsstrahlung      : boolean = 1
+
+  #@description The activation flag for positron pannihilation
+  #em.positron.annihilation        : boolean = 1
+
+  ################
+  # Deexcitation #
+  ################
+
+  #@description The activation flag for deexcitation fluorescence process
+  #em.deexcitation.fluo         : boolean = 0
+
+  #@description The activation flag for Auger process
+  #em.deexcitation.auger        : boolean = 0
+
+  #@description The activation flag for PIXE
+  #em.deexcitation.pixe         : boolean = 0
+
+  #@description The activation model for PIXE cross-sections
+  #em.deexcitation.pixe.model   : string = "Empirical"
+
+  ###########################
+  # Deexcitation per region #
+  ###########################
+
+  #@description The regions where to apply some deexcitation process
+  #em.deexcitation.regions    : string[2] = "A" "B"
+
+  #@description The activation flag for deexcitation fluorescence process in region "A"
+  #em.deexcitation.regions.A.fluo : boolean = 1
+
+  #@description The activation flag for Auger process in region "A"
+  #em.deexcitation.regions.A.auger : boolean = 1
+
+  #@description The activation flag for PIXE in region "A"
+  #em.deexcitation.regions.A.pixe : boolean = 1
+
+  #@description The activation flag for deexcitation fluorescence process in region "B"
+  #em.deexcitation.regions.B.fluo : boolean = 1
+
+  #@description The activation flag for Auger process in region "B"
+  #em.deexcitation.regions.B.auger : boolean = 1
+
+  #@description The activation flag for PIXE in region "B"
+  #em.deexcitation.regions.B.pixe : boolean = 1
+#+END_SRC
+
 **** Step hit processors
 :PROPERTIES:
 :TANGLE: config/simulation/step_hit_processor_factory.conf
@@ -1288,7 +1407,6 @@ reconstruction modules ... but all of them will use the same geometry.
   manager.no_excluded_categories : boolean = 1
 #+END_SRC
 
-
 ** Histogram service
 
 The histogram service provides an esay way to handle histogram plot from
@@ -1328,13 +1446,13 @@ run =make= within this working directory.
 ** Source code compilation
 Second, you need to compile the =hpge_simulation= module files. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
-setup the dependences. Nevertheless, this implies that you have already and
-correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadfael]], [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux][Bayeux]] and Falaise. Then, you can configure, build
+setup the dependencies. Nevertheless, this implies that you have already and
+correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadfael]] and [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux][Bayeux]] setups. Then, you can configure, build
 and install the =hpge_simulation= module by doing
 #+BEGIN_SRC sh
   mkdir {build,install} && cd build
   cmake                                               \
-      -DCMAKE_PREFIX_PATH="<path to Falaise install>" \
+      -DCMAKE_PREFIX_PATH="<path to Bayeux install>"  \
       -DCMAKE_INSTALL_PREFIX=../install               \
       ../source
   make install
@@ -1365,8 +1483,8 @@ library(ies) which holds the needed modules.
 #+BEGIN_SRC sh
   dpp_processing                                                       \
       --module-manager-config $PWD/config/pipeline/module_manager.conf \
-      --module hpge_simulation_module                                \
-      --load-dll hpge_simulation                                     \
+      --module hpge_simulation_module                                  \
+      --load-dll hpge_simulation                                       \
       --load-dll <library>_bio
 #+END_SRC
 
@@ -1377,8 +1495,8 @@ writing
 #+BEGIN_SRC sh
   dpp_processing                                                       \
       --module-manager-config $PWD/config/pipeline/module_manager.conf \
-      --module hpge_simulation_module                                \
-      --load-dll hpge_simulation                                     \
+      --module hpge_simulation_module                                 \
+      --load-dll hpge_simulation                                      \
       --dll-config $PWD/config/pipeline/dlls.conf
 #+END_SRC
 
