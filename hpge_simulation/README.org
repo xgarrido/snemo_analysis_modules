@@ -84,10 +84,10 @@ The geometry factory holds all the files needed for the geometry construction.
 **** Geometry files
 #+BEGIN_SRC sh
   #@description List of files describing the geometry models
-  factory.geom_files : string[3] as path = \
-    "@HPGE_SIMULATION_DIR@/sources.geom"   \
-    "@HPGE_SIMULATION_DIR@/planar.geom"    \
-    "@HPGE_SIMULATION_DIR@/world.geom"
+  factory.geom_files : string[3] as path =        \
+    "@HPGE_SIMULATION_DIR@/geometry/sources.geom" \
+    "@HPGE_SIMULATION_DIR@/geometry/planar.geom"  \
+    "@HPGE_SIMULATION_DIR@/geometry/world.geom"
 #+END_SRC
 
 *** ID manager
@@ -103,7 +103,7 @@ volume.
 #+BEGIN_SRC sh
   #@description Source file of the geometry categories used by the ID manager
   id_mgr.categories_list : string as path = \
-    "@HPGE_SIMULATION_DIR@/categories.lis"
+    "@HPGE_SIMULATION_DIR@/geometry/categories.lis"
 #+END_SRC
 *** Mapping configuration
 #+BEGIN_SRC sh
@@ -123,7 +123,7 @@ volume.
 
   #@description Configuration files for geometry manager's plugins
   plugins.configuration_files : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/materials_plugin.conf"
+      "@HPGE_SIMULATION_DIR@/geometry/materials_plugin.conf"
 #+END_SRC
 
 ** Geometry models
@@ -432,7 +432,7 @@ to change the source foil isotope.
       "@materials:data/std_isotopes.def"  \
       "@materials:data/std_elements.def"  \
       "@materials:data/std_materials.def" \
-      "@HPGE_SIMULATION_DIR@/hpge_materials.def"
+      "@HPGE_SIMULATION_DIR@/geometry/hpge_materials.def"
 #+END_SRC
 *** Material aliases
 :PROPERTIES:
@@ -610,15 +610,15 @@ service files.
 #+BEGIN_SRC sh
   #@description The configuration file of the embedded service manager
   service_manager.configuration : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/service_manager.conf"
+      "@HPGE_SIMULATION_DIR@/pipeline/service_manager.conf"
 #+END_SRC
 
 *** Configuration files for modules
 #+BEGIN_SRC sh
   #@description The configuration files for modules
   modules.configuration_files : string[2] as path =   \
-      "@HPGE_SIMULATION_DIR@/simulation_modules.conf" \
-      "@HPGE_SIMULATION_DIR@/analysis_modules.conf"
+      "@HPGE_SIMULATION_DIR@/pipeline/simulation_modules.conf" \
+      "@HPGE_SIMULATION_DIR@/pipeline/analysis_modules.conf"
 #+END_SRC
 
 ** Service manager
@@ -642,7 +642,7 @@ service files.
 #+BEGIN_SRC sh
   #@description The list of files that describe services
   services.configuration_files : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/services.conf"
+      "@HPGE_SIMULATION_DIR@/pipeline/services.conf"
 #+END_SRC
 
 ** DLL loader
@@ -713,7 +713,7 @@ module configuration to analyse simulated data.
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "notice"
+  logging.priority : string = "trace"
 #+END_SRC
 
 *** Bank & service labels
@@ -754,13 +754,19 @@ module configuration to analyse simulated data.
 #+BEGIN_SRC sh
   #@description The simulation manager configuration file
   manager.configuration_filename : string as path = \
-      "@HPGE_SIMULATION_DIR@/g4_manager.conf"
+      "@HPGE_SIMULATION_DIR@/simulation/g4_manager.conf"
 #+END_SRC
 **** Configuration
 :PROPERTIES:
 :MKDIRP: yes
 :TANGLE: config/simulation/g4_manager.conf
 :END:
+***** Preamble
+#+BEGIN_SRC sh
+  #@description The list of configuration for internal components of Geant4 manager
+  #@key_label   "name"
+  #@meta_label  ""
+#+END_SRC
 ***** Manager section
 #+BEGIN_SRC sh
   [name="manager"]
@@ -783,7 +789,7 @@ module configuration to analyse simulated data.
 
   #@description Configuration file for the embedded '::genbb::manager'
   manager.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/event_generator_manager.conf"
+    "@HPGE_SIMULATION_DIR@/simulation/event_generator_manager.conf"
 #+END_SRC
 ***** Vertex generator section
 #+BEGIN_SRC sh
@@ -791,7 +797,7 @@ module configuration to analyse simulated data.
 
   #@description Main configuration file for the vertex generator manager
   manager.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/vertex_generator_manager.conf"
+    "@HPGE_SIMULATION_DIR@/simulation/vertex_generator_manager.conf"
 #+END_SRC
 ***** Detector construction
 #+BEGIN_SRC sh
@@ -816,7 +822,7 @@ module configuration to analyse simulated data.
 
   #@description Configuration file for the step hit processor factory:
   hit_processor_factory.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/step_hit_processor_factory.conf"
+    "@HPGE_SIMULATION_DIR@/simulation/step_hit_processor_factory.conf"
 
   #@description Parameters for the generation of 'sensitive hits' through 'sensitive detectors' :
   sensitive.detectors : string[1] = "germanium_SD"
@@ -847,14 +853,14 @@ module configuration to analyse simulated data.
 
   #@description Configuration file of the physics constructors named 'particles'
   physics_constructors.particles.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/physics_list_particles.conf"
+    "@HPGE_SIMULATION_DIR@/simulation/physics_list_particles.conf"
 
   #@description Class ID of the physics constructors named 'em'
   physics_constructors.em.id            : string = "mctools::g4::em_physics_constructor"
 
   #@description Configuration file of the physics constructors named 'em'
   physics_constructors.em.config        : string as path = \
-    "@HPGE_SIMULATION_DIR@/physics_list_em_processes.conf"
+    "@HPGE_SIMULATION_DIR@/simulation/physics_list_em_processes.conf"
 #+END_SRC
 ***** Run, event, tracking... actions
 #+BEGIN_SRC sh
@@ -890,6 +896,12 @@ module configuration to analyse simulated data.
 :PROPERTIES:
 :TANGLE: config/simulation/step_hit_processor_factory.conf
 :END:
+***** Preamble
+#+BEGIN_SRC sh
+  #@description A list of simulated step hit processors
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
 ***** Crystal hit processor
 #+BEGIN_SRC sh
   [name="crystal.hit_processor" type="mctools::calorimeter_step_hit_processor"]
@@ -943,12 +955,18 @@ module configuration to analyse simulated data.
 
   #@description The list of files that contain the rules for vertex generators
   vg_list : string[1] as path = \
-    "@HPGE_SIMULATION_DIR@/vertex_generators.conf"
+    "@HPGE_SIMULATION_DIR@/simulation/vertex_generators.conf"
 #+END_SRC
 **** Vertex generator definitions
 :PROPERTIES:
 :TANGLE: config/simulation/vertex_generators.conf
 :END:
+***** Preamble
+#+BEGIN_SRC sh
+  #@description A list of vertex generators
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
 ***** Point source vertex
 Generate vertex from an arbitrary point of the experimental setup
 #+BEGIN_SRC sh
@@ -997,14 +1015,19 @@ Generate vertex in the bulk volume of the sample
 
   #@description List of files containing particle generator definition rules
   generators.configuration_files : string[2] as path =       \
-    "@HPGE_SIMULATION_DIR@/event_generator_backgrounds.conf" \
-    "@HPGE_SIMULATION_DIR@/event_generator_misc.conf"
+    "@HPGE_SIMULATION_DIR@/simulation/event_generator_backgrounds.conf" \
+    "@HPGE_SIMULATION_DIR@/simulation/event_generator_misc.conf"
 #+END_SRC
 **** Event generator definitions
 ***** Background events
 :PROPERTIES:
 :TANGLE: config/simulation/event_generator_backgrounds.conf
 :END:
+#+BEGIN_SRC sh
+  #@description A sample list of event generators
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
 ****** \nbsp^{208}Tl
 #+BEGIN_SRC sh
   [name="bkg_Tl208" type="genbb::wdecay0"]
@@ -1077,6 +1100,11 @@ Generate vertex in the bulk volume of the sample
 :PROPERTIES:
 :TANGLE: config/simulation/event_generator_misc.conf
 :END:
+#+BEGIN_SRC sh
+  #@description A sample list of event generators
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
 ****** Electron with 1-2 MeV flat energy
 #+BEGIN_SRC sh
   [name="electron_1-2MeV_flat" type="genbb::single_particle_generator"]
@@ -1235,6 +1263,31 @@ software components, including other services or data processing modules (see
   #@description Flag to backup the former context load file
   backup.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_bak.conf"
 #+END_SRC
+
+** Geometry service
+
+The following code block declares the geometry service to properly load all the
+geometry and material construction of the detector. This service, only declared
+here, can be used by several operations like calibration, and other related
+reconstruction modules ... but all of them will use the same geometry.
+
+#+BEGIN_SRC sh
+  [name="Geo" type="geomtools::geometry_service"]
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description Embedded SuperNEMO geometry manager main configuration file
+  manager.configuration_file : string as path = \
+      "@HPGE_SIMULATION_DIR@/geometry/manager.conf"
+
+  #@description Embedded SuperNEMO geometry manager must build its mapping lookup table
+  manager.build_mapping : boolean = 1
+
+  #@description Embedded geometry manager's mapping lookup table does not exclude any geometry category
+  manager.no_excluded_categories : boolean = 1
+#+END_SRC
+
 
 ** Histogram service
 
