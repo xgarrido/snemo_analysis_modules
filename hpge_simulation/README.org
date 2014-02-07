@@ -950,7 +950,157 @@ Generate vertex in the bulk volume of the sample
   #@description The event generator PRNG label
   manager.event_generator_name  : string  = "bkg_Tl208"
 #+END_SRC
+**** Manager configuration
+:PROPERTIES:
+:TANGLE: config/simulation/event_generator_manager.conf
+:END:
+#+BEGIN_SRC sh
+  #@config Main configuration parameters for the genbb manager
 
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description List of files containing particle generator definition rules
+  generators.configuration_files : string[2] as path =       \
+    "@HPGE_SIMULATION_DIR@/event_generator_backgrounds.conf" \
+    "@HPGE_SIMULATION_DIR@/event_generator_misc.conf"
+#+END_SRC
+**** Event generator definitions
+***** Background events
+:PROPERTIES:
+:TANGLE: config/simulation/event_generator_backgrounds.conf
+:END:
+****** \nbsp^{208}Tl
+#+BEGIN_SRC sh
+  [name="bkg_Tl208" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Tl208"
+  #energy_min      : real as energy = 0.0 MeV
+  #energy_max      : real as energy = 5.0 MeV
+#+END_SRC
+****** \nbsp^{234}Th
+#+BEGIN_SRC sh
+  [name="bkg_Th234" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Th234"
+#+END_SRC
+****** \nbsp^{214}Pb
+#+BEGIN_SRC sh
+  [name="bkg_Pb214" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Pb214"
+#+END_SRC
+****** \nbsp^{214}Bi
+#+BEGIN_SRC sh
+  [name="bkg_Bi214" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Bi214"
+#+END_SRC
+****** \nbsp^{210}Pb
+#+BEGIN_SRC sh
+  [name="bkg_Pb210" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Pb210"
+#+END_SRC
+****** \nbsp^{210}Pb+\nbsp{210}Bi
+#+BEGIN_SRC sh
+  [name="bkg_Pb210_Bi210" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Pb210+Bi210"
+#+END_SRC
+****** \nbsp^{212}Pb
+#+BEGIN_SRC sh
+  [name="bkg_Pb212" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Pb212"
+#+END_SRC
+****** \nbsp^{212}Bi+\nbsp{212}Po
+#+BEGIN_SRC sh
+  [name="bkg_Bi212_Po212" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Bi212+Po212"
+#+END_SRC
+****** \nbsp^{214}Bi+\nbsp^{214}Po
+#+BEGIN_SRC sh
+  [name="bkg_Bi214_Po214" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Bi214+Po214"
+#+END_SRC
+****** \nbsp^{22}Na
+#+BEGIN_SRC sh
+  [name="bkg_Na22" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Na22"
+#+END_SRC
+****** \nbsp^{54}Mn
+#+BEGIN_SRC sh
+  [name="bkg_Mn54" type="genbb::wdecay0"]
+  decay_type      : string  ="background"
+  decay_isotope   : string  = "Mn54"
+#+END_SRC
+***** Misc. generators
+:PROPERTIES:
+:TANGLE: config/simulation/event_generator_misc.conf
+:END:
+****** Electron with 1-2 MeV flat energy
+#+BEGIN_SRC sh
+  [name="electron_1-2MeV_flat" type="genbb::single_particle_generator"]
+
+  #@config Parameters for the "single_particle" mode (class genbb::single_particle_generator):
+
+  #@description Generated particle ("electron", "positron", "gamma", "alpha"):
+  particle_name         : string = "electron"
+
+  #@description Mode ("energy_range", "gaussian_energy", "monokinetic"):
+  mode                  : string = "energy_range"
+
+  #@description Flag to randomize the direction of the emitted particle (in 4xPi)
+  randomized_direction   : boolean = 0
+
+  ### Only for "energy_range" mode:
+  min_energy            : real as energy = 1000. keV
+  max_energy            : real as energy = 2000. keV
+#+END_SRC
+****** 1 MeV electron beam
+#+BEGIN_SRC sh
+  [name="electron_1MeV" type="genbb::single_particle_generator"]
+  particle_name         : string = "electron"
+  mode                  : string = "monokinetic"
+  energy                : real as energy = 1000. keV
+  randomized_direction  : boolean = 1
+#+END_SRC
+****** 27 keV gamma beam
+#+BEGIN_SRC sh
+  [name="gamma_27keV" type="genbb::single_particle_generator"]
+  particle_name         : string = "gamma"
+  mode                  : string = "monokinetic"
+  energy                : real as energy = 27.0 keV
+  randomized_direction  : boolean = 1
+#+END_SRC
+****** 186 keV gamma beam
+#+BEGIN_SRC sh
+  [name="gamma_186keV" type="genbb::single_particle_generator"]
+  particle_name         : string = "gamma"
+  mode                  : string = "monokinetic"
+  energy                : real as energy  = 186.11 keV
+  randomized_direction  : boolean = 1
+#+END_SRC
+****** 352 keV gamma beam
+#+BEGIN_SRC sh
+  [name="gamma_352keV" type="genbb::single_particle_generator"]
+  particle_name         : string = "gamma"
+  mode                  : string = "monokinetic"
+  energy                : real as energy = 352.0 keV
+  randomized_direction  : boolean = 1
+#+END_SRC
+****** 1 GeV muon beam
+#+BEGIN_SRC sh
+  [name="muon_1GeV" type="genbb::single_particle_generator"]
+  particle_name         : string = "mu-"
+  mode                  : string = "monokinetic"
+  energy                : real as energy = 1.0 GeV
+  randomized_direction  : boolean = 1
+#+END_SRC
 ** Histogram declarations
 :PROPERTIES:
 :TANGLE: config/pipeline/histogram_templates.conf
