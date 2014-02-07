@@ -16,8 +16,9 @@ all: $(files_tangle)
 	@echo "NOTICE: Tangling $<..."
 	@mkdir -p config/pipeline
 	@$(BATCH) --visit "$<" --funcall org-babel-tangle
-	@(cd config/pipeline && sed -i -e 's#@HPGE_SIMULATION_DIR@#'`pwd`'#g' *.*)
-	@(cd config/geometry && sed -i -e 's#@HPGE_SIMULATION_DIR@#'`pwd`'#g' *.*)
+	@(cd config/pipeline   && sed -i -e 's#@HPGE_SIMULATION_DIR@#'`pwd`'#g' *.*)
+	@(cd config/geometry   && sed -i -e 's#@HPGE_SIMULATION_DIR@#'`pwd`'#g' *.*)
+	@(cd config/simulation && sed -i -e 's#@HPGE_SIMULATION_DIR@#'`pwd`'#g' *.*)
 	@touch $@
 
 clean:

@@ -616,8 +616,9 @@ service files.
 *** Configuration files for modules
 #+BEGIN_SRC sh
   #@description The configuration files for modules
-  modules.configuration_files : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/hpge_simulation_modules.conf"
+  modules.configuration_files : string[2] as path =   \
+      "@HPGE_SIMULATION_DIR@/simulation_modules.conf" \
+      "@HPGE_SIMULATION_DIR@/analysis_modules.conf"
 #+END_SRC
 
 ** Service manager
@@ -685,17 +686,15 @@ named =hpge_simulation=. The following table sets the libraries
 #+BEGIN_SRC sh :noweb yes
   <<dll_loader(dll_libraries[*,0])>>
 #+END_SRC
-* Geant4 validation modules
+* Modules
 
-The next item holds the configuration for validating Geant4 setup. The second
-item is related to histogram declarations.
+The next items hold the configuration to simulate HPGe with Geant4 and the
+module configuration to analyse simulated data.
 
-** Module declaration
+** Simulation module declaration
 :PROPERTIES:
-:TANGLE: config/pipeline/hpge_simulation_modules.conf
+:TANGLE: config/pipeline/simulation_modules.conf
 :END:
-
-Here, we just set up the module declaration.
 
 *** File preamble
 #+BEGIN_SRC sh
@@ -705,9 +704,9 @@ Here, we just set up the module declaration.
 #+END_SRC
 *** Declaration & description
 #+BEGIN_SRC sh
-  [name="hpge_simulation_module" type="analysis::hpge_simulation_module"]
+  [name="simulation" type="mctools::g4::simulation_module"]
 
-  #@description A module to study and to validate Geant4 setup
+  #@config 'mctools::g4::simulation_module' configuration parameters for HPGe simulation
 #+END_SRC
 
 *** Logging priority
@@ -716,11 +715,240 @@ Here, we just set up the module declaration.
   logging.priority : string = "notice"
 #+END_SRC
 
-*** Histogram service label
-Set the same histogram service label as defined [[Histogram service][here]]
+*** Bank & service labels
 #+BEGIN_SRC sh
-  #@description The Histogram Service label
-  Histo_label : string = "Histo"
+  #@description The Geometry Service label
+  Geo_label : string = "Geo"
+
+  #@description The 'Simulated data' bank label in the event record
+  SD_label  : string = "SD"
+
+  #@description Flag to allow cleaning of some former simulated data bank if any (default: 0)
+  erase_former_SD_bank : boolean = 0
+#+END_SRC
+*** Seed values
+#+BEGIN_SRC sh
+  #@description The simulation manager PRNG seed
+  manager.seed                  : integer = 0
+
+  #@description The vertex generator PRNG seed
+  manager.vertex_generator_seed : integer = 0
+
+  #@description The event generator PRNG seed
+  manager.event_generator_seed  : integer = 0
+
+  #@description The SHPF PRNG seed
+  manager.shpf_seed             : integer = 0
+
+  #@description The saving of PRNG seeds
+  manager.output_prng_seeds_file  : string as path = "/tmp/${USER}/hpge.d/prng_seeds.save"
+
+  #@description The saving of PRNG states
+  manager.output_prng_states_file : string as path = "/tmp/${USER}/hpge.d/prng_states.save"
+
+  #@description The modulo for PRNG states backup
+  manager.prng_states_save_modulo : integer = 10
+#+END_SRC
+*** G4 manager
+#+BEGIN_SRC sh
+  #@description The simulation manager configuration file
+  manager.configuration_filename : string as path = \
+      "@HPGE_SIMULATION_DIR@/g4_manager.conf"
+#+END_SRC
+**** Configuration
+:PROPERTIES:
+:MKDIRP: yes
+:TANGLE: config/simulation/g4_manager.conf
+:END:
+***** Manager section
+#+BEGIN_SRC sh
+  [name="manager"]
+
+  #@description Logging priority
+  logging.priority      : string = "warning"
+
+  #@description Number of events to be simulated (superseded by the pipeline)
+  number_of_events      : integer = 20
+
+  #@description Geant4 tracking verbosity flag (from 0 to 10):
+  g4_tracking_verbosity : integer = 0
+
+  #@description Geant4 visualization activation flag:
+  g4_visualization      : boolean = 0
+#+END_SRC
+***** Event generator section
+#+BEGIN_SRC sh
+  [name="event_generator"]
+
+  #@description Configuration file for the embedded '::genbb::manager'
+  manager.config : string as path = \
+    "@HPGE_SIMULATION_DIR@/event_generator_manager.conf"
+#+END_SRC
+***** Vertex generator section
+#+BEGIN_SRC sh
+  [name="vertex_generator"]
+
+  #@description Main configuration file for the vertex generator manager
+  manager.config : string as path = \
+    "@HPGE_SIMULATION_DIR@/vertex_generator_manager.conf"
+#+END_SRC
+***** Detector construction
+#+BEGIN_SRC sh
+  [name="detector_construction"]
+
+  #@description Main configuration file for the detector construction user object:
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description Temporary directory for GDML file generation:
+  gdml.tmp_dir         : string as path = "/tmp/${USER}/g4.d"
+
+  #@description Access mode to the GDML schema ("local" or "remote")
+  gdml.schema_location : string = "local" # "remote"
+
+  #@description Flag to skip GDML validation
+  gdml.no_validation   : boolean = 0
+
+  #@description Logging support for step hit processor factory
+  hit_processor_factory.logging.priority : string = "warning"
+
+  #@description Configuration file for the step hit processor factory:
+  hit_processor_factory.config : string as path = \
+    "@HPGE_SIMULATION_DIR@/step_hit_processor_factory.conf"
+
+  #@description Parameters for the generation of 'sensitive hits' through 'sensitive detectors' :
+  sensitive.detectors : string[1] = "germanium_SD"
+
+  sensitive.germanium_SD.logging.priority               : string = "warning"
+  sensitive.germanium_SD.hits_buffer_capacity           : integer = 1000
+  sensitive.crystal_SD.record_alpha_quenching           : boolean = 0
+  sensitive.germanium_SD.record_track_id                : boolean = 1
+  sensitive.germanium_SD.record_primary_particle        : boolean = 1
+  sensitive.germanium_SD.drop_zero_energy_deposit_steps : boolean = 0
+  sensitive.germanium_SD.track_gamma                    : boolean = 1
+  sensitive.germanium_SD.track_neutron                  : boolean = 1
+#+END_SRC
+***** Physics list
+#+BEGIN_SRC sh
+  [name="physics_list"]
+
+  #@description Main configuration file for the physics lists:
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description List of physics constructors
+  physics_constructors.names : string[2] = "particles" "em"
+
+  #@description Class ID of the physics constructors named 'particles'
+  physics_constructors.particles.id     : string = "mctools::g4::particles_physics_constructor"
+
+  #@description Configuration file of the physics constructors named 'particles'
+  physics_constructors.particles.config : string as path = \
+    "@HPGE_SIMULATION_DIR@/physics_list_particles.conf"
+
+  #@description Class ID of the physics constructors named 'em'
+  physics_constructors.em.id            : string = "mctools::g4::em_physics_constructor"
+
+  #@description Configuration file of the physics constructors named 'em'
+  physics_constructors.em.config        : string as path = \
+    "@HPGE_SIMULATION_DIR@/physics_list_em_processes.conf"
+#+END_SRC
+***** Run, event, tracking... actions
+#+BEGIN_SRC sh
+  [name="run_action"]
+
+  #@description Logging priority :
+  logging.priority : string = "warning"
+
+  #@description If set, this flag forbids the generation of output files :
+  file.no_save : boolean = 1
+
+  [name="primary_generator_action"]
+
+  #@description Primary generator action logging priority
+  logging.priority : string = "warning"
+
+  [name="tracking_action"]
+
+  #@description Primary generator action logging priority
+  logging.priority : string = "warning"
+
+  [name="stepping_action"]
+
+  #@description Primary generator action logging priority
+  logging.priority : string = "warning"
+
+  [name="stacking_action"]
+
+  #@description Primary generator action logging priority
+  logging.priority : string = "warning"
+ #+END_SRC
+*** Vertex generator
+#+BEGIN_SRC sh
+  #@description The vertex generator PRNG label
+  manager.vertex_generator_name : string  = "source_bulk"
+#+END_SRC
+**** Manager configuration
+:PROPERTIES:
+:TANGLE: config/simulation/vertex_generator_manager.conf
+:END:
+#+BEGIN_SRC sh
+  #@config Configuration of the genvtx::manager class
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description Embeded PRNG seed
+  prng_seed : integer = 12345
+
+  #@description Embeded PRNG type (default is "taus2", fast and good quality)
+  prng_id : string = "taus2"
+
+  #@description The list of files that contain the rules for vertex generators
+  vg_list : string[1] as path = \
+    "@HPGE_SIMULATION_DIR@/vertex_generators.conf"
+#+END_SRC
+**** Vertex generator definitions
+:PROPERTIES:
+:TANGLE: config/simulation/vertex_generators.conf
+:END:
+***** Point source vertex
+Generate vertex from an arbitrary point of the experimental setup
+#+BEGIN_SRC sh
+  [name="point_source" type="genvtx::spot_vertex_generator"]
+
+  #@description Logging priority
+  logging.priority  : string = "warning"
+
+  #@description X position of the spot
+  spot.x : real as length = -280.0 mm
+
+  #@description Y position of the spot
+  spot.y : real as length =    0.0 mm
+
+  #@description Z position of the spot
+  spot.z : real as length =    0.0 mm
+#+END_SRC
+***** Source bulk
+Generate vertex in the bulk volume of the sample
+#+BEGIN_SRC sh
+  [name="source_bulk" type="genvtx::cylinder_model_vg"]
+
+  #@description Logging priority
+  logging.priority  : string = "warning"
+
+  #@description The rule that describes the geometry origin of vertex in term of geometry category and addresses (geom ID)
+  origin : string  = "category=source.category"
+
+  #@description The mode used for vertex generator from the underlying box model associated to the target logical volume ("surface" or "bulk")
+  mode   : string  = "bulk"
+#+END_SRC
+*** Event generator
+#+BEGIN_SRC sh
+  #@description The event generator PRNG label
+  manager.event_generator_name  : string  = "bkg_Tl208"
 #+END_SRC
 
 ** Histogram declarations
