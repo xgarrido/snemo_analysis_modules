@@ -1,4 +1,4 @@
-#+TITLE:  High Purity Germanium simulation
+#+TITLE:  High Purity Germanium simulation & analysis
 #+AUTHOR: Xavier Garrido
 #+DATE:   2014-02-06
 #+OPTIONS: ^:{}
@@ -85,9 +85,9 @@ The geometry factory holds all the files needed for the geometry construction.
 #+BEGIN_SRC sh
   #@description List of files describing the geometry models
   factory.geom_files : string[3] as path =        \
-    "@HPGE_SIMULATION_DIR@/geometry/sources.geom" \
-    "@HPGE_SIMULATION_DIR@/geometry/planar.geom"  \
-    "@HPGE_SIMULATION_DIR@/geometry/world.geom"
+    "@HPGE_SIMULATION_DIR@/config/geometry/sources.geom" \
+    "@HPGE_SIMULATION_DIR@/config/geometry/planar.geom"  \
+    "@HPGE_SIMULATION_DIR@/config/geometry/world.geom"
 #+END_SRC
 
 *** ID manager
@@ -103,7 +103,7 @@ volume.
 #+BEGIN_SRC sh
   #@description Source file of the geometry categories used by the ID manager
   id_mgr.categories_list : string as path = \
-    "@HPGE_SIMULATION_DIR@/geometry/categories.lis"
+    "@HPGE_SIMULATION_DIR@/config/geometry/categories.lis"
 #+END_SRC
 *** Mapping configuration
 #+BEGIN_SRC sh
@@ -123,7 +123,7 @@ volume.
 
   #@description Configuration files for geometry manager's plugins
   plugins.configuration_files : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/geometry/materials_plugin.conf"
+      "@HPGE_SIMULATION_DIR@/config/geometry/materials_plugin.conf"
 #+END_SRC
 
 ** Geometry models
@@ -432,7 +432,7 @@ to change the source foil isotope.
       "@materials:data/std_isotopes.def"  \
       "@materials:data/std_elements.def"  \
       "@materials:data/std_materials.def" \
-      "@HPGE_SIMULATION_DIR@/geometry/hpge_materials.def"
+      "@HPGE_SIMULATION_DIR@/config/geometry/hpge_materials.def"
 #+END_SRC
 *** Material aliases
 :PROPERTIES:
@@ -610,15 +610,15 @@ service files.
 #+BEGIN_SRC sh
   #@description The configuration file of the embedded service manager
   service_manager.configuration : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/pipeline/service_manager.conf"
+      "@HPGE_SIMULATION_DIR@/config/pipeline/service_manager.conf"
 #+END_SRC
 
 *** Configuration files for modules
 #+BEGIN_SRC sh
   #@description The configuration files for modules
   modules.configuration_files : string[2] as path =   \
-      "@HPGE_SIMULATION_DIR@/pipeline/simulation_modules.conf" \
-      "@HPGE_SIMULATION_DIR@/pipeline/analysis_modules.conf"
+      "@HPGE_SIMULATION_DIR@/config/pipeline/simulation_modules.conf" \
+      "@HPGE_SIMULATION_DIR@/config/pipeline/analysis_modules.conf"
 #+END_SRC
 
 ** Service manager
@@ -642,7 +642,7 @@ service files.
 #+BEGIN_SRC sh
   #@description The list of files that describe services
   services.configuration_files : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/pipeline/services.conf"
+      "@HPGE_SIMULATION_DIR@/config/pipeline/services.conf"
 #+END_SRC
 
 ** DLL loader
@@ -655,18 +655,26 @@ This skeleton code ease the declaration of dll loader since it
 receives a table list and builds the corresponding =dlls.conf= file.
 
 #+NAME: dll_loader
-#+HEADERS: :var list=""
+#+HEADERS: :var name="" :var filename=""
 #+BEGIN_SRC sh
   echo '#@description A sample list of setups'
   echo '#@key_label   "name"'
   echo '#@meta_label  "filename"'
-  for i in $list
+  j=0
+  echo $name
+  for i in $name
   do
       dll=$(echo $i | sed '/(/ s/("\|")//g')
-      echo '[name="'$dll'" filename=""]'
+      dllpath=${filename[j]}
+      if [ -n "$dllpath" ]; then
+          echo '[name="'$dll'" filename="'$dllpath'"]'
+      else
+          echo '[name="'$dll'" filename=""]'
+      fi
       echo '#config The '$dll' library'
       echo 'autoload : boolean = 1'
       echo
+      let j++
   done
 #+END_SRC
 *** Libraries
@@ -679,13 +687,13 @@ named =hpge_simulation=. The following table sets the libraries
 
 #+CAPTION: Libraries to be used by =hpge_simulation= modules
 #+TBLNAME: dll_libraries :results none
-|---------------------|
-| mctools_g4          |
-| mctools_bio         |
-|---------------------|
+|-----------------------+--------------------------------------------------------------|
+| hpge_analysis         | @HPGE_SIMULATION_DIR@/source/install/lib/libhpge_analysis.so |
+| Bayeux_mctools_geant4 |                                                              |
+|-----------------------+--------------------------------------------------------------|
 
 #+BEGIN_SRC sh :noweb yes
-  <<dll_loader(dll_libraries[*,0])>>
+  <<dll_loader(dll_libraries[*,0],dll_libraries[*,1])>>
 #+END_SRC
 * Modules
 
@@ -754,7 +762,7 @@ module configuration to analyse simulated data.
 #+BEGIN_SRC sh
   #@description The simulation manager configuration file
   manager.configuration_filename : string as path = \
-      "@HPGE_SIMULATION_DIR@/simulation/g4_manager.conf"
+      "@HPGE_SIMULATION_DIR@/config/simulation/g4_manager.conf"
 #+END_SRC
 **** Configuration
 :PROPERTIES:
@@ -789,7 +797,7 @@ module configuration to analyse simulated data.
 
   #@description Configuration file for the embedded '::genbb::manager'
   manager.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/simulation/event_generator_manager.conf"
+    "@HPGE_SIMULATION_DIR@/config/simulation/event_generator_manager.conf"
 #+END_SRC
 ***** Vertex generator section
 #+BEGIN_SRC sh
@@ -797,7 +805,7 @@ module configuration to analyse simulated data.
 
   #@description Main configuration file for the vertex generator manager
   manager.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/simulation/vertex_generator_manager.conf"
+    "@HPGE_SIMULATION_DIR@/config/simulation/vertex_generator_manager.conf"
 #+END_SRC
 ***** Detector construction
 #+BEGIN_SRC sh
@@ -822,7 +830,7 @@ module configuration to analyse simulated data.
 
   #@description Configuration file for the step hit processor factory:
   hit_processor_factory.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/simulation/step_hit_processor_factory.conf"
+    "@HPGE_SIMULATION_DIR@/config/simulation/step_hit_processor_factory.conf"
 
   #@description Parameters for the generation of 'sensitive hits' through 'sensitive detectors' :
   sensitive.detectors : string[1] = "germanium_SD"
@@ -853,14 +861,14 @@ module configuration to analyse simulated data.
 
   #@description Configuration file of the physics constructors named 'particles'
   physics_constructors.particles.config : string as path = \
-    "@HPGE_SIMULATION_DIR@/simulation/physics_list_particles.conf"
+    "@HPGE_SIMULATION_DIR@/config/simulation/physics_list_particles.conf"
 
   #@description Class ID of the physics constructors named 'em'
   physics_constructors.em.id            : string = "mctools::g4::em_physics_constructor"
 
   #@description Configuration file of the physics constructors named 'em'
   physics_constructors.em.config        : string as path = \
-    "@HPGE_SIMULATION_DIR@/simulation/physics_list_em_processes.conf"
+    "@HPGE_SIMULATION_DIR@/config/simulation/physics_list_em_processes.conf"
 #+END_SRC
 ***** Run, event, tracking... actions
 #+BEGIN_SRC sh
@@ -1074,7 +1082,7 @@ module configuration to analyse simulated data.
 
   #@description The list of files that contain the rules for vertex generators
   vg_list : string[1] as path = \
-    "@HPGE_SIMULATION_DIR@/simulation/vertex_generators.conf"
+    "@HPGE_SIMULATION_DIR@/config/simulation/vertex_generators.conf"
 #+END_SRC
 **** Vertex generator definitions
 :PROPERTIES:
@@ -1134,8 +1142,8 @@ Generate vertex in the bulk volume of the sample
 
   #@description List of files containing particle generator definition rules
   generators.configuration_files : string[2] as path =       \
-    "@HPGE_SIMULATION_DIR@/simulation/event_generator_backgrounds.conf" \
-    "@HPGE_SIMULATION_DIR@/simulation/event_generator_misc.conf"
+    "@HPGE_SIMULATION_DIR@/config/simulation/event_generator_backgrounds.conf" \
+    "@HPGE_SIMULATION_DIR@/config/simulation/event_generator_misc.conf"
 #+END_SRC
 **** Event generator definitions
 ***** Background events
@@ -1293,61 +1301,34 @@ Generate vertex in the bulk volume of the sample
   #@key_label   "name"
   #@meta_label  "type"
 #+END_SRC
-
-** Histogram declarations
-:PROPERTIES:
-:TANGLE: config/pipeline/histogram_templates.conf
-:END:
-
-The histogram declarations /i.e./ name, boundaries, binning... are set in this
-section which is organized by data bank related plots. There are two kinds of
-histograms:
-- /template/ histogram which may be used by several data bank.
-
-*** Mandatory preamble
+*** Basic analysis module
 #+BEGIN_SRC sh
-  #@description A sample list of setups
-  #@key_label   "name"
-  #@meta_label  "type"
-#+END_SRC
+  [name="basic_analysis_module" type="hpge::basic_analysis_module"]
 
-*** Energy template
+  #@config A basic module to process simulated data for HPGe detector
+
+  #@description Logging flag
+  logging.priority : string = "warning"
+
+  #@description The label of the 'Simulated Data' bank
+  SD_label : string  = "SD"
+
+  #@description The file name
+  ROOT_filename : string as path = "/tmp/${USER}/hpge.d/hpge_analysis.root"
+#+END_SRC
+*** Simulation \to Analysis chain
 #+BEGIN_SRC sh
-  [name="energy_template" type="mygsl::histogram_1d"]
-  #@description The title of the histogram (optional)
-  title : string = ""
+  [name="hpge_chain" type="dpp::chain_module"]
 
-  #@description The group of the histogram (optional)
-  group : string = "__template"
+  #@description Logging flag
+  logging.priority : string = "warning"
 
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
+  #@description The list of processing modules to be applied (in this order) :
+  modules : string [2] = \
+      "simulation"       \
+      "basic_analysis_module"
 
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The X axis label
-  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"
-
-  #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
-  display.xaxis.unit : string = "keV"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "dN/dE [A.U.]"
-
-  #@description The number of bins
-  number_of_bins : integer = 25
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
-
-  #@description The lower bound of the histogram
-  min : real = 2000.0
-
-  #@description The upper bound of the histogram
-  max : real = 3200.0
 #+END_SRC
-
 * Services
 :PROPERTIES:
 :TANGLE: config/pipeline/services.conf
@@ -1398,43 +1379,13 @@ reconstruction modules ... but all of them will use the same geometry.
 
   #@description Embedded SuperNEMO geometry manager main configuration file
   manager.configuration_file : string as path = \
-      "@HPGE_SIMULATION_DIR@/geometry/manager.conf"
+      "@HPGE_SIMULATION_DIR@/config/geometry/manager.conf"
 
   #@description Embedded SuperNEMO geometry manager must build its mapping lookup table
   manager.build_mapping : boolean = 1
 
   #@description Embedded geometry manager's mapping lookup table does not exclude any geometry category
   manager.no_excluded_categories : boolean = 1
-#+END_SRC
-
-** Histogram service
-
-The histogram service provides an esay way to handle histogram plot from
-different modules (mainly plot modules). It provides a service where 1D or 2D
-histograms can be added to a histogram dictionnary.
-
-#+BEGIN_SRC sh
-  [name="Histo" type="dpp::histogram_service"]
-
-  #@description Logging priority
-  logging.priority : string = "warning"
-
-  #@description The description string of the embedded pool of histograms
-  pool.description : string = "Geant4 histograms"
-#+END_SRC
-
-#+BEGIN_SRC sh
-  #@description The main configuration file for the embedded histogram manager
-  pool.histo.setups : string[1] as path = \
-      "@HPGE_SIMULATION_DIR@/histogram_templates.conf"
-#+END_SRC
-
-Finally, all histograms created can be stored inside ROOT files or XML archives.
-#+BEGIN_SRC sh
-  #@description The ouput file where to store the histograms
-  output_files : string[2] as path =                        \
-      "/tmp/${USER}/snemo.d/hpge_simulation_histos.root" \
-      "/tmp/${USER}/snemo.d/geant4_vlaidation_histos.xml"
 #+END_SRC
 
 * Running SN@ilWare processing chain
