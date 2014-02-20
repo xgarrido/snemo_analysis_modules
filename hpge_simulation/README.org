@@ -408,7 +408,7 @@ Use standard IEAE RGU-1
 
 We use the definitions of isotopes, elements and materials from the installed
 materials library. Here the =materials_aliases= definition are locally defined
-to change the source foil isotope.
+to change the source sample isotope.
 *** Plugin declaration
 #+BEGIN_SRC sh
   #@description The geometry manager plugin for materials
@@ -439,31 +439,31 @@ to change the source foil isotope.
 :TANGLE: config/geometry/hpge_materials.def
 :END:
 #+BEGIN_SRC sh
-    #@description A list of materials for BiPo experiment
-    #@key_label   "name"
-    #@meta_label  "type"
+  #@description A list of materials for BiPo experiment
+  #@key_label   "name"
+  #@meta_label  "type"
 
-    [name="Germanium" type="element"]
-    #@description The Ge natural element
-    z               : integer   = 32
-    isotope.names   : string[5] = "Ge-70" "Ge-72" "Ge-73"  "Ge-74"  "Ge-76"
-    isotope.weights : real[5]   = 0.209 0.275  0.077 0.363 0.076
+  [name="Germanium" type="element"]
+  #@description The Ge natural element
+  z               : integer   = 32
+  isotope.names   : string[5] = "Ge-70" "Ge-72" "Ge-73"  "Ge-74"  "Ge-76"
+  isotope.weights : real[5]   = 0.209 0.275  0.077 0.363 0.076
 
 
-    [name="hpge::germanium" type="material"]
-    #@description natural Ge material
-    density        : real   = 5.323
-    density.unit   : string = "g/cm3"
-    state          : string = "solid"
-    composition.mode : string   = "fraction_mass"
-    composition.names         : string [1]  = "Germanium"
-    composition.fraction_mass : real   [1]  =  1.0
+  [name="hpge::germanium" type="material"]
+  #@description natural Ge material
+  density        : real   = 5.323
+  density.unit   : string = "g/cm3"
+  state          : string = "solid"
+  composition.mode : string   = "fraction_mass"
+  composition.names         : string [1]  = "Germanium"
+  composition.fraction_mass : real   [1]  =  1.0
 
-    [name="hpge::SiO2" type="material"]
-    #@description silica material
-    density          : real   = 1.19
-    density.unit     : string = "g/cm3"
-    state            : string = "solid"
+  [name="hpge::SiO2" type="material"]
+  #@description silica material
+  density          : real   = 1.19
+  density.unit     : string = "g/cm3"
+  state            : string = "solid"
   composition.mode            : string       = "number_of_atoms"
   composition.names           : string  [2]  = "Silicium" "Oxygen"
   composition.number_of_atoms : integer [2]  =     1       2
@@ -1187,7 +1187,7 @@ Generate vertex in the bulk volume of the sample
   decay_type      : string  ="background"
   decay_isotope   : string  = "Pb210"
 #+END_SRC
-****** \nbsp^{210}Pb+\nbsp{210}Bi
+****** \nbsp^{210}Pb+\nbsp^{210}Bi
 #+BEGIN_SRC sh
   [name="bkg_Pb210_Bi210" type="genbb::wdecay0"]
   decay_type      : string  ="background"
@@ -1199,7 +1199,7 @@ Generate vertex in the bulk volume of the sample
   decay_type      : string  ="background"
   decay_isotope   : string  = "Pb212"
 #+END_SRC
-****** \nbsp^{212}Bi+\nbsp{212}Po
+****** \nbsp^{212}Bi+\nbsp^{212}Po
 #+BEGIN_SRC sh
   [name="bkg_Bi212_Po212" type="genbb::wdecay0"]
   decay_type      : string  ="background"

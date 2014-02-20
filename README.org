@@ -1,20 +1,23 @@
 #+TITLE:  SN@ilWare Simulation Modules
 #+AUTHOR: Xavier Garrido
 #+DATE:   2013-11-01
+#+OPTIONS: ^:{}
 
 This repository holds several modules, one per directory, for SN@ilWare
 framework :
 
-- =snemo_control_plot= :: This module produce general plots of different
+- [[./snemo_control_plot/README.org][snemo_control_plot]] :: This module produce general plots of different
      physical information inside different data bank. For example, it plots the
      number of Geiger hits within the simulated data bank and within the
      calibrated data bank, the number of calorimeters...
-- =snemo_bb0nu_studies= :: This module calculates 0\nu sensitivity for SuperNEMO
+- [[./snemo_bb0nu_studies/README.org][snemo_bb0nu_studies]] :: This module calculates 0\nu sensitivity for SuperNEMO
      experiment. It succesively builds the energy distribution of signal &
      backgrounds, determines the efficiency and finally extracts the 0\nu
      sensitivity given experimental conditions (namely exposure time, isotope
      mass...).
-- =geant4_validation= :: This directory sets up a minimal and simple geometry
+- [[./geant4_validation/README.org][geant4_validation]] :: This directory sets up a minimal and simple geometry
      layout to test Geant4 simulation and to validate Geant4 Physics list. It
      generates plots of relevant physical "quantities" such as energy loss in
      materials, scattering angle distribution.
+  - [[./hpge_simulation/README.org][hpge_simulation]] :: This directory holds a full setup from geometry declaration
+       to analysis modules to perform High Purity Germanium simulations.
