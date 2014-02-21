@@ -19,5 +19,5 @@ framework :
      layout to test Geant4 simulation and to validate Geant4 Physics list. It
      generates plots of relevant physical "quantities" such as energy loss in
      materials, scattering angle distribution.
-  - [[./hpge_simulation/README.org][hpge_simulation]] :: This directory holds a full setup from geometry declaration
-       to analysis modules to perform High Purity Germanium simulations.
+- [[./hpge_simulation/README.org][hpge_simulation]] :: This directory holds a full setup from geometry declaration
+     to analysis modules to perform High Purity Germanium simulations.
