@@ -146,6 +146,7 @@ volume.
   material.ref : string = "std::plexiglass"
 #+END_SRC
 **** Source model
+
 Use standard IEAE RGU-1
 #+BEGIN_SRC sh
   [name="source.model" type="geomtools::simple_shaped_model"]
