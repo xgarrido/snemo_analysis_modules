@@ -1,0 +1,2126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>High Purity Germanium simulation &amp; analysis</title>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Xavier Garrido" />
+<link rel="stylesheet" href="../css/styles.css">
+               <link rel="stylesheet" href="../css/org-pygments.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">High Purity Germanium simulation &amp; analysis</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Content</a></li>
+<li><a href="#sec-3">3. Geometry setup</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Manager configuration</a></li>
+<li><a href="#sec-3-2">3.2. Geometry models</a></li>
+<li><a href="#sec-3-3">3.3. Mapping categories</a></li>
+<li><a href="#sec-3-4">3.4. Materials plugin</a></li>
+<li><a href="#sec-3-5">3.5. Visualization settings</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Pipeline general configuration</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Module manager</a></li>
+<li><a href="#sec-4-2">4.2. Service manager</a></li>
+<li><a href="#sec-4-3">4.3. DLL loader</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Modules</a>
+<ul>
+<li><a href="#sec-5-1">5.1. Simulation module declaration</a></li>
+<li><a href="#sec-5-2">5.2. Analysis modules</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. Services</a>
+<ul>
+<li><a href="#sec-6-1">6.1. Preamble</a></li>
+<li><a href="#sec-6-2">6.2. Context service</a></li>
+<li><a href="#sec-6-3">6.3. Geometry service</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. Running SN@ilWare processing chain</a>
+<ul>
+<li><a href="#sec-7-1">7.1. Tangling configuration</a></li>
+<li><a href="#sec-7-2">7.2. Source code compilation</a></li>
+<li><a href="#sec-7-3">7.3. Use and execute <code>hpge_simulation</code> module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This repository holds a configuration to do High Purity Germanium (HPGe)
+simulations using Geant4 framework. It also contains a module to plot &gamma; energy
+distribution from Germanium crystal.
+</p>
+
+<p>
+The current version is hosted at
+<a href="https://github.com/xgarrido/snemo_simulation_modules/hpge_simulation">https://github.com/xgarrido/snemo_simulation_modules/hpge_simulation</a> under
+<code>git</code> version control. You can clone this repository by doing
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">git clone https://github.com/xgarrido/snemo_simulation_modules/hpge_simulation hpge_simulation
+</pre>
+</div>
+
+<p>
+This will create a directory <code>hpge_validation</code> in the working directory
+containing all the source files needed to configure and to setup SN@ilWare
+programs.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Content</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The code is organised as follow :
+</p>
+
+<dl class="org-dl">
+<dt> <code>README.org</code> </dt><dd>This file holds the pipeline configuration + the documentation
+on how to use the <code>hpge_simulation</code> module.
+</dd>
+<dt> <code>Makefile</code> </dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
+parsing and tangling this file <i>i.e.</i> <code>README.org</code> (see below).
+</dd>
+<dt> <code>source</code> </dt><dd>This directory holds the source code of the <code>hpge_simulation</code>
+module. It also has a <code>CMakeLists.txt</code> file in order to compile,
+build and install all the software pieces through <code>cmake</code> rules.
+</dd>
+</dl>
+
+<p>
+The <code>README.org</code> file is organised using <a href="http://orgmode.org/worg/org-contrib/babel/index.html">org-babel</a> and its ability to execute
+source code. It requires then a recent installation of emacs<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> which bundles
+<code>org</code>. Without entering into too much details regarding <code>org-babel</code> abilities,
+the basic idea is to give a &ldquo;literate&rdquo; way to navigate through the different
+sections, each of them representing a part of the pipeline
+configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
+hide and the user can focus on relevant parts.
+</p>
+
+<p>
+To export the different configuration files, you can run <code>org-babel-tangle</code>
+which will tangle each code block into the given file<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> or use the associated
+<code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
+process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
+&ldquo;occupies&rdquo; emacs during its execution).
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Geometry setup</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Manager configuration</h3>
+<div class="outline-text-3" id="text-3-1">
+</div>
+<div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1">Setup label, description and version</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup label</span>
+setup_label : <span class="org-variable-name">string</span> = <span class="org-string">"hpge_simulation"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup description</span>
+setup_description : <span class="org-variable-name">string</span> = <span class="org-string">"The HPGe planar geometry"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup version</span>
+setup_version : <span class="org-variable-name">string</span> = <span class="org-string">"1.0"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2">Logging priority</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3">Geometry factory</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<p>
+The geometry factory holds all the files needed for the geometry construction.
+</p>
+</div>
+<ul class="org-ul"><li>Logging priority<br  /><div class="outline-text-5" id="text-3-1-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority of the embedded geometry model factory</span>
+factory.logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</li>
+<li>Geometry files<br  /><div class="outline-text-5" id="text-3-1-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of files describing the geometry models</span>
+factory.geom_files : string[3] as <span class="org-variable-name">path</span> =        <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/geometry/sources.geom"</span> <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/geometry/planar.geom"</span>  <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/geometry/world.geom"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+<div id="outline-container-sec-3-1-4" class="outline-4">
+<h4 id="sec-3-1-4">ID manager</h4>
+<div class="outline-text-4" id="text-3-1-4">
+</div><ul class="org-ul"><li>Logging priority<br  /><div class="outline-text-5" id="text-3-1-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging flag of the embedded ID manager</span>
+id_mgr.logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</li>
+<li>Category list<br  /><div class="outline-text-5" id="text-3-1-4-2">
+<p>
+Categories are used to assign a unique id number (integer) to a geometrical
+volume.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Source file of the geometry categories used by the ID manager</span>
+id_mgr.categories_list : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/geometry/categories.lis"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-3-1-5" class="outline-4">
+<h4 id="sec-3-1-5">Mapping configuration</h4>
+<div class="outline-text-4" id="text-3-1-5">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Build the embedded default mapping dictionnary</span>
+build_mapping : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Max depth of the mapping</span>
+mapping.max_depth : <span class="org-variable-name">integer</span> = 100
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-6" class="outline-4">
+<h4 id="sec-3-1-6">Plugins configuration</h4>
+<div class="outline-text-4" id="text-3-1-6">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Plugins factory preload from system registration (default=0)</span>
+plugins.factory_no_preload : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Plugins initialization at load (default=0)</span>
+plugins.force_initialization_at_load : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Configuration files for geometry manager's plugins</span>
+plugins.configuration_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/geometry/materials_plugin.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Geometry models</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1">Source model</h4>
+<div class="outline-text-4" id="text-3-2-1">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-5" id="text-3-2-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of geometry models</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Petri box<br  /><div class="outline-text-5" id="text-3-2-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"petri_box.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type   : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+<span class="org-builtin">r</span>            : real as <span class="org-variable-name">length</span> = 2.4 cm
+z            : real as <span class="org-variable-name">length</span> = 0.1 cm
+material.ref : <span class="org-variable-name">string</span> = <span class="org-string">"std::plexiglass"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Source model<br  /><div class="outline-text-5" id="text-3-2-1-3">
+<p>
+Use standard IEAE RGU-1
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"source.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type   : <span class="org-variable-name">string</span> =  <span class="org-string">"cylinder"</span>
+<span class="org-builtin">r</span>            : real as <span class="org-variable-name">length</span> = 2.25 cm
+z            : real as <span class="org-variable-name">length</span> = 0.3 cm
+material.ref : <span class="org-variable-name">string</span> = <span class="org-string">"hpge::SiO2"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2">HPGe planar model</h4>
+<div class="outline-text-4" id="text-3-2-2">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-5" id="text-3-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of geometry models</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Germanium model<br  /><div class="outline-text-5" id="text-3-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"germanium.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type         : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+<span class="org-builtin">r</span>                  : real as <span class="org-variable-name">length</span> = 3.985 cm
+z                  : real as <span class="org-variable-name">length</span> = 3.170 cm
+material.ref       : <span class="org-variable-name">string</span> = <span class="org-string">"hpge::germanium"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Internal lead model<br  /><div class="outline-text-5" id="text-3-2-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"internal_lead.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type        : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+<span class="org-builtin">r</span>                 : real as <span class="org-variable-name">length</span> = 4.485 cm
+z                 : real as <span class="org-variable-name">length</span> = 4.500 cm
+material.ref      : <span class="org-variable-name">string</span> = <span class="org-string">"std::lead"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Contact lead<br  /><div class="outline-text-5" id="text-3-2-2-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"contact_lead.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type        : <span class="org-variable-name">string</span> = <span class="org-string">"tube"</span>
+outer_r           : real as <span class="org-variable-name">length</span> = 4.485 cm
+inner_r           : real as <span class="org-variable-name">length</span> = 3.985 cm
+z                 : real as <span class="org-variable-name">length</span> = 3.700 cm
+material.ref      : <span class="org-variable-name">string</span> = <span class="org-string">"std::lead"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Support model<br  /><div class="outline-text-5" id="text-3-2-2-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"support.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type  : <span class="org-variable-name">string</span> = <span class="org-string">"polycone"</span>
+filled_mode : <span class="org-variable-name">string</span> = <span class="org-string">"by_envelope"</span>
+length_unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+material.ref        : <span class="org-variable-name">string</span> = <span class="org-string">"std::aluminium"</span>
+material.filled.ref : <span class="org-variable-name">string</span> = <span class="org-string">"std::vacuum"</span>
+
+build_mode   : <span class="org-variable-name">string</span> = <span class="org-string">"points"</span>
+list_of_z    : <span class="org-variable-name">real</span>[4] = -42.5  -39.5000001 -39.5   +42.5
+list_of_rmax : <span class="org-variable-name">real</span>[4] =  48.0   48.0        48.0    48.0
+list_of_rmin : <span class="org-variable-name">real</span>[4] =   0.0    0.0        44.85   44.85
+
+internal_item.filled.labels : <span class="org-variable-name">string</span>[3] = <span class="org-string">"germanium"</span> <span class="org-string">"internal_lead"</span> <span class="org-string">"contact_lead"</span>
+
+internal_item.filled.model.germanium         : <span class="org-variable-name">string</span> = <span class="org-string">"germanium.model"</span>
+internal_item.filled.placement.germanium     : <span class="org-variable-name">string</span> = <span class="org-string">"0. 0. 26.65 (mm)"</span>
+mapping.filled.daughter_id.germanium         : <span class="org-variable-name">string</span> = <span class="org-string">"[germanium.category]"</span>
+
+internal_item.filled.model.internal_lead     : <span class="org-variable-name">string</span> = <span class="org-string">"internal_lead.model"</span>
+internal_item.filled.placement.internal_lead : <span class="org-variable-name">string</span> = <span class="org-string">"0. 0. -17.0 (mm)"</span>
+mapping.filled.daughter_id.internal_lead     : <span class="org-variable-name">string</span> = <span class="org-string">"[internal_lead.category]"</span>
+
+internal_item.filled.model.contact_lead      : <span class="org-variable-name">string</span> = <span class="org-string">"contact_lead.model"</span>
+internal_item.filled.placement.contact_lead  : <span class="org-variable-name">string</span> = <span class="org-string">"0. 0. 24.0 (mm)"</span>
+mapping.filled.daughter_id.contact_lead      : <span class="org-variable-name">string</span> = <span class="org-string">"[contact_lead.category]"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Front window<br  /><div class="outline-text-5" id="text-3-2-2-6">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"front_window.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type        : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+<span class="org-builtin">r</span>                 : real as <span class="org-variable-name">length</span> = 6.70 cm
+z                 : real as <span class="org-variable-name">length</span> = 0.18 cm
+material.ref      : <span class="org-variable-name">string</span> = <span class="org-string">"std::aluminium"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Air gap<br  /><div class="outline-text-5" id="text-3-2-2-7">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"vacuum_gap.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type        : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+<span class="org-builtin">r</span>                 : real as <span class="org-variable-name">length</span> = 6.40 cm
+z                 : real as <span class="org-variable-name">length</span> = 1.42 cm
+material.ref      : <span class="org-variable-name">string</span> = <span class="org-string">"std::vacuum"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Support + window model<br  /><div class="outline-text-5" id="text-3-2-2-8">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"support_and_window.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::stacked_model"</span>]
+material.ref  : <span class="org-variable-name">string</span>  = <span class="org-string">"std::vacuum"</span>
+
+stacked.axis  : <span class="org-variable-name">string</span>  = <span class="org-string">"z"</span>
+stacked.number_of_items  : <span class="org-variable-name">integer</span> = 3
+
+stacked.model_0 : <span class="org-variable-name">string</span> = <span class="org-string">"support.model"</span>
+stacked.label_0 : <span class="org-variable-name">string</span> = <span class="org-string">"support"</span>
+
+stacked.model_1 : <span class="org-variable-name">string</span> = <span class="org-string">"vacuum_gap.model"</span>
+stacked.label_1 : <span class="org-variable-name">string</span> = <span class="org-string">"vacuum_gap"</span>
+
+stacked.model_2 : <span class="org-variable-name">string</span> = <span class="org-string">"front_window.model"</span>
+stacked.label_2 : <span class="org-variable-name">string</span> = <span class="org-string">"front_window"</span>
+
+mapping.daughter_id.support      : <span class="org-variable-name">string</span> = <span class="org-string">"[support.category]"</span>
+mapping.daughter_id.vacuum_gap   : <span class="org-variable-name">string</span> = <span class="org-string">"[vacuum_gap.category]"</span>
+mapping.daughter_id.front_window : <span class="org-variable-name">string</span> = <span class="org-string">"[front_window.category]"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Endcap model<br  /><div class="outline-text-5" id="text-3-2-2-9">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"endcap.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+shape_type        : <span class="org-variable-name">string</span> = <span class="org-string">"tube"</span>
+outer_r           : real as <span class="org-variable-name">length</span> =  6.70 cm
+inner_r           : real as <span class="org-variable-name">length</span> =  6.40 cm
+z                 : real as <span class="org-variable-name">length</span> = 19.84 mm
+material.ref      : <span class="org-variable-name">string</span> = <span class="org-string">"std::aluminium"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Detector model<br  /><div class="outline-text-5" id="text-3-2-2-10">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"detector.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+logging.priority  : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+shape_type        : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+<span class="org-builtin">r</span>                 : real as <span class="org-variable-name">length</span> =  6.8 cm
+z                 : real as <span class="org-variable-name">length</span> = 20.2 cm
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"std::air"</span>
+
+internal_item.labels : <span class="org-variable-name">string</span>[2]  = <span class="org-string">"support_and_window"</span> <span class="org-string">"endcap"</span>
+
+internal_item.model.support_and_window     : <span class="org-variable-name">string</span>    = <span class="org-string">"support_and_window.model"</span>
+internal_item.placement.support_and_window : <span class="org-variable-name">string</span>    = <span class="org-string">"0 0 50.5 (mm) @ 0 0 0 (deg)"</span>
+mapping.daughter_id.support_and_window     : <span class="org-variable-name">string</span>    = <span class="org-string">"[support_and_window.category]"</span>
+
+internal_item.model.endcap                 : <span class="org-variable-name">string</span>    = <span class="org-string">"endcap.model"</span>
+internal_item.placement.endcap             : <span class="org-variable-name">string</span>    = <span class="org-string">"0 0 0 (mm) @ 0 0 0 (deg)"</span>
+mapping.daughter_id.endcap                 : <span class="org-variable-name">string</span>    = <span class="org-string">"[endcap.category]"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Full setup model<br  /><div class="outline-text-5" id="text-3-2-2-11">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"setup.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::stacked_model"</span>]
+material.ref  : <span class="org-variable-name">string</span>  = <span class="org-string">"std::air"</span>
+
+stacked.axis            : <span class="org-variable-name">string</span>  = <span class="org-string">"z"</span>
+stacked.number_of_items : <span class="org-variable-name">integer</span> = 3
+
+stacked.model_0 : <span class="org-variable-name">string</span> = <span class="org-string">"detector.model"</span>
+stacked.label_0 : <span class="org-variable-name">string</span> = <span class="org-string">"detector"</span>
+
+stacked.model_1 : <span class="org-variable-name">string</span> = <span class="org-string">"petri_box.model"</span>
+stacked.label_1 : <span class="org-variable-name">string</span> = <span class="org-string">"petri"</span>
+
+stacked.model_2 : <span class="org-variable-name">string</span> = <span class="org-string">"source.model"</span>
+stacked.label_2 : <span class="org-variable-name">string</span> = <span class="org-string">"source"</span>
+
+mapping.daughter_id.detector : <span class="org-variable-name">string</span> = <span class="org-string">"[detector.category]"</span>
+mapping.daughter_id.petri    : <span class="org-variable-name">string</span> = <span class="org-string">"[petri.category:box=0]"</span>
+mapping.daughter_id.source   : <span class="org-variable-name">string</span> = <span class="org-string">"[source.category:source=0]"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3">World volume</h4>
+<div class="outline-text-4" id="text-3-2-3">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-5" id="text-3-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of geometry models</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>World volume<br  /><div class="outline-text-5" id="text-3-2-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"world"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_world_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config configuration parameters for the world logical volume</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The world volume X dimension (box)</span>
+world.x         : real as <span class="org-variable-name">length</span> = 300.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The world volume Y dimension (box)</span>
+world.y         : real as <span class="org-variable-name">length</span> = 300.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The world volume Z dimension (box)</span>
+world.z         : real as <span class="org-variable-name">length</span> = 800.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the model that represents the experimental setup daughter volume</span>
+setup.model     : <span class="org-variable-name">string</span> = <span class="org-string">"setup.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement phi angle</span>
+setup.phi       : real as <span class="org-variable-name">angle</span> = 0.0 degree
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement theta angle</span>
+setup.theta     : real as <span class="org-variable-name">angle</span> = 0.0 degree
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement X coordinate</span>
+setup.x         : real as <span class="org-variable-name">length</span> = 0.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement Y coordinate</span>
+setup.y         : real as <span class="org-variable-name">length</span> = 0.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement Z coordinate</span>
+setup.z         : real as <span class="org-variable-name">length</span> = 0.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material that fills the world volume</span>
+material.ref    : <span class="org-variable-name">string</span> = <span class="org-string">"std::vacuum"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directives for the 'setup' daughter volume</span>
+mapping.daughter_id.setup : <span class="org-variable-name">string</span>  = <span class="org-string">"[setup.category:volume=0]"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Mapping categories</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of geometry ID categories/types</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "category"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"world"</span>           <span class="org-variable-name">type</span>=<span class="org-string">"0"</span>]
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"world"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"setup.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2000"</span>]
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"volume"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"detector.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2100"</span>]
+inherits : <span class="org-variable-name">string</span>[1] = <span class="org-string">"setup.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"source.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2200"</span>]
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"source"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"petri.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2300"</span>]
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"box"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"support_and_window.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1001"</span>]
+inherits : <span class="org-variable-name">string</span>    = <span class="org-string">"detector.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"endcap.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1002"</span>]
+inherits : <span class="org-variable-name">string</span>   = <span class="org-string">"detector.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"support.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1003"</span>]
+inherits : <span class="org-variable-name">string</span>    = <span class="org-string">"support_and_window.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"front_window.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1004"</span>]
+inherits : <span class="org-variable-name">string</span>   = <span class="org-string">"support_and_window.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"vacuum_gap.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1005"</span>]
+inherits : <span class="org-variable-name">string</span>    = <span class="org-string">"support_and_window.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"germanium.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1006"</span>]
+inherits : <span class="org-variable-name">string</span>   = <span class="org-string">"support.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"contact_lead.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1007"</span>]
+inherits : <span class="org-variable-name">string</span>   = <span class="org-string">"support.category"</span>
+
+[<span class="org-variable-name">category</span>=<span class="org-string">"internal_lead.category"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1008"</span>]
+inherits : <span class="org-variable-name">string</span>   = <span class="org-string">"support.category"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Materials plugin</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+We use the definitions of isotopes, elements and materials from the installed
+materials library. Here the <code>materials_aliases</code> definition are locally defined
+to change the source sample isotope.
+</p>
+</div>
+<div id="outline-container-sec-3-4-1" class="outline-4">
+<h4 id="sec-3-4-1">Plugin declaration</h4>
+<div class="outline-text-4" id="text-3-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The geometry manager plugin for materials</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label  "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label "type"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"materials_driver"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::materials_plugin"</span>]
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4-2" class="outline-4">
+<h4 id="sec-3-4-2">Logging priority</h4>
+<div class="outline-text-4" id="text-3-4-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4-3" class="outline-4">
+<h4 id="sec-3-4-3">Files</h4>
+<div class="outline-text-4" id="text-3-4-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of files describing the materials</span>
+materials.files : string[4] as <span class="org-variable-name">path</span> =   <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@materials:data/std_isotopes.def"</span>  <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@materials:data/std_elements.def"</span>  <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@materials:data/std_materials.def"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/geometry/hpge_materials.def"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4-4" class="outline-4">
+<h4 id="sec-3-4-4">Material aliases</h4>
+<div class="outline-text-4" id="text-3-4-4">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A list of materials for BiPo experiment</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"Germanium"</span> <span class="org-variable-name">type</span>=<span class="org-string">"element"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Ge natural element</span>
+z               : <span class="org-variable-name">integer</span>   = 32
+isotope.names   : <span class="org-variable-name">string</span>[5] = <span class="org-string">"Ge-70"</span> <span class="org-string">"Ge-72"</span> <span class="org-string">"Ge-73"</span>  <span class="org-string">"Ge-74"</span>  <span class="org-string">"Ge-76"</span>
+isotope.weights : <span class="org-variable-name">real</span>[5]   = 0.209 0.275  0.077 0.363 0.076
+
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"hpge::germanium"</span> <span class="org-variable-name">type</span>=<span class="org-string">"material"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description natural Ge material</span>
+density        : <span class="org-variable-name">real</span>   = 5.323
+density.unit   : <span class="org-variable-name">string</span> = <span class="org-string">"g/cm3"</span>
+state          : <span class="org-variable-name">string</span> = <span class="org-string">"solid"</span>
+composition.mode : <span class="org-variable-name">string</span>   = <span class="org-string">"fraction_mass"</span>
+composition.names         : string [1]  = <span class="org-string">"Germanium"</span>
+composition.fraction_mass : real   [1]  =  1.0
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"hpge::SiO2"</span> <span class="org-variable-name">type</span>=<span class="org-string">"material"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description silica material</span>
+density          : <span class="org-variable-name">real</span>   = 1.19
+density.unit     : <span class="org-variable-name">string</span> = <span class="org-string">"g/cm3"</span>
+state            : <span class="org-variable-name">string</span> = <span class="org-string">"solid"</span>
+composition.mode            : <span class="org-variable-name">string</span>       = <span class="org-string">"number_of_atoms"</span>
+composition.names           : string  [2]  = <span class="org-string">"Silicium"</span> <span class="org-string">"Oxygen"</span>
+composition.number_of_atoms : integer [2]  =     1       2
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"hpge::sodium"</span> <span class="org-variable-name">type</span>=<span class="org-string">"material"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Sodium material</span>
+density        : <span class="org-variable-name">real</span>   = 0.971
+density.unit   : <span class="org-variable-name">string</span> = <span class="org-string">"g/cm3"</span>
+state          : <span class="org-variable-name">string</span> = <span class="org-string">"solid"</span>
+composition.mode          : <span class="org-variable-name">string</span>      = <span class="org-string">"fraction_mass"</span>
+composition.names         : string [1]  = <span class="org-string">"Sodium"</span>
+composition.fraction_mass : real   [1]  =   1.0
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"hpge::manganese"</span> <span class="org-variable-name">type</span>=<span class="org-string">"material"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Manganese material</span>
+density        : <span class="org-variable-name">real</span>   = 7.44
+density.unit   : <span class="org-variable-name">string</span> = <span class="org-string">"g/cm3"</span>
+state          : <span class="org-variable-name">string</span> = <span class="org-string">"solid"</span>
+composition.mode          : <span class="org-variable-name">string</span>      = <span class="org-string">"fraction_mass"</span>
+composition.names         : string [1]  = <span class="org-string">"Sodium"</span>
+composition.fraction_mass : real   [1]  =   1.0
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> Visualization settings</h3>
+<div class="outline-text-3" id="text-3-5">
+</div>
+<div id="outline-container-sec-3-5-1" class="outline-4">
+<h4 id="sec-3-5-1">Browser settings</h4>
+<div class="outline-text-4" id="text-3-5-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"browser_settings"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup label.</span>
+setup_label : <span class="org-variable-name">string</span> = <span class="org-string">"hpge_simulation"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Tab to view at startup.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">0: 3D Display 1: Raw Data 2: Options, 3: Selection</span>
+startup_tab : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">0: Top view 1: Front view 2: Side view</span>
+startup_2d_view : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Background color of displays.</span>
+background_color : <span class="org-variable-name">integer</span>[3] =   0   0   0
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5-2" class="outline-4">
+<h4 id="sec-3-5-2">Geometry settings</h4>
+<div class="outline-text-4" id="text-3-5-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"geometry_settings"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description List of volumes to take care.</span>
+volume_category_list : <span class="org-variable-name">string</span>[9] = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"setup.category"</span>               <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"endcap.category"</span>              <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"source.category"</span>              <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"petri.category"</span>               <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"support.category"</span>             <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"germanium.category"</span>           <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"front_window.category"</span>        <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"contact_lead.category"</span>        <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"internal_lead.category"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Volume visibility (visible/invisible/disable)</span>
+setup.category.visibility         : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+endcap.category.visibility        : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+source.category.visibility        : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+petri.category.visibility         : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+support.category.visibility       : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+germanium.category.visibility     : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+front_window.category.visibility  : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+contact_lead.category.visibility  : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+internal_lead.category.visibility : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Volume color</span>
+setup.category.color         : <span class="org-variable-name">integer</span>[3] = 228 123 220
+endcap.category.color        : <span class="org-variable-name">integer</span>[3] = 158 246 222
+source.category.color        : <span class="org-variable-name">integer</span>[3] = 141  17  79
+petri.category.color         : <span class="org-variable-name">integer</span>[3] =  66  43 244
+support.category.color       : <span class="org-variable-name">integer</span>[3] =  86 111 124
+germanium.category.color     : <span class="org-variable-name">integer</span>[3] = 236  33 141
+front_window.category.color  : <span class="org-variable-name">integer</span>[3] = 163  44  34
+contact_lead.category.color  : <span class="org-variable-name">integer</span>[3] =  90 156 254
+internal_lead.category.color : <span class="org-variable-name">integer</span>[3] =  90 156 254
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5-3" class="outline-4">
+<h4 id="sec-3-5-3">Particle settings</h4>
+<div class="outline-text-4" id="text-3-5-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"particle_settings"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description MC particle color</span>
+gamma.color                : <span class="org-variable-name">string</span> = <span class="org-string">"kYellow"</span>
+electron.color             : <span class="org-variable-name">string</span> = <span class="org-string">"kBlue"</span>
+positron.color             : <span class="org-variable-name">string</span> = <span class="org-string">"kCyan"</span>
+alpha.color                : <span class="org-variable-name">string</span> = <span class="org-string">"kMagenta"</span>
+delta_ray_from_alpha.color : <span class="org-variable-name">string</span> = <span class="org-string">"kGreen"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5-4" class="outline-4">
+<h4 id="sec-3-5-4">Misc.</h4>
+<div class="outline-text-4" id="text-3-5-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"miscellaneous"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description MC line style</span>
+mc_line_style : <span class="org-variable-name">integer</span> = 1
+mc_line_width : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Figure save options</span>
+save.directory : <span class="org-variable-name">string</span> = <span class="org-string">"."</span>
+save.extension : <span class="org-variable-name">string</span> = <span class="org-string">".eps"</span>
+save.prefix    : <span class="org-variable-name">string</span> = <span class="org-string">"event_"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Pipeline general configuration</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+SN@ilWare implements the concept of data processing pipeline. An event record
+object is passed through a chain of data processing modules, each of them being
+responsible for a given task. Modules and services are declared in Section
+<a href="#sec-5">5</a> and Section <a href="#sec-6">6</a>. For more details on running SuperNEMO simulations
+and the concept behind modules/services see <a href="http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889">these mandatory presentations</a> given
+by F. Mauger.
+</p>
+
+<p>
+The <code>@HPGE_SIMULATION_DIR@</code> corresponds to the directory where configuration
+files are going to be stored. This variable which varies from one installation
+to the other, is automatically changed when the tangle process occurs. This is
+done <i>via</i> the <code>Makefile</code> which parse and replace this variable.
+</p>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Module manager</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+This file is the main and central piece of code for loading all modules/services
+needed by <code>dpp_processing</code> binary. It provides links to module files and
+service files.
+</p>
+</div>
+<div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1">Logging priority</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Module manager logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded module factory debug flag</span>
+factory.debug : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded module factory 'no preload' flag</span>
+factory.no_preload : <span class="org-variable-name">boolean</span> = 0
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2">Service manager configuration</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration file of the embedded service manager</span>
+service_manager.configuration : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/pipeline/service_manager.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-3" class="outline-4">
+<h4 id="sec-4-1-3">Configuration files for modules</h4>
+<div class="outline-text-4" id="text-4-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration files for modules</span>
+modules.configuration_files : string[2] as <span class="org-variable-name">path</span> =   <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/pipeline/simulation_modules.conf"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/pipeline/analysis_modules.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Service manager</h3>
+<div class="outline-text-3" id="text-4-2">
+</div>
+<div id="outline-container-sec-4-2-1" class="outline-4">
+<h4 id="sec-4-2-1">Logging priority</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Service manager logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-2" class="outline-4">
+<h4 id="sec-4-2-2">Name &amp; description</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the service manager</span>
+name : <span class="org-variable-name">string</span> = <span class="org-string">"hpge_service_manager"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The description of the service manager</span>
+description : <span class="org-variable-name">string</span> = <span class="org-string">"A HPGe service manager"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-3" class="outline-4">
+<h4 id="sec-4-2-3">List of service files</h4>
+<div class="outline-text-4" id="text-4-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of files that describe services</span>
+services.configuration_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/pipeline/services.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> DLL loader</h3>
+<div class="outline-text-3" id="text-4-3">
+</div><div id="outline-container-sec-4-3-1" class="outline-4">
+<h4 id="sec-4-3-1">Libraries</h4>
+<div class="outline-text-4" id="text-4-3-1">
+<p>
+This part set the different libraries to be loaded at runtime. This is needed
+since event data models are defined in other libraries than the one currently
+named <code>hpge_simulation</code>. The following table sets the libraries
+</p>
+
+<table id="dll_libraries-:results-none" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 1:</span> Libraries to be used by <code>hpge_simulation</code> modules</caption>
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">hpge_analysis</td>
+<td class="left">@HPGE_SIMULATION_DIR@/source/install/lib/libhpge_analysis.so</td>
+</tr>
+
+<tr>
+<td class="left">Bayeux_mctools_geant4</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "filename"</span>
+hpge_analysis Bayeux_mctools_geant4
+[<span class="org-variable-name">name</span>=<span class="org-string">"hpge_analysis"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"@HPGE_SIMULATION_DIR@/source/install/lib/libhpge_analysis.so"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The hpge_analysis library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"Bayeux_mctools_geant4"</span> <span class="org-variable-name">filename</span>=<span class="org-string">""</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The Bayeux_mctools_geant4 library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Modules</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+The next items hold the configuration to simulate HPGe with Geant4 and the
+module configuration to analyse simulated data.
+</p>
+</div>
+
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> Simulation module declaration</h3>
+<div class="outline-text-3" id="text-5-1">
+</div>
+
+<div id="outline-container-sec-5-1-1" class="outline-4">
+<h4 id="sec-5-1-1">File preamble</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-1-2" class="outline-4">
+<h4 id="sec-5-1-2">Declaration &amp; description</h4>
+<div class="outline-text-4" id="text-5-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"simulation"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mctools::g4::simulation_module"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config 'mctools::g4::simulation_module' configuration parameters for HPGe simulation</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-1-3" class="outline-4">
+<h4 id="sec-5-1-3">Logging priority</h4>
+<div class="outline-text-4" id="text-5-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-1-4" class="outline-4">
+<h4 id="sec-5-1-4">Bank &amp; service labels</h4>
+<div class="outline-text-4" id="text-5-1-4">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The Geometry Service label</span>
+Geo_label : <span class="org-variable-name">string</span> = <span class="org-string">"Geo"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The 'Simulated data' bank label in the event record</span>
+SD_label  : <span class="org-variable-name">string</span> = <span class="org-string">"SD"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Flag to allow cleaning of some former simulated data bank if any (default: 0)</span>
+erase_former_SD_bank : <span class="org-variable-name">boolean</span> = 0
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-1-5" class="outline-4">
+<h4 id="sec-5-1-5">Seed values</h4>
+<div class="outline-text-4" id="text-5-1-5">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The simulation manager PRNG seed</span>
+manager.seed                  : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The vertex generator PRNG seed</span>
+manager.vertex_generator_seed : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The event generator PRNG seed</span>
+manager.event_generator_seed  : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The SHPF PRNG seed</span>
+manager.shpf_seed             : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The saving of PRNG seeds</span>
+manager.output_prng_seeds_file  : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/hpge.d/prng_seeds.save"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The saving of PRNG states</span>
+manager.output_prng_states_file : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/hpge.d/prng_states.save"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The modulo for PRNG states backup</span>
+manager.prng_states_save_modulo : <span class="org-variable-name">integer</span> = 10
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-1-6" class="outline-4">
+<h4 id="sec-5-1-6">G4 manager</h4>
+<div class="outline-text-4" id="text-5-1-6">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The simulation manager configuration file</span>
+manager.configuration_filename : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/g4_manager.conf"</span>
+</pre>
+</div>
+</div>
+<ul class="org-ul"><li>Configuration<br  /><div class="outline-text-5" id="text-5-1-6-1">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-6" id="text-5-1-6-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of configuration for internal components of Geant4 manager</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  ""</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Manager section<br  /><div class="outline-text-6" id="text-5-1-6-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"manager"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority      : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Number of events to be simulated (superseded by the pipeline)</span>
+number_of_events      : <span class="org-variable-name">integer</span> = 20
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Geant4 tracking verbosity flag (from 0 to 10):</span>
+g4_tracking_verbosity : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Geant4 visualization activation flag:</span>
+g4_visualization      : <span class="org-variable-name">boolean</span> = 0
+</pre>
+</div>
+</div>
+</li>
+
+<li>Event generator section<br  /><div class="outline-text-6" id="text-5-1-6-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"event_generator"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Configuration file for the embedded '::genbb::manager'</span>
+manager.config : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/event_generator_manager.conf"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Vertex generator section<br  /><div class="outline-text-6" id="text-5-1-6-1-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"vertex_generator"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Main configuration file for the vertex generator manager</span>
+manager.config : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/vertex_generator_manager.conf"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Detector construction<br  /><div class="outline-text-6" id="text-5-1-6-1-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"detector_construction"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Main configuration file for the detector construction user object:</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Temporary directory for GDML file generation:</span>
+gdml.tmp_dir         : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/g4.d"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Access mode to the GDML schema ("local" or "remote")</span>
+gdml.schema_location : <span class="org-variable-name">string</span> = <span class="org-string">"local"</span> <span class="org-comment-delimiter"># </span><span class="org-comment">"remote"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Flag to skip GDML validation</span>
+gdml.no_validation   : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging support for step hit processor factory</span>
+hit_processor_factory.logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Configuration file for the step hit processor factory:</span>
+hit_processor_factory.config : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/step_hit_processor_factory.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Parameters for the generation of 'sensitive hits' through 'sensitive detectors' :</span>
+sensitive.detectors : <span class="org-variable-name">string</span>[1] = <span class="org-string">"germanium_SD"</span>
+
+sensitive.germanium_SD.logging.priority               : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+sensitive.germanium_SD.hits_buffer_capacity           : <span class="org-variable-name">integer</span> = 1000
+sensitive.crystal_SD.record_alpha_quenching           : <span class="org-variable-name">boolean</span> = 0
+sensitive.germanium_SD.record_track_id                : <span class="org-variable-name">boolean</span> = 1
+sensitive.germanium_SD.record_primary_particle        : <span class="org-variable-name">boolean</span> = 1
+sensitive.germanium_SD.drop_zero_energy_deposit_steps : <span class="org-variable-name">boolean</span> = 0
+sensitive.germanium_SD.track_gamma                    : <span class="org-variable-name">boolean</span> = 1
+sensitive.germanium_SD.track_neutron                  : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</li>
+
+<li>Physics list<br  /><div class="outline-text-6" id="text-5-1-6-1-6">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"physics_list"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Main configuration file for the physics lists:</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description List of physics constructors</span>
+physics_constructors.names : <span class="org-variable-name">string</span>[2] = <span class="org-string">"particles"</span> <span class="org-string">"em"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Class ID of the physics constructors named 'particles'</span>
+physics_constructors.particles.id     : <span class="org-variable-name">string</span> = <span class="org-string">"mctools::g4::particles_physics_constructor"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Configuration file of the physics constructors named 'particles'</span>
+physics_constructors.particles.config : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/physics_list_particles.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Class ID of the physics constructors named 'em'</span>
+physics_constructors.em.id            : <span class="org-variable-name">string</span> = <span class="org-string">"mctools::g4::em_physics_constructor"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Configuration file of the physics constructors named 'em'</span>
+physics_constructors.em.config        : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/physics_list_em_processes.conf"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Run, event, tracking&#x2026; actions<br  /><div class="outline-text-6" id="text-5-1-6-1-7">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"run_action"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority :</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description If set, this flag forbids the generation of output files :</span>
+file.no_save : <span class="org-variable-name">boolean</span> = 1
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"event_action"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority :</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"primary_generator_action"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Primary generator action logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"tracking_action"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Primary generator action logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"stepping_action"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Primary generator action logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"stacking_action"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Primary generator action logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li>
+
+<li>Physics list<br  /><ul class="org-ul"><li>Particles<br  /><div class="outline-text-6" id="text-5-1-6-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@config Configuration parameters for the particles Geant4 physics constructor</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for geantinos (neutral and charged, default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_geantinos               : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for optical photons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_optical_photons         : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for muon leptons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_muon_leptons         : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for tau leptons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_tau_leptons          : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for light mesons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_light_mesons         : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for charm mesons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_charm_mesons         : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for bottom mesons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_bottom_mesons        : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for nucleons (default: 1)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_nucleons             : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for strange baryons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_strange_baryons      : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for charm baryons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_charm_baryons        : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for bottom baryons (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_bottom_baryons       : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for light nuclei (default: 1)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_light_nuclei         : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for light anti-nuclei (default: 0)</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">use_light_anti_nuclei    : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for generic ion (default: 0)</span>
+use_generic_ion          : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</li>
+
+<li>EM processes<br  /><div class="outline-text-6" id="text-5-1-6-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@config Configuration parameters for the electro-magnetic Geant4 physics constructor</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Electro-magntox interaction model (value in: "standard", "low_energy", "penelope")</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.model : string = "standard"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for electron/positron energy loss process</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.electron.energy_loss         : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for electron/positron multiple scaterring process</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.electron.multiple_scaterring : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for electron/positron bremsstrahlung process</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.electron.bremsstrahlung      : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for positron pannihilation</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.positron.annihilation        : boolean = 1</span>
+
+<span class="org-comment-delimiter">################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Deexcitation #</span>
+<span class="org-comment-delimiter">################</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for deexcitation fluorescence process</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.fluo         : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for Auger process</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.auger        : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for PIXE</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.pixe         : boolean = 0</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation model for PIXE cross-sections</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.pixe.model   : string = "Empirical"</span>
+
+<span class="org-comment-delimiter">###########################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Deexcitation per region #</span>
+<span class="org-comment-delimiter">###########################</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The regions where to apply some deexcitation process</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.regions    : string[2] = "A" "B"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for deexcitation fluorescence process in region "A"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.regions.A.fluo : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for Auger process in region "A"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.regions.A.auger : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for PIXE in region "A"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.regions.A.pixe : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for deexcitation fluorescence process in region "B"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.regions.B.fluo : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for Auger process in region "B"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.regions.B.auger : boolean = 1</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The activation flag for PIXE in region "B"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">em.deexcitation.regions.B.pixe : boolean = 1</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li>
+<li>Step hit processors<br  /><div class="outline-text-5" id="text-5-1-6-3">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-6" id="text-5-1-6-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A list of simulated step hit processors</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Crystal hit processor<br  /><div class="outline-text-6" id="text-5-1-6-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"crystal.hit_processor"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mctools::calorimeter_step_hit_processor"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The step hit processor for the crystal simulated hits</span>
+
+logging.priority      : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+hit.category          : <span class="org-variable-name">string</span> = <span class="org-string">"scin.hit"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">hit.category          : string = "crystal.hit"</span>
+sensitive.category    : <span class="org-variable-name">string</span> = <span class="org-string">"germanium_SD"</span>
+mapping.category      : <span class="org-variable-name">string</span> = <span class="org-string">"germanium.category"</span>
+
+use_private_pool      : <span class="org-variable-name">boolean</span> = 1
+private_pool_capacity : <span class="org-variable-name">integer</span> = 10
+
+cluster.time_range    : real as <span class="org-variable-name">time</span>   = 1.0 ns
+cluster.space_range   : real as <span class="org-variable-name">length</span> = 10.0 mm
+</pre>
+</div>
+</div>
+</li>
+
+<li>Visualization hit processors<br  /><div class="outline-text-6" id="text-5-1-6-3-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"all.volumes.visu.hit_processor"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mctools::push_all_step_hit_processor"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The step hit processor for collecting all the visu hits</span>
+
+logging.priority     : <span class="org-variable-name">string</span>  = <span class="org-string">"warning"</span>
+hit.category         : <span class="org-variable-name">string</span>  = <span class="org-string">"__visu.tracks"</span>
+sensitive.category   : <span class="org-variable-name">string</span>  = <span class="org-string">"__all.volumes.SD"</span>
+geometry.volumes.all : <span class="org-variable-name">boolean</span> = 1
+<span class="org-comment-delimiter">#</span><span class="org-comment">geometry.volumes.excluded : string[0] = "field_wire.model.log" "anode_wire.model.log"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-5-1-7" class="outline-4">
+<h4 id="sec-5-1-7">Vertex generator</h4>
+<div class="outline-text-4" id="text-5-1-7">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The vertex generator PRNG label</span>
+manager.vertex_generator_name : <span class="org-variable-name">string</span>  = <span class="org-string">"source_bulk"</span>
+</pre>
+</div>
+</div>
+<ul class="org-ul"><li>Manager configuration<br  /><div class="outline-text-5" id="text-5-1-7-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@config Configuration of the genvtx::manager class</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embeded PRNG seed</span>
+prng_seed : <span class="org-variable-name">integer</span> = 12345
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embeded PRNG type (default is "taus2", fast and good quality)</span>
+prng_id : <span class="org-variable-name">string</span> = <span class="org-string">"taus2"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of files that contain the rules for vertex generators</span>
+vg_list : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/vertex_generators.conf"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Vertex generator definitions<br  /><div class="outline-text-5" id="text-5-1-7-2">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-6" id="text-5-1-7-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A list of vertex generators</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Point source vertex<br  /><div class="outline-text-6" id="text-5-1-7-2-2">
+<p>
+Generate vertex from an arbitrary point of the experimental setup
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"point_source"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genvtx::spot_vertex_generator"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority  : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description X position of the spot</span>
+spot.x : real as <span class="org-variable-name">length</span> = -280.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Y position of the spot</span>
+spot.y : real as <span class="org-variable-name">length</span> =    0.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Z position of the spot</span>
+spot.z : real as <span class="org-variable-name">length</span> =    0.0 mm
+</pre>
+</div>
+</div>
+</li>
+
+<li>Source bulk<br  /><div class="outline-text-6" id="text-5-1-7-2-3">
+<p>
+Generate vertex in the bulk volume of the sample
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"source_bulk"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genvtx::cylinder_model_vg"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority  : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The rule that describes the geometry origin of vertex in term of geometry category and addresses (geom ID)</span>
+origin : <span class="org-variable-name">string</span>  = <span class="org-string">"category=source.category"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mode used for vertex generator from the underlying box model associated to the target logical volume ("surface" or "bulk")</span>
+mode   : <span class="org-variable-name">string</span>  = <span class="org-string">"bulk"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-5-1-8" class="outline-4">
+<h4 id="sec-5-1-8">Event generator</h4>
+<div class="outline-text-4" id="text-5-1-8">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The event generator PRNG label</span>
+manager.event_generator_name  : <span class="org-variable-name">string</span>  = <span class="org-string">"bkg_Tl208"</span>
+</pre>
+</div>
+</div>
+<ul class="org-ul"><li>Manager configuration<br  /><div class="outline-text-5" id="text-5-1-8-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@config Main configuration parameters for the genbb manager</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description List of files containing particle generator definition rules</span>
+generators.configuration_files : string[2] as <span class="org-variable-name">path</span> =       <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/event_generator_backgrounds.conf"</span> <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@HPGE_SIMULATION_DIR@/config/simulation/event_generator_misc.conf"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Event generator definitions<br  /><ul class="org-ul"><li>Background events<br  /><div class="outline-text-6" id="text-5-1-8-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of event generators</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+<ul class="org-ul"><li>&nbsp;<sup>208</sup>Tl<br  /><div class="outline-text-7" id="text-5-1-8-2-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Tl208"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Tl208"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">energy_min      : real as energy = 0.0 MeV</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">energy_max      : real as energy = 5.0 MeV</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>234</sup>Th<br  /><div class="outline-text-7" id="text-5-1-8-2-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Th234"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Th234"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>214</sup>Pb<br  /><div class="outline-text-7" id="text-5-1-8-2-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Pb214"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Pb214"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>214</sup>Bi<br  /><div class="outline-text-7" id="text-5-1-8-2-1-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Bi214"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Bi214"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>210</sup>Pb<br  /><div class="outline-text-7" id="text-5-1-8-2-1-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Pb210"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Pb210"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>210</sup>Pb+&nbsp;<sup>210</sup>Bi<br  /><div class="outline-text-7" id="text-5-1-8-2-1-6">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Pb210_Bi210"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Pb210+Bi210"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>212</sup>Pb<br  /><div class="outline-text-7" id="text-5-1-8-2-1-7">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Pb212"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Pb212"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>212</sup>Bi+&nbsp;<sup>212</sup>Po<br  /><div class="outline-text-7" id="text-5-1-8-2-1-8">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Bi212_Po212"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Bi212+Po212"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>214</sup>Bi+&nbsp;<sup>214</sup>Po<br  /><div class="outline-text-7" id="text-5-1-8-2-1-9">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Bi214_Po214"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Bi214+Po214"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>22</sup>Na<br  /><div class="outline-text-7" id="text-5-1-8-2-1-10">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Na22"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Na22"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>&nbsp;<sup>54</sup>Mn<br  /><div class="outline-text-7" id="text-5-1-8-2-1-11">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bkg_Mn54"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::wdecay0"</span>]
+decay_type      : <span class="org-variable-name">string</span>  =<span class="org-string">"background"</span>
+decay_isotope   : <span class="org-variable-name">string</span>  = <span class="org-string">"Mn54"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li>
+
+<li>Misc. generators<br  /><div class="outline-text-6" id="text-5-1-8-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of event generators</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+<ul class="org-ul"><li>Electron with 1-2 MeV flat energy<br  /><div class="outline-text-7" id="text-5-1-8-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"electron_1-2MeV_flat"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::single_particle_generator"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config Parameters for the "single_particle" mode (class genbb::single_particle_generator):</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Generated particle ("electron", "positron", "gamma", "alpha"):</span>
+particle_name         : <span class="org-variable-name">string</span> = <span class="org-string">"electron"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Mode ("energy_range", "gaussian_energy", "monokinetic"):</span>
+mode                  : <span class="org-variable-name">string</span> = <span class="org-string">"energy_range"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Flag to randomize the direction of the emitted particle (in 4xPi)</span>
+randomized_direction   : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">### </span><span class="org-comment">Only for "energy_range" mode:</span>
+min_energy            : real as <span class="org-variable-name">energy</span> = 1000. keV
+max_energy            : real as <span class="org-variable-name">energy</span> = 2000. keV
+</pre>
+</div>
+</div>
+</li>
+
+<li>1 MeV electron beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"electron_1MeV"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::single_particle_generator"</span>]
+particle_name         : <span class="org-variable-name">string</span> = <span class="org-string">"electron"</span>
+mode                  : <span class="org-variable-name">string</span> = <span class="org-string">"monokinetic"</span>
+energy                : real as <span class="org-variable-name">energy</span> = 1000. keV
+randomized_direction  : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</li>
+
+<li>27 keV gamma beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"gamma_27keV"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::single_particle_generator"</span>]
+particle_name         : <span class="org-variable-name">string</span> = <span class="org-string">"gamma"</span>
+mode                  : <span class="org-variable-name">string</span> = <span class="org-string">"monokinetic"</span>
+energy                : real as <span class="org-variable-name">energy</span> = 27.0 keV
+randomized_direction  : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</li>
+
+<li>186 keV gamma beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"gamma_186keV"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::single_particle_generator"</span>]
+particle_name         : <span class="org-variable-name">string</span> = <span class="org-string">"gamma"</span>
+mode                  : <span class="org-variable-name">string</span> = <span class="org-string">"monokinetic"</span>
+energy                : real as <span class="org-variable-name">energy</span>  = 186.11 keV
+randomized_direction  : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</li>
+
+<li>352 keV gamma beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"gamma_352keV"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::single_particle_generator"</span>]
+particle_name         : <span class="org-variable-name">string</span> = <span class="org-string">"gamma"</span>
+mode                  : <span class="org-variable-name">string</span> = <span class="org-string">"monokinetic"</span>
+energy                : real as <span class="org-variable-name">energy</span> = 352.0 keV
+randomized_direction  : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</li>
+
+<li>1 GeV muon beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-6">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"muon_1GeV"</span> <span class="org-variable-name">type</span>=<span class="org-string">"genbb::single_particle_generator"</span>]
+particle_name         : <span class="org-variable-name">string</span> = <span class="org-string">"mu-"</span>
+mode                  : <span class="org-variable-name">string</span> = <span class="org-string">"monokinetic"</span>
+energy                : real as <span class="org-variable-name">energy</span> = 1.0 GeV
+randomized_direction  : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</li></ul>
+</li></ul>
+</li></ul>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> Analysis modules</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-sec-5-2-1" class="outline-4">
+<h4 id="sec-5-2-1">File preamble</h4>
+<div class="outline-text-4" id="text-5-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2-2" class="outline-4">
+<h4 id="sec-5-2-2">Basic analysis module</h4>
+<div class="outline-text-4" id="text-5-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"basic_analysis_module"</span> <span class="org-variable-name">type</span>=<span class="org-string">"hpge::basic_analysis_module"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config A basic module to process simulated data for HPGe detector</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging flag</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of the 'Simulated Data' bank</span>
+SD_label : <span class="org-variable-name">string</span>  = <span class="org-string">"SD"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The file name</span>
+ROOT_filename : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/hpge.d/hpge_analysis.root"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2-3" class="outline-4">
+<h4 id="sec-5-2-3">Simulation &rarr; Analysis chain</h4>
+<div class="outline-text-4" id="text-5-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"hpge_chain"</span> <span class="org-variable-name">type</span>=<span class="org-string">"dpp::chain_module"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging flag</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of processing modules to be applied (in this order) :</span>
+modules : string [2] = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"simulation"</span>       <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"basic_analysis_module"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Services</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+A service generally hosts a specific resource that can be shared by many other
+software components, including other services or data processing modules (see
+<a href="https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice">SN@ilWare FAQ</a>).
+</p>
+</div>
+
+<div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> Preamble</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> Context service</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"Ctx"</span> <span class="org-variable-name">type</span>=<span class="org-string">"dpp::context_service"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description File from which the context is to be loaded at program start</span>
+load.file : string as <span class="org-variable-name">path</span>  = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description File to store the context at program termination</span>
+store.file : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context_end.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Flag to backup the former context load file</span>
+backup.file : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context_bak.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> Geometry service</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+The following code block declares the geometry service to properly load all the
+geometry and material construction of the detector. This service, only declared
+here, can be used by several operations like calibration, and other related
+reconstruction modules &#x2026; but all of them will use the same geometry.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"Geo"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::geometry_service"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded SuperNEMO geometry manager main configuration file</span>
+manager.configuration_file : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@HPGE_SIMULATION_DIR@/config/geometry/manager.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded SuperNEMO geometry manager must build its mapping lookup table</span>
+manager.build_mapping : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded geometry manager's mapping lookup table does not exclude any geometry category</span>
+manager.no_excluded_categories : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Running SN@ilWare processing chain</h2>
+<div class="outline-text-2" id="text-7">
+</div><div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> Tangling configuration</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+First, you need to tangle this file. As explained in the <a href="#sec-2">Content</a> section, you
+may use the dedicated <code>Makefile</code> to generate the pipeline configuration. Just
+run <code>make</code> within this working directory.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> Source code compilation</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+Second, you need to compile the <code>hpge_simulation</code> module files. The build
+system used is <code>cmake</code> and a <code>CMakeLists.txt</code> file is provided to correctly
+setup the dependencies. Nevertheless, this implies that you have already and
+correctly installed <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael">Cadfael</a> and <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux">Bayeux</a> setups. Then, you can configure, build
+and install the <code>hpge_simulation</code> module by doing
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">mkdir {build,install} &amp;&amp; <span class="org-builtin">cd</span> build
+cmake                                               <span class="org-sh-escaped-newline">\</span>
+    -DCMAKE_PREFIX_PATH=<span class="org-string">"&lt;path to Bayeux install&gt;"</span>  <span class="org-sh-escaped-newline">\</span>
+    -DCMAKE_INSTALL_PREFIX=../install               <span class="org-sh-escaped-newline">\</span>
+    ../source
+make install
+<span class="org-builtin">cd</span> ..
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> Use and execute <code>hpge_simulation</code> module</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+After a successful build, you will get an <code>install</code> directory holding the
+<code>libhpge_simulation.so</code> file. Assuming you are under <code>bash</code> shell, you will
+need to add it to your <code>LD_LIBRARY_PATH</code> by doing
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-builtin">export</span> <span class="org-variable-name">LD_LIBRARY_PATH</span>=${<span class="org-variable-name">PWD</span>}/install/lib:${<span class="org-variable-name">LD_LIBRARY_PATH</span>}
+</pre>
+</div>
+
+<p>
+Another approach, maybe less intrusive, will be to set the <code>LD_LIBRARY_PATH</code>
+when running the <code>dpp_processing</code> binary. You can for example write something
+like
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-variable-name">LD_LIBRARY_PATH</span>=${<span class="org-variable-name">PWD</span>}/install/lib:${<span class="org-variable-name">LD_LIBRARY_PATH</span>} dpp_processing ...
+</pre>
+</div>
+
+<p>
+Running processing pipeline is done by the <code>dpp_processing</code> program provided by
+<code>dpp</code> library. Its call is pretty simple and only implies to have a module
+manager file and the name of the module to be run <i>i.e.</i>
+<code>hpge_simulation_module</code>. Nevertheless, you need to dynamically load the
+library(ies) which holds the needed modules.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">dpp_processing                                                       <span class="org-sh-escaped-newline">\</span>
+    --module-manager-config $<span class="org-variable-name">PWD</span>/config/pipeline/module_manager.conf <span class="org-sh-escaped-newline">\</span>
+    --module hpge_simulation_module                                  <span class="org-sh-escaped-newline">\</span>
+    --load-dll hpge_simulation                                       <span class="org-sh-escaped-newline">\</span>
+    --load-dll &lt;library&gt;_bio
+</pre>
+</div>
+
+<p>
+<code>&lt;library&gt;_bio</code> represents libraries which holds event data models such as
+<code>mctools_bio</code>. You can use the <code>dlls.conf</code> file built in section <a href="#sec-4-3">4.3</a> by
+writing
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">dpp_processing                                                       <span class="org-sh-escaped-newline">\</span>
+    --module-manager-config $<span class="org-variable-name">PWD</span>/config/pipeline/module_manager.conf <span class="org-sh-escaped-newline">\</span>
+    --module hpge_simulation_module                                 <span class="org-sh-escaped-newline">\</span>
+    --load-dll hpge_simulation                                      <span class="org-sh-escaped-newline">\</span>
+    --dll-config $<span class="org-variable-name">PWD</span>/config/pipeline/dlls.conf
+</pre>
+</div>
+
+<p>
+It will run the <code>hpge_simulation_module</code> and it will generate a ROOT file
+containing several histograms. This file is located by default, in
+<code>/tmp/${USER}/snemo.d</code> directory under the <code>hpge_simulation_histos.root</code>
+name. You can change the output directory and output file name in <i>this section</i>.
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+At the time of writing this document, emacs version is 24.3.1
+</p></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+Emacs lisp function can be run using <code>ALT-x</code> command and typing the function
+name.
+</p></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+File under git version control - commit 34c035d - 2014-02-20
+</div>
+</body>
+</html>

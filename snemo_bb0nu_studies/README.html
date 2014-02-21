@@ -1,0 +1,872 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>SuperNEMO - &beta;&beta; studies</title>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Xavier Garrido" />
+<link rel="stylesheet" href="../css/styles.css">
+               <link rel="stylesheet" href="../css/org-pygments.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">SuperNEMO - &beta;&beta; studies</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Content</a></li>
+<li><a href="#sec-3">3. Pipeline general configuration</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Module manager</a></li>
+<li><a href="#sec-3-2">3.2. Service manager</a></li>
+<li><a href="#sec-3-3">3.3. DLL loader</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. SuperNEMO &beta;&beta;0&nu; modules</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Module declaration</a></li>
+<li><a href="#sec-4-2">4.2. Histogram declarations</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Services</a>
+<ul>
+<li><a href="#sec-5-1">5.1. Preamble</a></li>
+<li><a href="#sec-5-2">5.2. Context service</a></li>
+<li><a href="#sec-5-3">5.3. Histogram service</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. Running SN@ilWare processing chain</a>
+<ul>
+<li><a href="#sec-6-1">6.1. Tangling configuration</a></li>
+<li><a href="#sec-6-2">6.2. Source code compilation</a></li>
+<li><a href="#sec-6-3">6.3. Use and execute <code>snemo_bb0nu_studies</code> module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This repository holds a SN@ilWare configuration + source code to calculate &beta;&beta;0&nu;
+sensitivity for SuperNEMO experiment. Given 2&beta; simulations (maybe data one day)
+from 0&nu; double decay and background simulations (2&nu;,&nbsp;<sup>208</sup>Tl,&nbsp;<sup>214</sup>Bi&#x2026;), the
+module <code>snemo_bb0nu_halflife_limit</code> calculates signal/background efficiencies
+and then determines the best sensitivity.
+</p>
+
+<p>
+The current version is hosted at
+<a href="https://github.com/xgarrido/snemo_simulation_modules/snemo_bb0nu_studies">https://github.com/xgarrido/snemo_simulation_modules/snemo_bb0nu_studies</a> under
+<code>git</code> version control. You can clone this repository by doing
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">git clone https://github.com/xgarrido/snemo_simulation_modules/snemo_bb0nu_studies snemo_bb0nu_studies
+</pre>
+</div>
+
+<p>
+This will create a directory <code>snemo_bb0nu_studies</code> in the working directory
+containing all the source files needed to configure and to setup SN@ilWare
+programs.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Content</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The code is organised as follow :
+</p>
+
+<dl class="org-dl">
+<dt> <code>README.org</code> </dt><dd>This file holds the pipeline configuration + the documentation
+on how to use the <code>snemo_bb0nu_studies</code> module.
+</dd>
+<dt> <code>Makefile</code> </dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
+parsing and tangling this file <i>i.e.</i> <code>README.org</code> (see below).
+</dd>
+<dt> <code>source</code> </dt><dd>This directory holds the source code of the <code>snemo_bb0nu_studies</code>
+module. It also has a <code>CMakeLists.txt</code> file in order to compile,
+build and install all the software pieces through <code>cmake</code> rules.
+</dd>
+</dl>
+
+<p>
+The <code>README.org</code> file is organised using <a href="http://orgmode.org/worg/org-contrib/babel/index.html">org-babel</a> and its ability to execute
+source code. It requires then a recent installation of emacs<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> which bundles
+<code>org</code>. Without entering into too much details regarding <code>org-babel</code> abilities,
+the basic idea is to give a &ldquo;literate&rdquo; way to navigate through the different
+sections, each of them representing a part of the pipeline
+configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
+hide and the user can focus on relevant parts.
+</p>
+
+<p>
+To export the different configuration files, you can run <code>org-babel-tangle</code>
+which will tangle each code block into the given file<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> or use the associated
+<code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
+process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
+&ldquo;occupies&rdquo; emacs during its execution).
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Pipeline general configuration</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+SN@ilWare implements the concept of data processing pipeline. An event record
+object is passed through a chain of data processing modules, each of them being
+responsible for a given task. Modules and services are declared in Section
+<i>Modules</i> and Section <a href="#sec-5">5</a>. For more details on running SuperNEMO simulations
+and the concept behind modules/services see <a href="http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889">these mandatory presentations</a> given
+by F. Mauger.
+</p>
+
+<p>
+The <code>@SNEMO_BB0NU_STUDIES_DIR@</code> corresponds to the directory where configuration
+files are going to be stored. This variable which varies from one installation
+to the other, is automatically change when the tangle process occurs. This is
+done <i>via</i> the <code>Makefile</code> which parse and replace this variable.
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Module manager</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+This file is the main and central piece of code for loading all modules/services
+needed by <code>dpp_processing</code> binary. It provides links to module files and
+service files.
+</p>
+</div>
+<div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1">Logging priority</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Module manager logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded module factory debug flag</span>
+factory.debug : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded module factory 'no preload' flag</span>
+factory.no_preload : <span class="org-variable-name">boolean</span> = 0
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2">Service manager configuration</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration file of the embedded service manager</span>
+service_manager.configuration : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_BB0NU_STUDIES_DIR@/service_manager.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3">Configuration files for modules</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration files for modules</span>
+modules.configuration_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_BB0NU_STUDIES_DIR@/snemo_bb0nu_studies_modules.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Service manager</h3>
+<div class="outline-text-3" id="text-3-2">
+</div>
+<div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1">Logging priority</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Service manager logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2">Name &amp; description</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the service manager</span>
+name : <span class="org-variable-name">string</span> = <span class="org-string">"sn_service_manager"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The description of the service manager</span>
+description : <span class="org-variable-name">string</span> = <span class="org-string">"A SuperNEMO service manager"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3">List of service files</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of files that describe services</span>
+services.configuration_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_BB0NU_STUDIES_DIR@/services.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> DLL loader</h3>
+<div class="outline-text-3" id="text-3-3">
+</div><div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1">Code generator</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<p>
+This skeleton code ease the declaration of dll loader since it
+receives a table list and builds the corresponding <code>dlls.conf</code> file.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh" id="dll_loader"><span class="org-builtin">echo</span> <span class="org-string">'#@description A sample list of setups'</span>
+<span class="org-builtin">echo</span> <span class="org-string">'#@key_label   "name"'</span>
+<span class="org-builtin">echo</span> <span class="org-string">'#@meta_label  "filename"'</span>
+<span class="org-keyword">for</span> i<span class="org-keyword"> in</span> $<span class="org-variable-name">list</span>
+<span class="org-keyword">do</span>
+    <span class="org-variable-name">dll</span>=$(<span class="org-builtin">echo</span> $<span class="org-variable-name">i</span> | sed <span class="org-string">'/(/ s/("\|")//g'</span>)
+    <span class="org-builtin">echo</span> <span class="org-string">'[name="'</span>$<span class="org-variable-name">dll</span><span class="org-string">'" filename=""]'</span>
+    <span class="org-builtin">echo</span> <span class="org-string">'#config The '</span>$<span class="org-variable-name">dll</span><span class="org-string">' library'</span>
+    <span class="org-builtin">echo</span> <span class="org-string">'autoload : boolean = 1'</span>
+    <span class="org-builtin">echo</span>
+<span class="org-keyword">done</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3-2" class="outline-4">
+<h4 id="sec-3-3-2">Libraries</h4>
+<div class="outline-text-4" id="text-3-3-2">
+<p>
+This part set the different libraries to be loaded at runtime. This is needed
+since event data models are defined in other libraries than the one currently
+named <code>snemo_bb0nu_studies</code>. The following table sets the libraries
+</p>
+
+<table id="dll_libraries-:results-none" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 1:</span> Libraries to be used by <code>snemo_bb0nu_studies</code> modules</caption>
+
+<colgroup>
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">mctools_bio</td>
+</tr>
+
+<tr>
+<td class="left">sncore_bio</td>
+</tr>
+
+<tr>
+<td class="left">snanalysis_bio</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "filename"</span>
+[<span class="org-variable-name">name</span>=<span class="org-string">"mctools_bio"</span> <span class="org-variable-name">filename</span>=<span class="org-string">""</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The mctools_bio library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"sncore_bio"</span> <span class="org-variable-name">filename</span>=<span class="org-string">""</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The sncore_bio library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"snanalysis_bio"</span> <span class="org-variable-name">filename</span>=<span class="org-string">""</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The snanalysis_bio library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> SuperNEMO &beta;&beta;0&nu; modules</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+The next item holds the configuration for the SuperNEMO &beta;&beta; modules. The
+second item is related to histogram declarations.
+</p>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Module declaration</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Here, we just set up the module declaration.
+</p>
+</div>
+
+<div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1">File preamble</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2">Declaration &amp; description</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"bb0nu_halflife_limit_module"</span> <span class="org-variable-name">type</span>=<span class="org-string">"analysis::snemo_bb0nu_halflife_limit_module"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description A SuperNEMO module to calculate the 0nu sensitivity</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-3" class="outline-4">
+<h4 id="sec-4-1-3">Logging priority</h4>
+<div class="outline-text-4" id="text-4-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"error"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-4" class="outline-4">
+<h4 id="sec-4-1-4">Histogram service label</h4>
+<div class="outline-text-4" id="text-4-1-4">
+<p>
+Set the same histogram service label as defined <a href="#sec-5-3">here</a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The Histogram Service label</span>
+Histo_label : <span class="org-variable-name">string</span> = <span class="org-string">"Histo"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-5" class="outline-4">
+<h4 id="sec-4-1-5">Building histogram keys</h4>
+<div class="outline-text-4" id="text-4-1-5">
+<p>
+The key fields are used to build different identifiants for histogram
+dictionnary. The basic idea is to have this information inside <code>event_header</code>
+and use it to build a <code>string</code> key. The program is then quite dynamic in the
+sense that 0&nu; halflife calculation can be done for different study purpose (just
+change the <code>key_fields</code>).
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The key fields from 'Event Header' bank to build a unique key for histogram</span>
+key_fields : <span class="org-variable-name">string</span>[2] =     <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"analysis.decay_process"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"analysis.source_isotope"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-6" class="outline-4">
+<h4 id="sec-4-1-6">Exprimental setup</h4>
+<div class="outline-text-4" id="text-4-1-6">
+<p>
+Here we define the experimental conditions basically which isotope, mass, 2&beta;
+halflife, exposure are used.
+</p>
+</div>
+
+<ul class="org-ul"><li>Isotope values<br  /><div class="outline-text-5" id="text-4-1-6-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The atomic mass number of the isotope</span>
+experiment.isotope_mass_number : <span class="org-variable-name">integer</span> = 82
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The total mass of the isotope</span>
+experiment.isotope_mass : real as <span class="org-variable-name">mass</span> = 5 kg
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The bb2nu halflife of the isotope</span>
+experiment.isotope_bb2nu_halflife : <span class="org-variable-name">real</span> = 9.0e19 <span class="org-comment-delimiter">#</span><span class="org-comment">year</span>
+</pre>
+</div>
+</div>
+</li>
+<li>Experiment exposure<br  /><div class="outline-text-5" id="text-4-1-6-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The exposure time of the experiment</span>
+experiment.exposure_time : <span class="org-variable-name">real</span> = 2.0 <span class="org-comment-delimiter">#</span><span class="org-comment">year</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Histogram declarations</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+The histogram declarations <i>i.e.</i> name, boundaries, binning&#x2026; are set in this
+section which is organized by data bank related plots. There are two kinds of
+histograms:
+</p>
+<ul class="org-ul">
+<li><i>template</i> histogram which may be used by several data bank.
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-4-2-1" class="outline-4">
+<h4 id="sec-4-2-1">Mandatory preamble</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-2-2" class="outline-4">
+<h4 id="sec-4-2-2">Energy template</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"energy_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The title of the histogram (optional)</span>
+title : <span class="org-variable-name">string</span> = <span class="org-string">""</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis unit for display (a standard unit, typically SI or CLHEP)</span>
+display.xaxis.unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"dN/dE [A.U.]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
+number_of_bins : <span class="org-variable-name">integer</span> = 25
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
+unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+min : <span class="org-variable-name">real</span> = 2000.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+max : <span class="org-variable-name">real</span> = 3200.0
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-3" class="outline-4">
+<h4 id="sec-4-2-3">Efficiency template</h4>
+<div class="outline-text-4" id="text-4-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"efficiency_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram of the energy selection efficiency</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The title of the histogram (optional)</span>
+title : <span class="org-variable-name">string</span> = <span class="org-string">""</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis unit for display (a standard unit, typically SI or CLHEP)</span>
+display.xaxis.unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"efficiency"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
+number_of_bins : <span class="org-variable-name">integer</span> = 25
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
+unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+min : <span class="org-variable-name">real</span> = 2000.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+max : <span class="org-variable-name">real</span> = 3200.0
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-2-4" class="outline-4">
+<h4 id="sec-4-2-4">Halflife limit template</h4>
+<div class="outline-text-4" id="text-4-2-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"halflife_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram of the energy selection efficiency</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The title of the histogram (optional)</span>
+title : <span class="org-variable-name">string</span> = <span class="org-string">""</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis unit for display (a standard unit, typically SI or CLHEP)</span>
+display.xaxis.unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"halflife limit"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
+number_of_bins : <span class="org-variable-name">integer</span> = 25
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
+unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+min : <span class="org-variable-name">real</span> = 2000.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+max : <span class="org-variable-name">real</span> = 3200.0
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Services</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+A service generally hosts a specific resource that can be shared by many other
+software components, including other services or data processing modules (see
+<a href="https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice">SN@ilWare FAQ</a>).
+</p>
+</div>
+
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> Preamble</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> Context service</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"Ctx"</span> <span class="org-variable-name">type</span>=<span class="org-string">"dpp::context_service"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description File from which the context is to be loaded at program start</span>
+load.file : string as <span class="org-variable-name">path</span>  = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description File to store the context at program termination</span>
+store.file : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context_end.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Flag to backup the former context load file</span>
+backup.file : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context_bak.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-3" class="outline-3">
+<h3 id="sec-5-3"><span class="section-number-3">5.3</span> Histogram service</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+The histogram service provides an esay way to handle histogram plot from
+different modules (mainly plot modules). It provides a service where 1D or 2D
+histograms can be added to a histogram dictionnary.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"Histo"</span> <span class="org-variable-name">type</span>=<span class="org-string">"dpp::histogram_service"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The description string of the embedded pool of histograms</span>
+pool.description : <span class="org-variable-name">string</span> = <span class="org-string">"SuperNEMO histograms"</span>
+</pre>
+</div>
+
+<p>
+Embedded histograms are declared into a dedicated file defines in
+<a href="snanalysis_manager.html">snanalysis_manager.org</a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The main configuration file for the embedded histogram manager</span>
+pool.histo.setups : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_BB0NU_STUDIES_DIR@/histogram_templates.conf"</span>
+</pre>
+</div>
+
+<p>
+Finally, all histograms created can be stored inside ROOT files or XML archives.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The ouput file where to store the histograms</span>
+output_files : string[2] as <span class="org-variable-name">path</span> =                        <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.root"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Running SN@ilWare processing chain</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> Tangling configuration</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+First, you need to tangle this file. As explained in the <a href="#sec-2">Content</a> section, you
+may use the dedicated <code>Makefile</code> to generate the pipeline configuration. Just
+run <code>make</code> within this working directory.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> Source code compilation</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+Second, you need to compile the <code>snemo_bb0nu_studies</code> module files. The build
+system used is <code>cmake</code> and a <code>CMakeLists.txt</code> file is provided to correctly
+setup the dependences. Nevertheless, this implies that you have already and
+correctly installed <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael">Cadfael</a>, <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux">Bayeux</a> and Falaise. Then, you can configure, build
+and install the <code>snemo_bb0nu_studies</code> module by doing
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">mkdir {build,install} &amp;&amp; <span class="org-builtin">cd</span> build
+cmake                                               <span class="org-sh-escaped-newline">\</span>
+    -DCMAKE_PREFIX_PATH=<span class="org-string">"&lt;path to Falaise install&gt;"</span> <span class="org-sh-escaped-newline">\</span>
+    -DCMAKE_INSTALL_PREFIX=../install               <span class="org-sh-escaped-newline">\</span>
+    ../source
+make install
+<span class="org-builtin">cd</span> ..
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> Use and execute <code>snemo_bb0nu_studies</code> module</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+After a successful build, you will get an <code>install</code> directory holding the
+<code>libsnemo_bb0nu_studies.so</code> file. Assuming you are under <code>bash</code> shell, you will
+need to add it to your <code>LD_LIBRARY_PATH</code> by doing
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-builtin">export</span> <span class="org-variable-name">LD_LIBRARY_PATH</span>=${<span class="org-variable-name">PWD</span>}/install/lib:${<span class="org-variable-name">LD_LIBRARY_PATH</span>}
+</pre>
+</div>
+
+<p>
+Another approach, maybe less intrusive, will be to set the <code>LD_LIBRARY_PATH</code>
+when running the <code>dpp_processing</code> binary. You can for example write something
+like
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-variable-name">LD_LIBRARY_PATH</span>=${<span class="org-variable-name">PWD</span>}/install/lib:${<span class="org-variable-name">LD_LIBRARY_PATH</span>} dpp_processing ...
+</pre>
+</div>
+
+<p>
+Running processing pipeline is done by the <code>dpp_processing</code> program provided by
+<code>dpp</code> library. Its call is pretty simple and only implies to have a module
+manager file and the name of the module to be run <i>i.e.</i>
+<code>bb0nu_halflife_limit_module</code>. Nevertheless, you need to load the dynamically
+load the library(ies) which holds the needed modules.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">dpp_processing                                                       <span class="org-sh-escaped-newline">\</span>
+    --module-manager-config $<span class="org-variable-name">PWD</span>/config/pipeline/module_manager.conf <span class="org-sh-escaped-newline">\</span>
+    --module bb0nu_halflife_limit_module                             <span class="org-sh-escaped-newline">\</span>
+    --load-dll snemo_bb0nu_studies                                   <span class="org-sh-escaped-newline">\</span>
+    --load-dll &lt;library&gt;_bio                                         <span class="org-sh-escaped-newline">\</span>
+    --input-file &lt;path to a data record&gt;
+</pre>
+</div>
+
+<p>
+<code>&lt;library&gt;_bio</code> represents libraries which holds event data models such as
+<code>mctools_bio</code> and <code>sncore_bio</code>. Regarding the input data file and its content,
+you will need to load both to be able to retrieve <code>simulated_data</code> bank
+(<code>mctools_bio</code>) or specific SuperNEMO banks (<code>sncore_bio</code> and
+<code>snanalysis_bio</code>). Then, you can use the <code>dlls.conf</code> file built in section <a href="#sec-3-3">3.3</a> by writing
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">dpp_processing                                                       <span class="org-sh-escaped-newline">\</span>
+    --module-manager-config $<span class="org-variable-name">PWD</span>/config/pipeline/module_manager.conf <span class="org-sh-escaped-newline">\</span>
+    --module bb0nu_halflife_limit_module                             <span class="org-sh-escaped-newline">\</span>
+    --load-dll snemo_bb0nu_studies                                   <span class="org-sh-escaped-newline">\</span>
+    --dll-config $<span class="org-variable-name">PWD</span>/config/pipeline/dlls.conf                      <span class="org-sh-escaped-newline">\</span>
+    --input-file &lt;path to a data record&gt;
+</pre>
+</div>
+
+<p>
+It will run the <code>bb0nu_halflife_limit_module</code> over the input file<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup> and it will
+generate a ROOT file containing several histograms. This file is located by
+default, in <code>/tmp/${USER}/snemo.d</code> directory under the
+<code>snemo_bb0nu_halflife_limit_histos.root</code> name. You can change the output
+directory and output file name in <a href="#sec-5-3">this section</a>.
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+At the time of writing this document, emacs version is 24.3.1
+</p></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+Emacs lisp function can be run using <code>ALT-x</code> command and typing the function
+name.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
+here we assume that you already have generated a data record. The
+<code>bb0nu_halflife_limit_module</code> only generate the plot and does not do neither
+simulation nor reconstruction.
+</p></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+File under git version control - commit 34c035d - 2014-02-20
+</div>
+</body>
+</html>

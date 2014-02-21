@@ -1,0 +1,2037 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>SuperNEMO - Geant4 Validation</title>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Xavier Garrido" />
+<link rel="stylesheet" href="../css/styles.css">
+               <link rel="stylesheet" href="../css/org-pygments.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">SuperNEMO - Geant4 Validation</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Content</a></li>
+<li><a href="#sec-3">3. Geometry setup</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Manager configuration</a></li>
+<li><a href="#sec-3-2">3.2. Geometry models</a></li>
+<li><a href="#sec-3-3">3.3. Mapping categories</a></li>
+<li><a href="#sec-3-4">3.4. Materials plugin</a></li>
+<li><a href="#sec-3-5">3.5. Magnetic field plugin</a></li>
+<li><a href="#sec-3-6">3.6. Visualization settings</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Pipeline general configuration</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Module manager</a></li>
+<li><a href="#sec-4-2">4.2. Service manager</a></li>
+<li><a href="#sec-4-3">4.3. DLL loader</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Geant4 validation modules</a>
+<ul>
+<li><a href="#sec-5-1">5.1. Module declaration</a></li>
+<li><a href="#sec-5-2">5.2. Histogram declarations</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. Services</a>
+<ul>
+<li><a href="#sec-6-1">6.1. Preamble</a></li>
+<li><a href="#sec-6-2">6.2. Context service</a></li>
+<li><a href="#sec-6-3">6.3. Histogram service</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. Running SN@ilWare processing chain</a>
+<ul>
+<li><a href="#sec-7-1">7.1. Tangling configuration</a></li>
+<li><a href="#sec-7-2">7.2. Source code compilation</a></li>
+<li><a href="#sec-7-3">7.3. Use and execute <code>geant4_validation</code> module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This repository holds a configuration to study Geant4 simulation and to plot
+relevant physical quantities in order to check Geant4 reliability.
+</p>
+
+<p>
+The current version is hosted at
+<a href="https://github.com/xgarrido/snemo_simulation_modules/geant4_validation">https://github.com/xgarrido/snemo_simulation_modules/geant4_validation</a> under
+<code>git</code> version control. You can clone this repository by doing
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">git clone https://github.com/xgarrido/snemo_simulation_modules/geant4_validation geant4_validation
+</pre>
+</div>
+
+<p>
+This will create a directory <code>geant4_validation</code> in the working directory
+containing all the source files needed to configure and to setup SN@ilWare
+programs.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Content</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The code is organised as follow :
+</p>
+
+<dl class="org-dl">
+<dt> <code>README.org</code> </dt><dd>This file holds the pipeline configuration + the documentation
+on how to use the <code>geant4_validation</code> module.
+</dd>
+<dt> <code>Makefile</code> </dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
+parsing and tangling this file <i>i.e.</i> <code>README.org</code> (see below).
+</dd>
+<dt> <code>source</code> </dt><dd>This directory holds the source code of the <code>geant4_validation</code>
+module. It also has a <code>CMakeLists.txt</code> file in order to compile,
+build and install all the software pieces through <code>cmake</code> rules.
+</dd>
+</dl>
+
+<p>
+The <code>README.org</code> file is organised using <a href="http://orgmode.org/worg/org-contrib/babel/index.html">org-babel</a> and its ability to execute
+source code. It requires then a recent installation of emacs<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> which bundles
+<code>org</code>. Without entering into too much details regarding <code>org-babel</code> abilities,
+the basic idea is to give a &ldquo;literate&rdquo; way to navigate through the different
+sections, each of them representing a part of the pipeline
+configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
+hide and the user can focus on relevant parts.
+</p>
+
+<p>
+To export the different configuration files, you can run <code>org-babel-tangle</code>
+which will tangle each code block into the given file<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> or use the associated
+<code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
+process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
+&ldquo;occupies&rdquo; emacs during its execution).
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Geometry setup</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Manager configuration</h3>
+<div class="outline-text-3" id="text-3-1">
+</div>
+<div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1">Setup label, description and version</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup label</span>
+setup_label : <span class="org-variable-name">string</span> = <span class="org-string">"geant4_validation"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup description</span>
+setup_description : <span class="org-variable-name">string</span> = <span class="org-string">"A minimal geometry setup to test Geant4"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup version</span>
+setup_version : <span class="org-variable-name">string</span> = <span class="org-string">"1.0"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2">Logging priority</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3">Geometry factory</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<p>
+The geometry factory holds all the files needed for the geometry construction.
+</p>
+</div>
+<ul class="org-ul"><li>Logging priority<br  /><div class="outline-text-5" id="text-3-1-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority of the embedded geometry model factory</span>
+factory.logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</li>
+<li>Geometry files<br  /><div class="outline-text-5" id="text-3-1-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of files describing the geometry models</span>
+factory.geom_files : string[3] as <span class="org-variable-name">path</span> =         <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@GEANT4_VALIDATION_DIR@/optical_module.geom"</span>  <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@GEANT4_VALIDATION_DIR@/source.geom"</span>          <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@GEANT4_VALIDATION_DIR@/lab_world.geom"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+<div id="outline-container-sec-3-1-4" class="outline-4">
+<h4 id="sec-3-1-4">ID manager</h4>
+<div class="outline-text-4" id="text-3-1-4">
+</div><ul class="org-ul"><li>Logging priority<br  /><div class="outline-text-5" id="text-3-1-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging flag of the embedded ID manager</span>
+id_mgr.logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</li>
+<li>Category list<br  /><div class="outline-text-5" id="text-3-1-4-2">
+<p>
+Categories are used to assign a unique id number (integer) to a geometrical
+volume.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Source file of the geometry categories used by the ID manager</span>
+id_mgr.categories_list : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+  <span class="org-string">"@GEANT4_VALIDATION_DIR@/categories.lis"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-3-1-5" class="outline-4">
+<h4 id="sec-3-1-5">Mapping configuration</h4>
+<div class="outline-text-4" id="text-3-1-5">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Build the embedded default mapping dictionnary</span>
+build_mapping : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Max depth of the mapping</span>
+mapping.max_depth : <span class="org-variable-name">integer</span> = 100
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-6" class="outline-4">
+<h4 id="sec-3-1-6">Plugins configuration</h4>
+<div class="outline-text-4" id="text-3-1-6">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Plugins factory preload from system registration (default=0)</span>
+plugins.factory_no_preload : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Plugins initialization at load (default=0)</span>
+plugins.force_initialization_at_load : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Configuration files for geometry manager's plugins</span>
+plugins.configuration_files : string[2] as <span class="org-variable-name">path</span> =   <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/materials_plugin.conf"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/magnetic_field_plugin.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Geometry models</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1">Optical module</h4>
+<div class="outline-text-4" id="text-3-2-1">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-5" id="text-3-2-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of geometry models</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Wrapping model<br  /><ul class="org-ul"><li>z-position (front) wrapping<br  /><div class="outline-text-6" id="text-3-2-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"zpos_wrapping.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the wrapping in front of the scintillator block</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type : <span class="org-variable-name">string</span> =  <span class="org-string">"box"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X dimension</span>
+x : real as <span class="org-variable-name">length</span>  = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y dimension</span>
+y : real as <span class="org-variable-name">length</span>  = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension</span>
+z : real as <span class="org-variable-name">length</span>  = 12 um
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref : <span class="org-variable-name">string</span>  = <span class="org-string">"mylar"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>x-sides wrapping<br  /><ul class="org-ul"><li>Model<br  /><div class="outline-text-7" id="text-3-2-1-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"x_sides_wrapping.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the wrapping on X sides of the scintillator block</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type : <span class="org-variable-name">string</span> = <span class="org-string">"box"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X dimension</span>
+x : real as <span class="org-variable-name">length</span> = 40.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y dimension</span>
+y : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension</span>
+z : real as <span class="org-variable-name">length</span> = 12 um
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"mylar"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Positionning<br  /><div class="outline-text-7" id="text-3-2-1-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"xpos_wrapping.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::rotated_boxed_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the rotated wrapping film</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation geometry model</span>
+rotated.model : <span class="org-variable-name">string</span> = <span class="org-string">"x_sides_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotated geometry model label</span>
+rotated.label : <span class="org-variable-name">string</span> = <span class="org-string">"side_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation axis</span>
+rotated.axis  : <span class="org-variable-name">string</span> = <span class="org-string">"y"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation special angle</span>
+rotated.special_angle : <span class="org-variable-name">string</span>  = <span class="org-string">"90"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"lab_medium"</span>
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"xneg_wrapping.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::rotated_boxed_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the rotated wrapping film</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation axis</span>
+rotated.axis  : <span class="org-variable-name">string</span> = <span class="org-string">"y"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation special angle</span>
+rotated.special_angle : <span class="org-variable-name">string</span>  = <span class="org-string">"270"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation geometry model</span>
+rotated.model : <span class="org-variable-name">string</span> = <span class="org-string">"x_sides_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotated geometry model label</span>
+rotated.label : <span class="org-variable-name">string</span> = <span class="org-string">"side_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"lab_medium"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li>
+<li>y-sides wrapping<br  /><ul class="org-ul"><li>Model<br  /><div class="outline-text-7" id="text-3-2-1-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"y_sides_wrapping.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the wrapping on Y sides of the scintillator block</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type : <span class="org-variable-name">string</span> = <span class="org-string">"box"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X dimension</span>
+x : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y dimension</span>
+y : real as <span class="org-variable-name">length</span> = 40.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension</span>
+z : real as <span class="org-variable-name">length</span> = 12 um
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref : <span class="org-variable-name">string</span> = <span class="org-string">"mylar"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Positionning<br  /><div class="outline-text-7" id="text-3-2-1-2-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"ypos_wrapping.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::rotated_boxed_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the rotated wrapping film</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation axis</span>
+rotated.axis  : <span class="org-variable-name">string</span> = <span class="org-string">"x"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation special angle</span>
+rotated.special_angle : <span class="org-variable-name">string</span>  = <span class="org-string">"90"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation geometry model</span>
+rotated.model : <span class="org-variable-name">string</span> = <span class="org-string">"y_sides_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotated geometry model label</span>
+rotated.label : <span class="org-variable-name">string</span> = <span class="org-string">"side_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"lab_medium"</span>
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"yneg_wrapping.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::rotated_boxed_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the rotated wrapping film</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation axis</span>
+rotated.axis  : <span class="org-variable-name">string</span> = <span class="org-string">"x"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation special angle</span>
+rotated.special_angle : <span class="org-variable-name">string</span>  = <span class="org-string">"270"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotation geometry model</span>
+rotated.model : <span class="org-variable-name">string</span> = <span class="org-string">"y_sides_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Rotated geometry model label</span>
+rotated.label : <span class="org-variable-name">string</span> = <span class="org-string">"side_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"lab_medium"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li></ul>
+</li>
+
+<li>Scintillator model<br  /><ul class="org-ul"><li>Block model<br  /><div class="outline-text-6" id="text-3-2-1-3-1">
+<p>
+We first design the shape and the dimensions of the block
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"scintillator_block.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the scintillator block</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type : <span class="org-variable-name">string</span> =  <span class="org-string">"box"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X dimension</span>
+x : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y dimension</span>
+y : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension</span>
+z : real as <span class="org-variable-name">length</span> = 40.0 mm
+</pre>
+</div>
+
+<p>
+Then we define a material
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span> = <span class="org-string">"polystyrene"</span>
+</pre>
+</div>
+
+<p>
+Finally, we attach to it a sensitive category to ease the interface between
+<code>mctools</code> and Geant4 digitization<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The 'sensitive' category attached to this detector volume</span>
+sensitive.category : <span class="org-variable-name">string</span>  = <span class="org-string">"scin_SD"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Wrapped block model<br  /><div class="outline-text-6" id="text-3-2-1-3-2">
+<p>
+The wrapped model consists of wrapping with mylar the previous &ldquo;nude&rdquo; block. We
+then use a <code>surrounded_bowed_model</code> to place mylar on each scintillator faces.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"wrapped_scintillator_block.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::surrounded_boxed_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the wrapped scintillatorblock</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the surrounded geometry model</span>
+surrounded.model         : <span class="org-variable-name">string</span> = <span class="org-string">"scintillator_block.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label associated to the surrounded geometry model</span>
+surrounded.label         : <span class="org-variable-name">string</span> = <span class="org-string">"scintillator_block"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the (z&gt;0) side surrounding geometry model</span>
+surrounded.top_model     : <span class="org-variable-name">string</span> = <span class="org-string">"zpos_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of a  (x&gt;0) side surrounding geometry model</span>
+surrounded.front_model   : <span class="org-variable-name">string</span> = <span class="org-string">"xpos_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of a  (x&lt;0) side surrounding geometry model</span>
+surrounded.back_model    : <span class="org-variable-name">string</span> = <span class="org-string">"xneg_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of a  (y&gt;0) side surrounding geometry model</span>
+surrounded.right_model   : <span class="org-variable-name">string</span> = <span class="org-string">"ypos_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of a  (y&lt;0) side surrounding geometry model</span>
+surrounded.left_model    : <span class="org-variable-name">string</span> = <span class="org-string">"yneg_wrapping.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of the (z&gt;0) side surrounding geometry model</span>
+surrounded.top_label     : <span class="org-variable-name">string</span> = <span class="org-string">"top_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of a  (x&gt;0) side surrounding geometry model</span>
+surrounded.front_label   : <span class="org-variable-name">string</span> = <span class="org-string">"front_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of a  (x&lt;0) side surrounding geometry model</span>
+surrounded.back_label    : <span class="org-variable-name">string</span> = <span class="org-string">"back_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of a  (y&gt;0) side surrounding geometry model</span>
+surrounded.right_label   : <span class="org-variable-name">string</span> = <span class="org-string">"right_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of a  (y&lt;0) side surrounding geometry model</span>
+surrounded.left_label    : <span class="org-variable-name">string</span> = <span class="org-string">"left_wrapping"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"lab_medium"</span>
+</pre>
+</div>
+
+<p>
+Finally, we attach mapping id to the mother volume as well as its daughter
+<i>i.e.</i> mylar elements.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directive for the "scintillator_block" daughter volume</span>
+mapping.daughter_id.scintillator_block : <span class="org-variable-name">string</span>  = <span class="org-string">"[scin_block.gc]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directive for the "left_wrapping" daughter volume</span>
+mapping.daughter_id.front_wrapping     : <span class="org-variable-name">string</span>  = <span class="org-string">"[scin_block_wrapping.gc:side=0]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directive for the "right_wrapping" daughter volume</span>
+mapping.daughter_id.back_wrapping      : <span class="org-variable-name">string</span>  = <span class="org-string">"[scin_block_wrapping.gc:side=1]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directive for the "left_wrapping" daughter volume</span>
+mapping.daughter_id.left_wrapping      : <span class="org-variable-name">string</span>  = <span class="org-string">"[scin_block_wrapping.gc:side=2]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directive for the "right_wrapping" daughter volume</span>
+mapping.daughter_id.right_wrapping     : <span class="org-variable-name">string</span>  = <span class="org-string">"[scin_block_wrapping.gc:side=3]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directive for the "top_wrapping" daughter volume</span>
+mapping.daughter_id.top_wrapping       : <span class="org-variable-name">string</span>  = <span class="org-string">"[scin_block_wrapping.gc:side=5]"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li>
+
+<li>Light guide model<br  /><ul class="org-ul"><li>Basic light guide<br  /><div class="outline-text-6" id="text-3-2-1-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"light_guide.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the light guide</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The default implicit length unit</span>
+length_unit  : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type   : <span class="org-variable-name">string</span> = <span class="org-string">"polyhedra"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The polyhedra build mode</span>
+build_mode   : <span class="org-variable-name">string</span> = <span class="org-string">"points"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The polyhedra number of sides</span>
+sides        : <span class="org-variable-name">integer</span> = 4
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of Z coordinates for the shape</span>
+list_of_z    : real [3] =  -40.     +30.     +40.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of inner radius coordinates for the shape</span>
+list_of_rmin : real [3] =    0.      0.       0.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of outer radius coordinates for the shape</span>
+list_of_rmax : real [3] =    20.    50.     50.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref : <span class="org-variable-name">string</span>  = <span class="org-string">"plexiglass"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Rotated light guide<br  /><div class="outline-text-6" id="text-3-2-1-4-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">########################################################################</span>
+[<span class="org-variable-name">name</span>=<span class="org-string">"rotated_light_guide.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::rotated_boxed_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the rotated light guide</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The rotation axis</span>
+rotated.axis  : <span class="org-variable-name">string</span> = <span class="org-string">"z"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The rotation angle</span>
+rotated.angle : real as <span class="org-variable-name">angle</span> = 45.0 degree
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X dimension</span>
+x             : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y dimension</span>
+y             : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the model to be rotated</span>
+rotated.model : <span class="org-variable-name">string</span> = <span class="org-string">"light_guide.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label associated to the rotated daughter model</span>
+rotated.label : <span class="org-variable-name">string</span> = <span class="org-string">"light_guide"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material around the light guide to be rotated</span>
+material.ref  : <span class="org-variable-name">string</span>  = <span class="org-string">"lab_medium"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</li>
+
+<li>PMT model<br  /><div class="outline-text-5" id="text-3-2-1-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"pmt.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the photomultiplier tube</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The default implicit length unit</span>
+length_unit  : <span class="org-variable-name">string</span>   = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type   : <span class="org-variable-name">string</span>   = <span class="org-string">"polycone"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The polycone build mode</span>
+build_mode   : <span class="org-variable-name">string</span>   = <span class="org-string">"points"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of Z coordinates for the shape</span>
+list_of_z    : real [6] =  -50.0   -49.0  -48.99  +48.99  +49.0 +50.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of inner radius coordinates for the shape</span>
+list_of_rmin : real [6] =    0.      0.    19.     19.      0.    0.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of outer radius coordinates for the shape</span>
+list_of_rmax : real [6] =    20.    20.    20.     20.     20.   20.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref : <span class="org-variable-name">string</span>  = <span class="org-string">"glass"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Optical module<br  /><div class="outline-text-5" id="text-3-2-1-6">
+<p>
+Given the previous model, we stack them to get a full optical module from PMT &rarr;
+light guide &rarr; scintillator block &rarr; the last layer of mylar
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"optical_module.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::stacked_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the optical module</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The stacking axis</span>
+stacked.axis            : <span class="org-variable-name">string</span> = <span class="org-string">"z"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of stacked volumes</span>
+stacked.number_of_items : <span class="org-variable-name">integer</span> = 3
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the stacked volume #2</span>
+stacked.model_2   : <span class="org-variable-name">string</span>  = <span class="org-string">"wrapped_scintillator_block.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of the stacked volume #2</span>
+stacked.label_2   : <span class="org-variable-name">string</span>  = <span class="org-string">"scintillator_block"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the stacked volume #1</span>
+stacked.model_1   : <span class="org-variable-name">string</span>   = <span class="org-string">"rotated_light_guide.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of the stacked volume #1</span>
+stacked.label_1   : <span class="org-variable-name">string</span>  = <span class="org-string">"light_guide"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the stacked volume #0</span>
+stacked.model_0   : <span class="org-variable-name">string</span>   = <span class="org-string">"pmt.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The label of the stacked volume #0</span>
+stacked.label_0   : <span class="org-variable-name">string</span>  = <span class="org-string">"pmt"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>    = <span class="org-string">"lab_medium"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directive for the "light_guide" daughter volume</span>
+mapping.daughter_id.light_guide : <span class="org-variable-name">string</span>  = <span class="org-string">"[light_guide.gc]"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2">Source</h4>
+<div class="outline-text-4" id="text-3-2-2">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-5" id="text-3-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of geometry models</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Film model<br  /><div class="outline-text-5" id="text-3-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"source_film.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the source film</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape of the source film</span>
+shape_type  : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The R dimension (radius) of the cylinder source film</span>
+<span class="org-builtin">r</span> : real as <span class="org-variable-name">length</span> = 9.5 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension (thickness) of the cylinder source film</span>
+z : real as <span class="org-variable-name">length</span> = 5 um
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material of the source film</span>
+material.ref : <span class="org-variable-name">string</span> = <span class="org-string">"mylar"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Source support model<br  /><div class="outline-text-5" id="text-3-2-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"source_support.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the source support</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape of the source support ring</span>
+shape_type  : <span class="org-variable-name">string</span> = <span class="org-string">"tube"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The inner R dimension (inner radius) of the source support ring</span>
+inner_r     : real as <span class="org-variable-name">length</span> = 10.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The outer R dimension (inner radius) of the source support ring</span>
+outer_r     : real as <span class="org-variable-name">length</span> = 12.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension (thickness) of the source support ring</span>
+z           : real as <span class="org-variable-name">length</span> = 5.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material of the source support ring</span>
+material.ref : <span class="org-variable-name">string</span> = <span class="org-string">"aluminium"</span>
+</pre>
+</div>
+</div>
+</li>
+<li>Source model<br  /><div class="outline-text-5" id="text-3-2-2-4">
+<p>
+The source model will used the two previous models by placing them &ldquo;internally&rdquo;
+to a larger cylinder. We first declare the holding volume
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"source.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape of the source cylindric envelope</span>
+shape_type  : <span class="org-variable-name">string</span> = <span class="org-string">"cylinder"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The R dimension (radius) of the source cylindric envelope</span>
+<span class="org-builtin">r</span> : real as <span class="org-variable-name">length</span> = 12.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension (thickness) of the source cylindric envelope</span>
+z : real as <span class="org-variable-name">length</span> = 5.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref : <span class="org-variable-name">string</span>  = <span class="org-string">"lab_medium"</span>
+</pre>
+</div>
+<p>
+and then place inside, the &ldquo;support&rdquo; and &ldquo;film&rdquo; models
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of daughter volumes by label</span>
+internal_item.labels : <span class="org-variable-name">string</span>[2] = <span class="org-string">"support"</span> <span class="org-string">"film"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the "support" daughter volume</span>
+internal_item.model.support : <span class="org-variable-name">string</span>  = <span class="org-string">"source_support.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The placement of the "support" daughter volume</span>
+internal_item.placement.support : <span class="org-variable-name">string</span>  = <span class="org-string">"0 0 0 (mm)"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the "film" daughter volume</span>
+internal_item.model.film : <span class="org-variable-name">string</span>  = <span class="org-string">"source_film.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The placement of the "film" daughter volume</span>
+internal_item.placement.film : <span class="org-variable-name">string</span>  = <span class="org-string">"0 0 0 (mm)"</span>
+</pre>
+</div>
+
+<p>
+We finally define mapping ids
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directives for the "film" daughter volume</span>
+mapping.daughter_id.film : <span class="org-variable-name">string</span>  = <span class="org-string">"[source_film.gc]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directives for the "support" daughter volume</span>
+mapping.daughter_id.support : <span class="org-variable-name">string</span>  = <span class="org-string">"[source_support.gc]"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3">Laboratory &amp; world volume</h4>
+<div class="outline-text-4" id="text-3-2-3">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-5" id="text-3-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of geometry models</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Absorber<br  /><div class="outline-text-5" id="text-3-2-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"thin_absorber.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the thin_absorber front of the detector</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type :   <span class="org-variable-name">string</span> =  <span class="org-string">"box"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X dimension</span>
+x   : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y dimension</span>
+y   : real as <span class="org-variable-name">length</span> = 100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension</span>
+z   : real as <span class="org-variable-name">length</span> = 50 um
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref      : <span class="org-variable-name">string</span>  = <span class="org-string">"copper"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Black box<br  /><div class="outline-text-5" id="text-3-2-3-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"black_box.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the light guide</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The default implicit length unit</span>
+length_unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape</span>
+shape_type : <span class="org-variable-name">string</span> = <span class="org-string">"polyhedra"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The polyhedra build mode</span>
+build_mode : <span class="org-variable-name">string</span> = <span class="org-string">"points"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The polyhedra number of sides</span>
+sides        : <span class="org-variable-name">integer</span> = 4
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of Z coordinates for the shape</span>
+list_of_z    : real [2] =   -125.     +125.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of inner radius coordinates for the shape</span>
+list_of_rmin : real [2] =    51.      51.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of outer radius coordinates for the shape</span>
+list_of_rmax : real [2] =    53.      53.
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material</span>
+material.ref : <span class="org-variable-name">string</span>  = <span class="org-string">"inox"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Lab. model<br  /><div class="outline-text-5" id="text-3-2-3-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"lab.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_shaped_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the laboratory experimental area</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the 3D shape of the lab area</span>
+shape_type  : <span class="org-variable-name">string</span> = <span class="org-string">"box"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X dimension of the box</span>
+x           : real as <span class="org-variable-name">length</span> = 900.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y dimension of the box</span>
+y           : real as <span class="org-variable-name">length</span> = 450.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Z dimension of the box</span>
+z           : real as <span class="org-variable-name">length</span> = 450.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material that fills the lab atmosphere</span>
+material.ref : <span class="org-variable-name">string</span> = <span class="org-string">"lab_medium"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of daughter volumes by labels</span>
+internal_item.labels : <span class="org-variable-name">string</span>[4] = <span class="org-string">"source"</span> <span class="org-string">"detector"</span> <span class="org-string">"box"</span> <span class="org-string">"absorber0"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the "source" daughter volume</span>
+internal_item.model.source        : <span class="org-variable-name">string</span>  = <span class="org-string">"source.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The placement of the "source" daughter volume</span>
+internal_item.placement.source    : <span class="org-variable-name">string</span>  = <span class="org-string">"20 0 0 (cm) / y +90 (degree)"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the "detector" daughter volume</span>
+internal_item.model.detector      : <span class="org-variable-name">string</span>  = <span class="org-string">"optical_module.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The placement of the "detector" daughter volume</span>
+internal_item.placement.detector  : <span class="org-variable-name">string</span>  = <span class="org-string">"-20 0 0 (cm) / y +90 (degree) "</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the "box" daughter volume</span>
+internal_item.model.box           : <span class="org-variable-name">string</span>  = <span class="org-string">"black_box.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The placement of the "box" daughter volume</span>
+internal_item.placement.box       : <span class="org-variable-name">string</span>  = <span class="org-string">"-24 0 0 (cm) @  0 90 45 (degree) "</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The model of the "absorber0" daughter volume</span>
+internal_item.model.absorber0     : <span class="org-variable-name">string</span>  = <span class="org-string">"thin_absorber.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The placement of the "absorber0" daughter volume</span>
+internal_item.placement.absorber0 : <span class="org-variable-name">string</span>  = <span class="org-string">"0 0 0 (cm) @  0 90 0 (degree) "</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directives for the "source" daughter volume</span>
+mapping.daughter_id.source   : <span class="org-variable-name">string</span>  = <span class="org-string">"[source.gc:position=0]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directives for the "detector" daughter volume</span>
+mapping.daughter_id.detector : <span class="org-variable-name">string</span>  = <span class="org-string">"[optical_module.gc:detector=0]"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>World volume<br  /><div class="outline-text-5" id="text-3-2-3-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"world"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::simple_world_model"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config configuration parameters for the world logical volume</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The world volume X dimension (box)</span>
+world.x         : real as <span class="org-variable-name">length</span>  = 1000.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The world volume Y dimension (box)</span>
+world.y         : real as <span class="org-variable-name">length</span> = 500.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The world volume Z dimension (box)</span>
+world.z         : real as <span class="org-variable-name">length</span> = 500.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the model that represents the experimental setup daughter volume</span>
+setup.model     : <span class="org-variable-name">string</span> = <span class="org-string">"lab.model"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement phi angle</span>
+setup.phi       : real as <span class="org-variable-name">angle</span> = 0.0 degree
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement theta angle</span>
+setup.theta     : real as <span class="org-variable-name">angle</span> = 0.0 degree
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement X coordinate</span>
+setup.x         : real as <span class="org-variable-name">length</span> = 0.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement Y coordinate</span>
+setup.y         : real as <span class="org-variable-name">length</span> = 0.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The setup placement Z coordinate</span>
+setup.z         : real as <span class="org-variable-name">length</span> = 0.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the material that fills the world volume</span>
+material.ref    : <span class="org-variable-name">string</span> = <span class="org-string">"vacuum"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The mapping directives for the 'setup' daughter volume</span>
+mapping.daughter_id.setup : <span class="org-variable-name">string</span>  = <span class="org-string">"[lab.gc:area=0]"</span>
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Mapping categories</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A list of geometry ID categories/types</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "category"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+
+
+<span class="org-comment-delimiter">##################################################################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This is the mandatory top-level geometry category.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">One should always provide it :</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"world"</span> <span class="org-variable-name">type</span>=<span class="org-string">"0"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of the top-level world volume</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The world's GID address is characterized by its 'world' number</span>
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"world"</span>
+
+
+<span class="org-comment-delimiter">##################################################################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This geometry category addresses an experimental area volume :</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"lab.gc"</span>  <span class="org-variable-name">type</span>=<span class="org-string">"100"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of the experimental area volume (lab)</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description A lab's GID address is charaterized by its 'area' number</span>
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"area"</span>
+
+
+<span class="org-comment-delimiter">################################################################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This geometry category addresses a calibration source object :</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"source.gc"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1000"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of a calibration source</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The GID address of a calibration source is defined by its 'position' number</span>
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"position"</span>
+
+
+<span class="org-comment-delimiter">##############################################################################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This geometry category addresses the support frame of a calibration source :</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"source_support.gc"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1010"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of a calibration source support</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The GID address of a source support inherits the GID address of the source</span>
+inherits : <span class="org-variable-name">string</span> = <span class="org-string">"source.gc"</span>
+
+
+<span class="org-comment-delimiter">#################################################################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This geometry category addresses of a calibration source film :</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"source_film.gc"</span> <span class="org-variable-name">type</span>=<span class="org-string">"1020"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of a calibration source film</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The GID address of a source film inherits the GID address of the source</span>
+inherits : <span class="org-variable-name">string</span> = <span class="org-string">"source.gc"</span>
+
+
+<span class="org-comment-delimiter">######################################################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This geometry category addresses an optical module :</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"optical_module.gc"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2020"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of a calibration source film</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The GID address of a column is defined by its 'detector' number</span>
+addresses : <span class="org-variable-name">string</span>[1] = <span class="org-string">"detector"</span>
+
+
+<span class="org-comment-delimiter">#################################################################################</span>
+<span class="org-comment-delimiter">#  </span><span class="org-comment">This geometry category addresses the scintillator block of an optical module :</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"scin_block.gc"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2030"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of the scintillator block of an optical module</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The GID address of a scin block inherits the GID address of the optical module</span>
+inherits : <span class="org-variable-name">string</span> = <span class="org-string">"optical_module.gc"</span>
+
+
+<span class="org-comment-delimiter">###############################################</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"scin_block_wrapping.gc"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2031"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of a wrapping film around a scintillator block</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The GID address of a wrapping film extends GID address of the scintillator block</span>
+extends : <span class="org-variable-name">string</span>[1] = <span class="org-string">"scin_block.gc"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The 'side' number extend the mother scintillator block GID address</span>
+by       : <span class="org-variable-name">string</span>[1] = <span class="org-string">"side"</span>
+
+
+<span class="org-comment-delimiter">#######################################</span>
+[<span class="org-variable-name">category</span>=<span class="org-string">"light_guide.gc"</span> <span class="org-variable-name">type</span>=<span class="org-string">"2032"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The geometry category of the light guide</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The GID address of a light guide inherits the GID address of the optical module</span>
+inherits : <span class="org-variable-name">string</span>[1] = <span class="org-string">"optical_module.gc"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Materials plugin</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+We use the definitions of isotopes, elements and materials from the installed
+materials library. Here the <code>materials_aliases</code> definition are locally defined
+to change the source foil isotope.
+</p>
+</div>
+<div id="outline-container-sec-3-4-1" class="outline-4">
+<h4 id="sec-3-4-1">Plugin declaration</h4>
+<div class="outline-text-4" id="text-3-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The geometry manager plugin for materials</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label  "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label "type"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"materials_driver"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::materials_plugin"</span>]
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4-2" class="outline-4">
+<h4 id="sec-3-4-2">Logging priority</h4>
+<div class="outline-text-4" id="text-3-4-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4-3" class="outline-4">
+<h4 id="sec-3-4-3">Files</h4>
+<div class="outline-text-4" id="text-3-4-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description List of files describing the materials</span>
+materials.files : string[4] as <span class="org-variable-name">path</span> =   <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@materials:data/std_isotopes.def"</span>  <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@materials:data/std_elements.def"</span>  <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@materials:data/std_materials.def"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/materials_aliases.def"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4-4" class="outline-4">
+<h4 id="sec-3-4-4">Material aliases</h4>
+<div class="outline-text-4" id="text-3-4-4">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of aliases for standard materials</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"air"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for air</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::air"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"aluminium"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for aluminium</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::aluminium"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"inox"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for inox</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::inox"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"copper"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for copper</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::copper"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"mylar"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for mylar</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::mylar"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"plexiglass"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for plexiglass</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::plexiglass"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"polystyrene"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for polystyrene</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::polystyrene"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"glass"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for pyrex</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::pyrex"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"vacuum"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for vacuum</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::vacuum"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"lab_medium"</span> <span class="org-variable-name">type</span>=<span class="org-string">"alias"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The alias for air</span>
+material : <span class="org-variable-name">string</span> = <span class="org-string">"std::air"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">material : string = "std::vacuum"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> Magnetic field plugin</h3>
+<div class="outline-text-3" id="text-3-5">
+</div>
+<div id="outline-container-sec-3-5-1" class="outline-4">
+<h4 id="sec-3-5-1">Plugin declaration</h4>
+<div class="outline-text-4" id="text-3-5-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The geometry manager plugin for emfield</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label  "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label "type"</span>
+
+[<span class="org-variable-name">name</span>=<span class="org-string">"fields_driver"</span> <span class="org-variable-name">type</span>=<span class="org-string">"emfield::emfield_geom_plugin"</span>]
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-5-2" class="outline-4">
+<h4 id="sec-3-5-2">Logging priority</h4>
+<div class="outline-text-4" id="text-3-5-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-5-3" class="outline-4">
+<h4 id="sec-3-5-3">EM field manager configuration</h4>
+<div class="outline-text-4" id="text-3-5-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Manager logging priority</span>
+manager.logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the geometry service</span>
+manager.services.geometry : <span class="org-variable-name">string</span> = <span class="org-string">"Geo"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description List of EM fields definitions files</span>
+manager.field_definitions_filenames : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/magnetic_field_drivers.conf"</span>
+</pre>
+</div>
+
+<p>
+EM field defined within <code>manager.field_definitions_filenames</code> file can be set
+independently and at the same time for different G4 volumes. This association
+between volumes and field is done by the <code>geom_map</code> object of <code>emfield</code>
+component.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Flag to activate the geometry volume/field associations map</span>
+manager.build_geom_map : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Manager logging priority</span>
+manager.geom_map.logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of EM fields associated to some logical volumes</span>
+manager.geom_map.associations.labels : <span class="org-variable-name">string</span>[1] = <span class="org-string">"lab"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The logical model associated for the label 'tracker'</span>
+manager.geom_map.associations.lab.volume : <span class="org-variable-name">string</span> = <span class="org-string">"lab.model.log"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The EM field associated for the label "tracker"</span>
+manager.geom_map.associations.lab.field_name : <span class="org-variable-name">string</span> = <span class="org-string">"B0"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-5-4" class="outline-4">
+<h4 id="sec-3-5-4">Magnetic fields</h4>
+<div class="outline-text-4" id="text-3-5-4">
+</div>
+<ul class="org-ul"><li>Preamble<br  /><div class="outline-text-5" id="text-3-5-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Definition parameters for some electro-magnetic fields</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Constant magnetic field<br  /><div class="outline-text-5" id="text-3-5-4-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"B0"</span> <span class="org-variable-name">type</span>=<span class="org-string">"emfield::uniform_magnetic_field"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config Configuration parameters for the magnetic field generated by a coil</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Default implicit magnetic field unit</span>
+magnetic_field.unit        : <span class="org-variable-name">string</span>  = <span class="org-string">"gauss"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Coordinates of the static magnetic field (Bx, By, Bz)</span>
+magnetic_field.coordinates : <span class="org-variable-name">real</span>[3] = 0.0 0.0 25.0
+</pre>
+</div>
+</div>
+</li></ul>
+</div>
+</div>
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> Visualization settings</h3>
+<div class="outline-text-3" id="text-3-6">
+</div>
+<div id="outline-container-sec-3-6-1" class="outline-4">
+<h4 id="sec-3-6-1">Browser settings</h4>
+<div class="outline-text-4" id="text-3-6-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"browser_settings"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Setup label.</span>
+setup_label : <span class="org-variable-name">string</span> = <span class="org-string">"geant4_validation"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Tab to view at startup.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">0: 3D Display 1: Raw Data 2: Options, 3: Selection</span>
+startup_tab : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">0: Top view 1: Front view 2: Side view</span>
+startup_2d_view : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Background color of displays.</span>
+background_color : <span class="org-variable-name">integer</span>[3] =   0   0   0
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6-2" class="outline-4">
+<h4 id="sec-3-6-2">Geometry settings</h4>
+<div class="outline-text-4" id="text-3-6-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"geometry_settings"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description List of volumes to take care.</span>
+volume_category_list : <span class="org-variable-name">string</span>[8] =                          <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"lab.gc"</span>                 <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"light_guide.gc"</span>         <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"optical_module.gc"</span>      <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"scin_block.gc"</span>          <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"scin_block_wrapping.gc"</span> <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"source.gc"</span>              <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"source_film.gc"</span>         <span class="org-sh-escaped-newline">\</span>
+                                   <span class="org-string">"source_support.gc"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Volume visibility (visible/invisible/disable)</span>
+lab.gc.visibility                 : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+light_guide.gc.visibility         : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+optical_module.gc.visibility      : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+scin_block.gc.visibility          : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+scin_block_wrapping.gc.visibility : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+source.gc.visibility              : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+source_film.gc.visibility         : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+source_support.gc.visibility      : <span class="org-variable-name">string</span> = <span class="org-string">"visible"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Volume color</span>
+lab.gc.color                 : <span class="org-variable-name">integer</span>[3] = 228 123 220
+light_guide.gc.color         : <span class="org-variable-name">integer</span>[3] = 158 246 222
+optical_module.gc.color      : <span class="org-variable-name">integer</span>[3] = 141  17  79
+scin_block.gc.color          : <span class="org-variable-name">integer</span>[3] =  66  43 244
+scin_block_wrapping.gc.color : <span class="org-variable-name">integer</span>[3] =  86 111 124
+source.gc.color              : <span class="org-variable-name">integer</span>[3] = 236  33 141
+source_film.gc.color         : <span class="org-variable-name">integer</span>[3] = 163  44  34
+source_support.gc.color      : <span class="org-variable-name">integer</span>[3] =  90 156 254
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6-3" class="outline-4">
+<h4 id="sec-3-6-3">Particle settings</h4>
+<div class="outline-text-4" id="text-3-6-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"particle_settings"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description MC particle color</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-6-4" class="outline-4">
+<h4 id="sec-3-6-4">Misc.</h4>
+<div class="outline-text-4" id="text-3-6-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"miscellaneous"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description MC line style</span>
+mc_line_style : <span class="org-variable-name">integer</span> = 1
+mc_line_width : <span class="org-variable-name">integer</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Figure save options</span>
+save.directory : <span class="org-variable-name">string</span> = <span class="org-string">"."</span>
+save.extension : <span class="org-variable-name">string</span> = <span class="org-string">".eps"</span>
+save.prefix    : <span class="org-variable-name">string</span> = <span class="org-string">"event_"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Pipeline general configuration</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+SN@ilWare implements the concept of data processing pipeline. An event record
+object is passed through a chain of data processing modules, each of them being
+responsible for a given task. Modules and services are declared in Section
+<i>Modules</i> and Section <a href="#sec-6">6</a>. For more details on running SuperNEMO simulations
+and the concept behind modules/services see <a href="http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889">these mandatory presentations</a> given
+by F. Mauger.
+</p>
+
+<p>
+The <code>@GEANT4_VALIDATION_DIR@</code> corresponds to the directory where configuration
+files are going to be stored. This variable which varies from one installation
+to the other, is automatically change when the tangle process occurs. This is
+done <i>via</i> the <code>Makefile</code> which parse and replace this variable.
+</p>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Module manager</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+This file is the main and central piece of code for loading all modules/services
+needed by <code>dpp_processing</code> binary. It provides links to module files and
+service files.
+</p>
+</div>
+<div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1">Logging priority</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Module manager logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded module factory debug flag</span>
+factory.debug : <span class="org-variable-name">boolean</span> = 0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Embedded module factory 'no preload' flag</span>
+factory.no_preload : <span class="org-variable-name">boolean</span> = 0
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2">Service manager configuration</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration file of the embedded service manager</span>
+service_manager.configuration : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/service_manager.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-1-3" class="outline-4">
+<h4 id="sec-4-1-3">Configuration files for modules</h4>
+<div class="outline-text-4" id="text-4-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration files for modules</span>
+modules.configuration_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/geant4_validation_modules.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Service manager</h3>
+<div class="outline-text-3" id="text-4-2">
+</div>
+<div id="outline-container-sec-4-2-1" class="outline-4">
+<h4 id="sec-4-2-1">Logging priority</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Service manager logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-2" class="outline-4">
+<h4 id="sec-4-2-2">Name &amp; description</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The name of the service manager</span>
+name : <span class="org-variable-name">string</span> = <span class="org-string">"sn_service_manager"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The description of the service manager</span>
+description : <span class="org-variable-name">string</span> = <span class="org-string">"A SuperNEMO service manager"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-3" class="outline-4">
+<h4 id="sec-4-2-3">List of service files</h4>
+<div class="outline-text-4" id="text-4-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of files that describe services</span>
+services.configuration_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/services.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> DLL loader</h3>
+<div class="outline-text-3" id="text-4-3">
+</div><div id="outline-container-sec-4-3-1" class="outline-4">
+<h4 id="sec-4-3-1">Code generator</h4>
+<div class="outline-text-4" id="text-4-3-1">
+<p>
+This skeleton code ease the declaration of dll loader since it
+receives a table list and builds the corresponding <code>dlls.conf</code> file.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh" id="dll_loader"><span class="org-builtin">echo</span> <span class="org-string">'#@description A sample list of setups'</span>
+<span class="org-builtin">echo</span> <span class="org-string">'#@key_label   "name"'</span>
+<span class="org-builtin">echo</span> <span class="org-string">'#@meta_label  "filename"'</span>
+<span class="org-keyword">for</span> i<span class="org-keyword"> in</span> $<span class="org-variable-name">list</span>
+<span class="org-keyword">do</span>
+    <span class="org-variable-name">dll</span>=$(<span class="org-builtin">echo</span> $<span class="org-variable-name">i</span> | sed <span class="org-string">'/(/ s/("\|")//g'</span>)
+    <span class="org-builtin">echo</span> <span class="org-string">'[name="'</span>$<span class="org-variable-name">dll</span><span class="org-string">'" filename=""]'</span>
+    <span class="org-builtin">echo</span> <span class="org-string">'#config The '</span>$<span class="org-variable-name">dll</span><span class="org-string">' library'</span>
+    <span class="org-builtin">echo</span> <span class="org-string">'autoload : boolean = 1'</span>
+    <span class="org-builtin">echo</span>
+<span class="org-keyword">done</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3-2" class="outline-4">
+<h4 id="sec-4-3-2">Libraries</h4>
+<div class="outline-text-4" id="text-4-3-2">
+<p>
+This part set the different libraries to be loaded at runtime. This is needed
+since event data models are defined in other libraries than the one currently
+named <code>geant4_validation</code>. The following table sets the libraries
+</p>
+
+<table id="dll_libraries-:results-none" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 1:</span> Libraries to be used by <code>geant4_validation</code> modules</caption>
+
+<colgroup>
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">mctools_bio</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "filename"</span>
+[<span class="org-variable-name">name</span>=<span class="org-string">"mctools_bio"</span> <span class="org-variable-name">filename</span>=<span class="org-string">""</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The mctools_bio library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Geant4 validation modules</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+The next item holds the configuration for validating Geant4 setup. The second
+item is related to histogram declarations.
+</p>
+</div>
+
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> Module declaration</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+Here, we just set up the module declaration.
+</p>
+</div>
+
+<div id="outline-container-sec-5-1-1" class="outline-4">
+<h4 id="sec-5-1-1">File preamble</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-1-2" class="outline-4">
+<h4 id="sec-5-1-2">Declaration &amp; description</h4>
+<div class="outline-text-4" id="text-5-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"geant4_validation_module"</span> <span class="org-variable-name">type</span>=<span class="org-string">"analysis::geant4_validation_module"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description A module to study and to validate Geant4 setup</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-1-3" class="outline-4">
+<h4 id="sec-5-1-3">Logging priority</h4>
+<div class="outline-text-4" id="text-5-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"notice"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-1-4" class="outline-4">
+<h4 id="sec-5-1-4">Histogram service label</h4>
+<div class="outline-text-4" id="text-5-1-4">
+<p>
+Set the same histogram service label as defined <a href="#sec-6-3">here</a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The Histogram Service label</span>
+Histo_label : <span class="org-variable-name">string</span> = <span class="org-string">"Histo"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> Histogram declarations</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+The histogram declarations <i>i.e.</i> name, boundaries, binning&#x2026; are set in this
+section which is organized by data bank related plots. There are two kinds of
+histograms:
+</p>
+<ul class="org-ul">
+<li><i>template</i> histogram which may be used by several data bank.
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-5-2-1" class="outline-4">
+<h4 id="sec-5-2-1">Mandatory preamble</h4>
+<div class="outline-text-4" id="text-5-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-2-2" class="outline-4">
+<h4 id="sec-5-2-2">Energy template</h4>
+<div class="outline-text-4" id="text-5-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"energy_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The title of the histogram (optional)</span>
+title : <span class="org-variable-name">string</span> = <span class="org-string">""</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis unit for display (a standard unit, typically SI or CLHEP)</span>
+display.xaxis.unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"dN/dE [A.U.]"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
+number_of_bins : <span class="org-variable-name">integer</span> = 25
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
+unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+min : <span class="org-variable-name">real</span> = 2000.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+max : <span class="org-variable-name">real</span> = 3200.0
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Services</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+A service generally hosts a specific resource that can be shared by many other
+software components, including other services or data processing modules (see
+<a href="https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice">SN@ilWare FAQ</a>).
+</p>
+</div>
+
+<div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> Preamble</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> Context service</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"Ctx"</span> <span class="org-variable-name">type</span>=<span class="org-string">"dpp::context_service"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description File from which the context is to be loaded at program start</span>
+load.file : string as <span class="org-variable-name">path</span>  = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description File to store the context at program termination</span>
+store.file : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context_end.conf"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Flag to backup the former context load file</span>
+backup.file : string as <span class="org-variable-name">path</span> = <span class="org-string">"/tmp/${USER}/snemo.d/snemo_context_bak.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> Histogram service</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+The histogram service provides an esay way to handle histogram plot from
+different modules (mainly plot modules). It provides a service where 1D or 2D
+histograms can be added to a histogram dictionnary.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"Histo"</span> <span class="org-variable-name">type</span>=<span class="org-string">"dpp::histogram_service"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"warning"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The description string of the embedded pool of histograms</span>
+pool.description : <span class="org-variable-name">string</span> = <span class="org-string">"Geant4 histograms"</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The main configuration file for the embedded histogram manager</span>
+pool.histo.setups : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@GEANT4_VALIDATION_DIR@/histogram_templates.conf"</span>
+</pre>
+</div>
+
+<p>
+Finally, all histograms created can be stored inside ROOT files or XML archives.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The ouput file where to store the histograms</span>
+output_files : string[2] as <span class="org-variable-name">path</span> =                        <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/geant4_validation_histos.root"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/geant4_vlaidation_histos.xml"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Running SN@ilWare processing chain</h2>
+<div class="outline-text-2" id="text-7">
+</div><div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> Tangling configuration</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+First, you need to tangle this file. As explained in the <a href="#sec-2">Content</a> section, you
+may use the dedicated <code>Makefile</code> to generate the pipeline configuration. Just
+run <code>make</code> within this working directory.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> Source code compilation</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+Second, you need to compile the <code>geant4_validation</code> module files. The build
+system used is <code>cmake</code> and a <code>CMakeLists.txt</code> file is provided to correctly
+setup the dependences. Nevertheless, this implies that you have already and
+correctly installed <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael">Cadfael</a>, <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux">Bayeux</a> and Falaise. Then, you can configure, build
+and install the <code>geant4_validation</code> module by doing
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">mkdir {build,install} &amp;&amp; <span class="org-builtin">cd</span> build
+cmake                                               <span class="org-sh-escaped-newline">\</span>
+    -DCMAKE_PREFIX_PATH=<span class="org-string">"&lt;path to Falaise install&gt;"</span> <span class="org-sh-escaped-newline">\</span>
+    -DCMAKE_INSTALL_PREFIX=../install               <span class="org-sh-escaped-newline">\</span>
+    ../source
+make install
+<span class="org-builtin">cd</span> ..
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> Use and execute <code>geant4_validation</code> module</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+After a successful build, you will get an <code>install</code> directory holding the
+<code>libgeant4_validation.so</code> file. Assuming you are under <code>bash</code> shell, you will
+need to add it to your <code>LD_LIBRARY_PATH</code> by doing
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-builtin">export</span> <span class="org-variable-name">LD_LIBRARY_PATH</span>=${<span class="org-variable-name">PWD</span>}/install/lib:${<span class="org-variable-name">LD_LIBRARY_PATH</span>}
+</pre>
+</div>
+
+<p>
+Another approach, maybe less intrusive, will be to set the <code>LD_LIBRARY_PATH</code>
+when running the <code>dpp_processing</code> binary. You can for example write something
+like
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-variable-name">LD_LIBRARY_PATH</span>=${<span class="org-variable-name">PWD</span>}/install/lib:${<span class="org-variable-name">LD_LIBRARY_PATH</span>} dpp_processing ...
+</pre>
+</div>
+
+<p>
+Running processing pipeline is done by the <code>dpp_processing</code> program provided by
+<code>dpp</code> library. Its call is pretty simple and only implies to have a module
+manager file and the name of the module to be run <i>i.e.</i>
+<code>geant4_validation_module</code>. Nevertheless, you need to dynamically load the
+library(ies) which holds the needed modules.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">dpp_processing                                                       <span class="org-sh-escaped-newline">\</span>
+    --module-manager-config $<span class="org-variable-name">PWD</span>/config/pipeline/module_manager.conf <span class="org-sh-escaped-newline">\</span>
+    --module geant4_validation_module                                <span class="org-sh-escaped-newline">\</span>
+    --load-dll geant4_validation                                     <span class="org-sh-escaped-newline">\</span>
+    --load-dll &lt;library&gt;_bio
+</pre>
+</div>
+
+<p>
+<code>&lt;library&gt;_bio</code> represents libraries which holds event data models such as
+<code>mctools_bio</code>. You can use the <code>dlls.conf</code> file built in section <a href="#sec-4-3">4.3</a> by
+writing
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">dpp_processing                                                       <span class="org-sh-escaped-newline">\</span>
+    --module-manager-config $<span class="org-variable-name">PWD</span>/config/pipeline/module_manager.conf <span class="org-sh-escaped-newline">\</span>
+    --module geant4_validation_module                                <span class="org-sh-escaped-newline">\</span>
+    --load-dll geant4_validation                                     <span class="org-sh-escaped-newline">\</span>
+    --dll-config $<span class="org-variable-name">PWD</span>/config/pipeline/dlls.conf
+</pre>
+</div>
+
+<p>
+It will run the <code>geant4_validation_module</code> and it will generate a ROOT file
+containing several histograms. This file is located by default, in
+<code>/tmp/${USER}/snemo.d</code> directory under the <code>geant4_validation_histos.root</code>
+name. You can change the output directory and output file name in <a href="#sec-6-3">this section</a>.
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+At the time of writing this document, emacs version is 24.3.1
+</p></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+Emacs lisp function can be run using <code>ALT-x</code> command and typing the function
+name.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
+We recommend that you name any sensitive category with the <code>_SD</code>
+suffix. This is to ease the reading of other configuration files at the
+simulation level (step hit processors). Also note that if you prefix the
+sensitive category name with two underscores (example: <code>__test_SD</code>), then the
+sensitive category is considered as &ldquo;private&rdquo; (non official) and may be
+processed in some special way by the simulation engine.
+</p></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+File under git version control - commit 34c035d - 2014-02-20
+</div>
+</body>
+</html>
