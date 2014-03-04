@@ -649,8 +649,8 @@ service files.
 ** DLL loader
 *** Code generator                                               :noexport:
 :PROPERTIES:
-:TANGLE: no
-:RESULTS: output
+:TANGLE:   no
+:RESULTS:  output
 :END:
 This skeleton code ease the declaration of dll loader since it
 receives a table list and builds the corresponding =dlls.conf= file.
@@ -661,13 +661,13 @@ receives a table list and builds the corresponding =dlls.conf= file.
   echo '#@description A sample list of setups'
   echo '#@key_label   "name"'
   echo '#@meta_label  "filename"'
-  j=0
-  echo $name
-  for i in $name
+  arr_name=(${name})
+  arr_filename=($filename)
+  for ((i=0; i < ${#arr_name[@]}; i++))
   do
-      dll=$(echo $i | sed '/(/ s/("\|")//g')
-      dllpath=${filename[j]}
-      if [ -n "$dllpath" ]; then
+      dll=${arr_name[$i]}
+      dllpath=${arr_filename[$i]}
+      if [ "$dllpath" != "none" ]; then
           echo '[name="'$dll'" filename="'$dllpath'"]'
       else
           echo '[name="'$dll'" filename=""]'
@@ -675,7 +675,6 @@ receives a table list and builds the corresponding =dlls.conf= file.
       echo '#config The '$dll' library'
       echo 'autoload : boolean = 1'
       echo
-      let j++
   done
 #+END_SRC
 *** Libraries
@@ -690,7 +689,7 @@ named =hpge_simulation=. The following table sets the libraries
 #+TBLNAME: dll_libraries :results none
 |-----------------------+--------------------------------------------------------------|
 | hpge_analysis         | @HPGE_SIMULATION_DIR@/source/install/lib/libhpge_analysis.so |
-| Bayeux_mctools_geant4 |                                                              |
+| Bayeux_mctools_geant4 | none                                                         |
 |-----------------------+--------------------------------------------------------------|
 
 #+BEGIN_SRC sh :noweb yes
