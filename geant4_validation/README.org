@@ -1181,15 +1181,22 @@ This skeleton code ease the declaration of dll loader since it
 receives a table list and builds the corresponding =dlls.conf= file.
 
 #+NAME: dll_loader
-#+HEADERS: :var list=""
+#+HEADERS: :var name="" :var filename=""
 #+BEGIN_SRC sh
   echo '#@description A sample list of setups'
   echo '#@key_label   "name"'
   echo '#@meta_label  "filename"'
-  for i in $list
+  arr_name=(${name})
+  arr_filename=($filename)
+  for ((i=0; i < ${#arr_name[@]}; i++))
   do
-      dll=$(echo $i | sed '/(/ s/("\|")//g')
-      echo '[name="'$dll'" filename=""]'
+      dll=${arr_name[$i]}
+      dllpath=${arr_filename[$i]}
+      if [ "$dllpath" != "none" ]; then
+          echo '[name="'$dll'" filename="'$dllpath'"]'
+      else
+          echo '[name="'$dll'" filename=""]'
+      fi
       echo '#config The '$dll' library'
       echo 'autoload : boolean = 1'
       echo
@@ -1205,9 +1212,9 @@ named =geant4_validation=. The following table sets the libraries
 
 #+CAPTION: Libraries to be used by =geant4_validation= modules
 #+TBLNAME: dll_libraries :results none
-|---------------------|
-| mctools_bio         |
-|---------------------|
+|-----------------------+---------------------------------------------------------------------|
+| Bayeux_mctools_geant4 | $SNAILWARE_PRO_DIR/bayeux/install/lib64/libBayeux_mctools_geant4.so |
+|-----------------------+---------------------------------------------------------------------|
 
 #+BEGIN_SRC sh :noweb yes
   <<dll_loader(dll_libraries[*,0])>>
