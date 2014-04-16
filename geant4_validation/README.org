@@ -310,7 +310,8 @@ We first design the shape and the dimensions of the block
 Then we define a material
 #+BEGIN_SRC sh
   #@description The name of the material
-  material.ref      : string = "polystyrene"
+  # material.ref      : string = "polystyrene"
+  material.ref      : string = "std::NaI"
 #+END_SRC
 
 Finally, we attach to it a sensitive category to ease the interface between
@@ -894,55 +895,88 @@ to change the source foil isotope.
       "@materials:data/std_materials.def"             \
       "@GEANT4_VALIDATION_DIR@/config/geometry/materials_aliases.def"
 #+END_SRC
+*** COMMENT Materials
+:PROPERTIES:
+:TANGLE: config/geometry/materials.def
+:END:
+**** Insert preamble
+#+BEGIN_SRC sh
+  #@description A sample list of radioactive materials
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+**** Bismuth 207
+#+BEGIN_SRC sh
+    [name="Bi-207" type="isotope"]
+    #@config The 207 Bismuth isotope
+    z : integer = 83
+    a : integer = 207
+
+    [name="bismuth-207" type="element"]
+    #@config The 48 Calcium enriched element
+    z               : integer   = 83
+    isotope.names   : string[1] = "Bi-207"
+    isotope.weights : real[1]   = 1.0
+
+    [name="bi207_source_material" type="material"]
+    #@config Bi207 material
+    density        : real   = 9.78
+    density.unit   : string = "g/cm3"
+    state          : string = "solid"
+    composition.mode          : string      = "fraction_mass"
+    composition.names         : string [1]  = "bismuth-207"
+    composition.fraction_mass : real   [1]  = 1.0
+#+END_SRC
+
 *** Material aliases
 :PROPERTIES:
 :TANGLE: config/geometry/materials_aliases.def
 :END:
 #+BEGIN_SRC sh
-  #@description A sample list of aliases for standard materials
-  #@key_label   "name"
-  #@meta_label  "type"
+    #@description A sample list of aliases for standard materials
+    #@key_label   "name"
+    #@meta_label  "type"
 
-  [name="air" type="alias"]
-  #@description The alias for air
-  material : string = "std::air"
+    [name="air" type="alias"]
+    #@description The alias for air
+    material : string = "std::air"
 
-  [name="aluminium" type="alias"]
-  #@description The alias for aluminium
-  material : string = "std::aluminium"
+    [name="aluminium" type="alias"]
+    #@description The alias for aluminium
+    material : string = "std::aluminium"
 
-  [name="inox" type="alias"]
-  #@description The alias for inox
-  material : string = "std::inox"
+    [name="inox" type="alias"]
+    #@description The alias for inox
+    material : string = "std::inox"
 
-  [name="copper" type="alias"]
-  #@description The alias for copper
-  material : string = "std::copper"
+    [name="copper" type="alias"]
+    #@description The alias for copper
+    material : string = "std::copper"
 
-  [name="mylar" type="alias"]
-  #@description The alias for mylar
-  material : string = "std::mylar"
+    [name="mylar" type="alias"]
+    #@description The alias for mylar
+    material : string = "std::mylar"
 
-  [name="plexiglass" type="alias"]
-  #@description The alias for plexiglass
-  material : string = "std::plexiglass"
+    [name="plexiglass" type="alias"]
+    #@description The alias for plexiglass
+    material : string = "std::plexiglass"
 
-  [name="polystyrene" type="alias"]
-  #@description The alias for polystyrene
-  material : string = "std::polystyrene"
+    [name="polystyrene" type="alias"]
+    #@description The alias for polystyrene
+    material : string = "std::polystyrene"
 
-  [name="glass" type="alias"]
-  #@description The alias for pyrex
-  material : string = "std::pyrex"
+    [name="glass" type="alias"]
+    #@description The alias for pyrex
+    material : string = "std::pyrex"
 
-  [name="vacuum" type="alias"]
-  #@description The alias for vacuum
-  material : string = "std::vacuum"
+    [name="vacuum" type="alias"]
+    #@description The alias for vacuum
+    material : string = "std::vacuum"
 
-  [name="lab_medium" type="alias"]
-  #@description The alias for air
-  material : string = "std::air"
-  #material : string = "std::vacuum"
+    [name="lab_medium" type="alias"]
+    #@description The alias for air
+    material : string = "std::air"
+    #material : string = "std::vacuum"
 #+END_SRC
 
 ** Magnetic field plugin
@@ -1060,11 +1094,11 @@ component.
                                      "source_support.gc"
 
   #@description Volume visibility (visible/invisible/disable)
-  lab.gc.visibility                 : string = "visible"
-  light_guide.gc.visibility         : string = "visible"
-  optical_module.gc.visibility      : string = "visible"
+  lab.gc.visibility                 : string = "invisible"
+  light_guide.gc.visibility         : string = "invisible"
+  optical_module.gc.visibility      : string = "invisible"
   scin_block.gc.visibility          : string = "visible"
-  scin_block_wrapping.gc.visibility : string = "visible"
+  scin_block_wrapping.gc.visibility : string = "invisible"
   source.gc.visibility              : string = "visible"
   source_film.gc.visibility         : string = "visible"
   source_support.gc.visibility      : string = "visible"
@@ -1073,7 +1107,7 @@ component.
   lab.gc.color                 : integer[3] = 228 123 220
   light_guide.gc.color         : integer[3] = 158 246 222
   optical_module.gc.color      : integer[3] = 141  17  79
-  scin_block.gc.color          : integer[3] =  66  43 244
+  scin_block.gc.color          : integer[3] = 144  17 179
   scin_block_wrapping.gc.color : integer[3] =  86 111 124
   source.gc.color              : integer[3] = 236  33 141
   source_film.gc.color         : integer[3] = 163  44  34
@@ -1084,6 +1118,8 @@ component.
   [name="particle_settings"]
 
   #@description MC particle color
+  gamma.color    : string = "#FFD700"
+  electron.color : string = "#87CEEB"
 #+END_SRC
 *** Misc.
 #+BEGIN_SRC sh
@@ -1586,8 +1622,35 @@ More details concerning the use of =genbb= can be found in [[https://nemo.lpc-ca
   logging.priority : string = "warning"
 
   #@description List of files containing particle generator definition rules
-  generators.configuration_files : string[1] as path = \
+  generators.configuration_files : string[2] as path = \
+      "@GEANT4_VALIDATION_DIR@/config/pipeline/calibrations.conf" \
       "@GEANT4_VALIDATION_DIR@/config/pipeline/guns.conf"
+#+END_SRC
+*** Calibration configuration
+:PROPERTIES:
+:TANGLE:   config/pipeline/calibrations.conf
+:END:
+**** Insert preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+**** Bi207
+#+BEGIN_SRC sh
+  [name="Bi207" type="genbb::wdecay0"]
+  #@config Bi-207 decay
+  logging.priority : string = "warning"
+  decay_type       : string = "background"
+  decay_isotope    : string = "Bi207+Pb207m"
+#+END_SRC
+**** Co60
+#+BEGIN_SRC sh
+  [name="Co60" type="genbb::wdecay0"]
+  #@config Co-60 decay
+  logging.priority : string = "warning"
+  decay_type       : string = "background"
+  decay_isotope    : string = "Co60"
 #+END_SRC
 *** Guns configuration
 :PROPERTIES:
@@ -1624,11 +1687,38 @@ More details concerning the use of =genbb= can be found in [[https://nemo.lpc-ca
   [name="electron_1MeV_cone" type="genbb::single_particle_generator"]
   #@config Electron with monokinetic energy @ 1 MeV [miscellaneous]
 
-  #@description Seed for the embedded random number generator:
-  #seed          : integer = 314159
-
   #@description Generated particle ("electron", "positron", "gamma", "alpha"):
   particle_name : string = "electron"
+
+  #@description Mode ("energy_range", "gaussian_energy", "monokinetic", "spectrum"):
+  mode          : string = "monokinetic"
+
+  #@description Direction of the emitted particle
+  emission_direction : string = "cone"
+
+  #@description The emission cone axis (values: "+x", "-x", "+y", "-y", "+z", "-z", "30.0 45.0 degree")
+  cone.axis : string = "-x"
+
+  #@description The default implicit angle unit
+  angle_unit : string = "degree"
+
+  #@description The minimum emission angle (cone)
+  cone.min_angle : real as angle = 0 degree
+
+  #@description The maximum emission angle (cone)
+  cone.max_angle : real as angle = 10 degree
+
+  #@description The kinetic energy of the generated particle
+  energy        : real as energy = 1000 keV
+#+END_SRC
+
+**** 1 MeV cone gamma
+#+BEGIN_SRC sh
+  [name="gamma_1MeV_cone" type="genbb::single_particle_generator"]
+  #@config Gamma with monokinetic energy @ 1 MeV [miscellaneous]
+
+  #@description Generated particle ("electron", "positron", "gamma", "alpha"):
+  particle_name : string = "gamma"
 
   #@description Mode ("energy_range", "gaussian_energy", "monokinetic", "spectrum"):
   mode          : string = "monokinetic"
@@ -1726,6 +1816,54 @@ More details concerning the use of =genbb= can be found in [[https://nemo.lpc-ca
   #@description A list of simulated step hit processors
   #@key_label   "name"
   #@meta_label  "type"
+#+END_SRC
+*** Scintillator/calorimeter hits
+#+BEGIN_SRC sh
+  [name="scin.hit_processor" type="mctools::calorimeter_step_hit_processor"]
+
+  #@config The step hit processor for the scintillator blocks
+
+  #@description Debug flag
+  logging.priority      : string = "warning"
+
+  #@description The name of the category of MC hits output by this processor
+  hit.category          : string = "scin.hit"
+
+  #@description The name of the sensitive MC hits the processor must process to fill the output hit category
+  sensitive.category    : string = "scin_SD"
+
+  #@description Flag to activate a preallocated buffer/pool of MC hits to optimize memory management
+  use_private_pool      : boolean  = 1
+
+  #@description Initial capacity of the buffer/pool of MC hits
+  private_pool_capacity : integer  = 10
+
+  #@description The time spread of primary MC step hits to apply the clusterization
+  cluster.time_range    : real as time  = 1.0 ns
+
+  #@description The spacial spread of primary MC step hits to apply the clusterization
+  cluster.space_range   : real as length = 10.0 mm
+
+  #@description The name of the geometry category to be attached to the output MC hits
+  mapping.category      : string = "scin_block.gc"
+
+  #@description The name of the geometry category to be attached to the output MC hits
+  ##mapping.category.any_addresses :  string[1] = "part"
+#+END_SRC
+#+BEGIN_SRC sh
+  [name="scin.visu.hit_processor" type="mctools::push_all_step_hit_processor"]
+
+  #@config The step hit processor for collecting all scintillator hits in the scintillator volume for visualization
+
+  #@description Debug flag
+  logging.priority   : string = "warning"
+
+  #@description The name of the target collection of MC hits
+  hit.category       : string  = "__visu.tracks"
+
+  #@description The sensitive category
+  sensitive.category : string  = "scin_SD"
+
 #+END_SRC
 *** Enabling all volumes
 #+BEGIN_SRC sh
@@ -1907,7 +2045,7 @@ named =geant4_validation=. The following table sets the libraries
 *** Seed values
 #+BEGIN_SRC sh
   #@description The simulation manager PRNG seed
-  manager.seed                  : integer = 2
+  manager.seed                  : integer = 1
 
   #@description The vertex generator PRNG seed
   manager.vertex_generator_seed : integer = 4
@@ -1935,7 +2073,7 @@ named =geant4_validation=. The following table sets the libraries
 *** Event generator
 #+BEGIN_SRC sh
   #@description The event generator PRNG label
-  manager.event_generator_name  : string  = "electron_1MeV"
+  manager.event_generator_name  : string  = "Bi207"
 #+END_SRC
 *** Simulation manager
 #+BEGIN_SRC sh
