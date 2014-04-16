@@ -8,7 +8,8 @@
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Xavier Garrido" />
 <link rel="stylesheet" href="css/styles.css">
-               <link rel="stylesheet" href="css/org-pygments.css">
+                 <link rel="stylesheet" href="css/org-pygments.css">
+                 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -54,9 +55,20 @@ for the JavaScript code in this tag.
      target.className = elem.cacheClassTarget;
  }
 /*]]>*///-->
+</script><script type="text/javascript">
+function displayTOC() {
+    var first = document.getElementById("text-table-of-contents").innerHTML;
+    if (first != "") {
+        var maincontent = '<a class="button"><i class="fa fa-list"></i></a>'
+        maincontent += "<div>" + first + "</div>";
+        document.getElementById("toc").innerHTML = maincontent;
+    } else {
+        document.getElementById("toc").style.display = "none";
+    }
+   }
 </script>
 </head>
-<body>
+<body onload="displayTOC()"><div id="toc"></div>
 <div id="content">
 <h1 class="title">SN@ilWare Simulation Modules</h1>
 <p>
@@ -78,7 +90,7 @@ mass&#x2026;).
 </dd>
 <dt> <a href="./geant4_validation/README.html">geant4_validation</a> </dt><dd>This directory sets up a minimal and simple geometry
 layout to test Geant4 simulation and to validate Geant4 Physics list. It
-generates plots of relevant physical &ldquo;quantities&rdquo; such as energy loss in
+generates plots of relevant physical "quantities" such as energy loss in
 materials, scattering angle distribution.
 </dd>
 <dt> <a href="./hpge_simulation/README.html">hpge_simulation</a> </dt><dd>This directory holds a full setup from geometry declaration
@@ -87,7 +99,7 @@ to analysis modules to perform High Purity Germanium simulations.
 </dl>
 </div>
 <div id="postamble" class="status">
-File under git version control - commit 45c63d2 - 2014-02-20
+File under git version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/92312965f8de22c1c092eb693f2114b381d09d83">9231296</a> - 2014-04-16
 </div>
 </body>
 </html>

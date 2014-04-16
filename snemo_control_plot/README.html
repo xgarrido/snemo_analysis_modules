@@ -8,7 +8,8 @@
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Xavier Garrido" />
 <link rel="stylesheet" href="../css/styles.css">
-               <link rel="stylesheet" href="../css/org-pygments.css">
+                 <link rel="stylesheet" href="../css/org-pygments.css">
+                 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -54,13 +55,24 @@ for the JavaScript code in this tag.
      target.className = elem.cacheClassTarget;
  }
 /*]]>*///-->
+</script><script type="text/javascript">
+function displayTOC() {
+    var first = document.getElementById("text-table-of-contents").innerHTML;
+    if (first != "") {
+        var maincontent = '<a class="button"><i class="fa fa-list"></i></a>'
+        maincontent += "<div>" + first + "</div>";
+        document.getElementById("toc").innerHTML = maincontent;
+    } else {
+        document.getElementById("toc").style.display = "none";
+    }
+   }
 </script>
 </head>
-<body>
+<body onload="displayTOC()"><div id="toc"></div>
 <div id="content">
 <h1 class="title">SuperNEMO control plot module</h1>
 <div id="table-of-contents">
-<h2>Table of Contents</h2>
+<h2></h2>
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. Introduction</a></li>
@@ -101,7 +113,7 @@ for the JavaScript code in this tag.
 <div class="outline-text-2" id="text-1">
 <p>
 This repository holds a SN@ilWare configuration to run SuperNEMO simulations and
-to produce several &ldquo;control&rdquo; plots. It provides one SN@ilWare module which
+to produce several "control" plots. It provides one SN@ilWare module which
 automatically plot physical quantities from different data banks. For example,
 it shows the distribution of the number of Geiger hits from the <code>simulated_data</code>
 bank and from the <code>calibrated_data</code> bank. The purpose of this module is to have
@@ -152,7 +164,7 @@ build and install all the software pieces through <code>cmake</code> rules.
 The <code>README.org</code> file is organised using <a href="http://orgmode.org/worg/org-contrib/babel/index.html">org-babel</a> and its ability to execute
 source code. It requires then a recent installation of emacs<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> which bundles
 <code>org</code>. Without entering into too much details regarding <code>org-babel</code> abilities,
-the basic idea is to give a &ldquo;literate&rdquo; way to navigate through the different
+the basic idea is to give a "literate" way to navigate through the different
 sections, each of them representing a part of the pipeline
 configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
 hide and the user can focus on relevant parts.
@@ -163,7 +175,7 @@ To export the different configuration files, you can run <code>org-babel-tangle<
 which will tangle each code block into the given file<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> or use the associated
 <code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
 process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
-&ldquo;occupies&rdquo; emacs during its execution).
+"occupies" emacs during its execution).
 </p>
 </div>
 </div>
@@ -197,7 +209,7 @@ service files.
 </p>
 </div>
 <div id="outline-container-sec-3-1-1" class="outline-4">
-<h4 id="sec-3-1-1">Logging priority</h4>
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> Logging priority</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <div class="org-src-container">
 
@@ -214,7 +226,7 @@ factory.no_preload : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 <div id="outline-container-sec-3-1-2" class="outline-4">
-<h4 id="sec-3-1-2">Service manager configuration</h4>
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Service manager configuration</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <div class="org-src-container">
 
@@ -226,7 +238,7 @@ service_manager.configuration : string[1] as <span class="org-variable-name">pat
 </div>
 </div>
 <div id="outline-container-sec-3-1-3" class="outline-4">
-<h4 id="sec-3-1-3">Configuration files for modules</h4>
+<h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> Configuration files for modules</h4>
 <div class="outline-text-4" id="text-3-1-3">
 <div class="org-src-container">
 
@@ -243,7 +255,7 @@ modules.configuration_files : string[1] as <span class="org-variable-name">path<
 <div class="outline-text-3" id="text-3-2">
 </div>
 <div id="outline-container-sec-3-2-1" class="outline-4">
-<h4 id="sec-3-2-1">Logging priority</h4>
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> Logging priority</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <div class="org-src-container">
 
@@ -255,7 +267,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 
 <div id="outline-container-sec-3-2-2" class="outline-4">
-<h4 id="sec-3-2-2">Name &amp; description</h4>
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Name &amp; description</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <div class="org-src-container">
 
@@ -270,7 +282,7 @@ description : <span class="org-variable-name">string</span> = <span class="org-s
 </div>
 
 <div id="outline-container-sec-3-2-3" class="outline-4">
-<h4 id="sec-3-2-3">List of service files</h4>
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> List of service files</h4>
 <div class="outline-text-4" id="text-3-2-3">
 <div class="org-src-container">
 
@@ -286,7 +298,7 @@ services.configuration_files : string[1] as <span class="org-variable-name">path
 <h3 id="sec-3-3"><span class="section-number-3">3.3</span> DLL loader</h3>
 <div class="outline-text-3" id="text-3-3">
 </div><div id="outline-container-sec-3-3-1" class="outline-4">
-<h4 id="sec-3-3-1">Code generator</h4>
+<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> Code generator</h4>
 <div class="outline-text-4" id="text-3-3-1">
 <p>
 This skeleton code ease the declaration of dll loader since it
@@ -312,7 +324,7 @@ receives a table list and builds the corresponding <code>dlls.conf</code> file.
 </div>
 
 <div id="outline-container-sec-3-3-2" class="outline-4">
-<h4 id="sec-3-3-2">Libraries</h4>
+<h4 id="sec-3-3-2"><span class="section-number-4">3.3.2</span> Libraries</h4>
 <div class="outline-text-4" id="text-3-3-2">
 <p>
 This part set the different libraries to be loaded at runtime. This is needed
@@ -320,7 +332,7 @@ since event data models are defined in other libraries than the one currently
 named <code>snemo_bb0nu_studies</code>. The following table sets the libraries
 </p>
 
-<table id="dll_libraries" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table id="dll_libraries" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="void">
 <caption class="t-above"><span class="table-number">Table 1:</span> Libraries to be used by <code>snemo_bb0nu_studies</code> modules</caption>
 
 <colgroup>
@@ -375,7 +387,7 @@ processing a file is <code>scp_module</code>.
 </div>
 
 <div id="outline-container-sec-4-1-1" class="outline-4">
-<h4 id="sec-4-1-1">File preamble</h4>
+<h4 id="sec-4-1-1"><span class="section-number-4">4.1.1</span> File preamble</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <div class="org-src-container">
 
@@ -388,7 +400,7 @@ processing a file is <code>scp_module</code>.
 </div>
 
 <div id="outline-container-sec-4-1-2" class="outline-4">
-<h4 id="sec-4-1-2">Declaration &amp; description</h4>
+<h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> Declaration &amp; description</h4>
 <div class="outline-text-4" id="text-4-1-2">
 <div class="org-src-container">
 
@@ -400,7 +412,7 @@ processing a file is <code>scp_module</code>.
 </div>
 </div>
 <div id="outline-container-sec-4-1-3" class="outline-4">
-<h4 id="sec-4-1-3">Logging priority</h4>
+<h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> Logging priority</h4>
 <div class="outline-text-4" id="text-4-1-3">
 <div class="org-src-container">
 
@@ -411,7 +423,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 <div id="outline-container-sec-4-1-4" class="outline-4">
-<h4 id="sec-4-1-4">Histogram service label</h4>
+<h4 id="sec-4-1-4"><span class="section-number-4">4.1.4</span> Histogram service label</h4>
 <div class="outline-text-4" id="text-4-1-4">
 <p>
 Set the same histogram service label as defined <a href="#sec-5-3">here</a>
@@ -448,7 +460,7 @@ histograms all belong to the <code>__template</code> group.
 </div>
 
 <div id="outline-container-sec-4-2-1" class="outline-4">
-<h4 id="sec-4-2-1">Mandatory preamble</h4>
+<h4 id="sec-4-2-1"><span class="section-number-4">4.2.1</span> Mandatory preamble</h4>
 <div class="outline-text-4" id="text-4-2-1">
 <div class="org-src-container">
 
@@ -460,7 +472,7 @@ histograms all belong to the <code>__template</code> group.
 </div>
 </div>
 <div id="outline-container-sec-4-2-2" class="outline-4">
-<h4 id="sec-4-2-2">Simulated data bank histograms</h4>
+<h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> Simulated data bank histograms</h4>
 <div class="outline-text-4" id="text-4-2-2">
 </div><ul class="org-ul"><li>Number of Geiger hits<br  /><div class="outline-text-5" id="text-4-2-2-1">
 <div class="org-src-container">
@@ -542,7 +554,7 @@ display.color : <span class="org-variable-name">string</span> = <span class="org
 </li></ul>
 </div>
 <div id="outline-container-sec-4-2-3" class="outline-4">
-<h4 id="sec-4-2-3">Calibrated data bank histograms</h4>
+<h4 id="sec-4-2-3"><span class="section-number-4">4.2.3</span> Calibrated data bank histograms</h4>
 <div class="outline-text-4" id="text-4-2-3">
 </div><ul class="org-ul"><li>Number of calibrated tracker hits<br  /><div class="outline-text-5" id="text-4-2-3-1">
 <div class="org-src-container">
@@ -624,7 +636,7 @@ display.color : <span class="org-variable-name">string</span> = <span class="org
 </li></ul>
 </div>
 <div id="outline-container-sec-4-2-4" class="outline-4">
-<h4 id="sec-4-2-4">Tracker clustering data bank histograms</h4>
+<h4 id="sec-4-2-4"><span class="section-number-4">4.2.4</span> Tracker clustering data bank histograms</h4>
 <div class="outline-text-4" id="text-4-2-4">
 </div><ul class="org-ul"><li>Number of clusters<br  /><div class="outline-text-5" id="text-4-2-4-1">
 <div class="org-src-container">
@@ -842,7 +854,7 @@ name. You can change the output directory and output file name in <a href="#sec-
 </div>
 </div>
 <div id="footnotes">
-<h2 class="footnotes">Footnotes: </h2>
+<h2 class="footnotes"> </h2>
 <div id="text-footnotes">
 
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
@@ -864,7 +876,7 @@ reconstruction.
 </div>
 </div></div>
 <div id="postamble" class="status">
-File under git version control - commit 45c63d2 - 2014-02-20
+File under git version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/92312965f8de22c1c092eb693f2114b381d09d83">9231296</a> - 2014-04-16
 </div>
 </body>
 </html>
