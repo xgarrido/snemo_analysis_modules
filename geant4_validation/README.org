@@ -422,7 +422,6 @@ Finally, we attach mapping id to the mother volume as well as its daughter
 #+END_SRC
 ***** Rotated light guide
 #+BEGIN_SRC sh
-  ########################################################################
   [name="rotated_light_guide.model" type="geomtools::rotated_boxed_model"]
 
   #@config The configuration parameters for the rotated light guide
