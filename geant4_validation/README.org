@@ -34,7 +34,7 @@ The code is organised as follow :
               build and install all the software pieces through =cmake= rules.
 
 The =README.org= file is organised using [[http://orgmode.org/worg/org-contrib/babel/index.html][org-babel]] and its ability to execute
-source code. It requires then a recent installation of emacs[1] which bundles
+source code. It requires then a recent installation of emacs[fn:1] which bundles
 =org=. Without entering into too much details regarding =org-babel= abilities,
 the basic idea is to give a "literate" way to navigate through the different
 sections, each of them representing a part of the pipeline
@@ -42,14 +42,11 @@ configuration. Moreover, using =org= folding/unfolding capability, item can be
 hide and the user can focus on relevant parts.
 
 To export the different configuration files, you can run =org-babel-tangle=
-which will tangle each code block into the given file[2] or use the associated
+which will tangle each code block into the given file[fn:2] or use the associated
 =Makefile=. The author recommends to use the =Makefile= since the tangling
 process is asynchronous and thus, does not freeze your emacs (=org-babel-tangle=
 "occupies" emacs during its execution).
 
-[1] At the time of writing this document, emacs version is 24.3.1
-[2] Emacs lisp function can be run using =ALT-x= command and typing the function
-name.
 * Geometry setup
 ** Manager configuration
 :PROPERTIES:
@@ -315,7 +312,7 @@ Then we define a material
 #+END_SRC
 
 Finally, we attach to it a sensitive category to ease the interface between
-=mctools= and Geant4 digitization[fn:1]
+=mctools= and Geant4 digitization[fn:3]
 #+BEGIN_SRC sh
   #@description The 'sensitive' category attached to this detector volume
   sensitive.category : string  = "scin_SD"
@@ -2331,7 +2328,12 @@ service][this section]].
 
 * Footnotes
 
-[fn:1] We recommend that you name any sensitive category with the =_SD=
+[fn:1] At the time of writing this document, emacs version is 24.3.1
+
+[fn:2] Emacs lisp function can be run using =ALT-x= command and typing the function
+name.
+
+[fn:3] We recommend that you name any sensitive category with the =_SD=
  suffix. This is to ease the reading of other configuration files at the
  simulation level (step hit processors). Also note that if you prefix the
  sensitive category name with two underscores (example: =__test_SD=), then the
