@@ -1175,7 +1175,7 @@ This part basically provides the location of vertex generator implemented by
 
 **** GDML scheme and options
 The Geometry Description Markup Language is an application-indepedent geometry
-description format based on XML[1]. It is used as Geant4 toolkit bindings
+description format based on XML[fn:4]. It is used as Geant4 toolkit bindings
 through =gemotools= converters.
 
 #+BEGIN_SRC sh
@@ -1188,8 +1188,6 @@ through =gemotools= converters.
   #@description Flag to skip GDML validation
   gdml.no_validation   : boolean = 0
 #+END_SRC
-
-[1] http://gdml.web.cern.ch/GDML
 
 **** Step hit processors
 Step hit processors are used to convert Geant4 steps into detector hits for
@@ -2339,3 +2337,5 @@ name.
  sensitive category name with two underscores (example: =__test_SD=), then the
  sensitive category is considered as "private" (non official) and may be
  processed in some special way by the simulation engine.
+
+[fn:4] http://gdml.web.cern.ch/GDML
