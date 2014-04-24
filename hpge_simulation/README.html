@@ -145,6 +145,7 @@ programs.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> Content</h2>
 <div class="outline-text-2" id="text-2">
@@ -153,13 +154,13 @@ The code is organised as follow :
 </p>
 
 <dl class="org-dl">
-<dt> <code>README.org</code> </dt><dd>This file holds the pipeline configuration + the documentation
+<dt><code>README.org</code></dt><dd>This file holds the pipeline configuration + the documentation
 on how to use the <code>hpge_simulation</code> module.
 </dd>
-<dt> <code>Makefile</code> </dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
+<dt><code>Makefile</code></dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
 parsing and tangling this file <i>i.e.</i> <code>README.org</code> (see below).
 </dd>
-<dt> <code>source</code> </dt><dd>This directory holds the source code of the <code>hpge_simulation</code>
+<dt><code>source</code></dt><dd>This directory holds the source code of the <code>hpge_simulation</code>
 module. It also has a <code>CMakeLists.txt</code> file in order to compile,
 build and install all the software pieces through <code>cmake</code> rules.
 </dd>
@@ -173,7 +174,7 @@ the basic idea is to give a "literate" way to navigate through the different
 sections, each of them representing a part of the pipeline
 configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
 hide and the user can focus on relevant parts.
-</p>
+ <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara"> At the time of writing this document, emacs version is 24.3.1 </p></div>
 
 <p>
 To export the different configuration files, you can run <code>org-babel-tangle</code>
@@ -181,10 +182,9 @@ which will tangle each code block into the given file<sup><a id="fnr.2" class="f
 <code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
 process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
 "occupies" emacs during its execution).
-</p>
+ <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara"> Emacs lisp function can be run using <code>ALT-x</code> command and typing the function name. </p></div>
 </div>
 </div>
-
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><span class="section-number-2">3</span> Geometry setup</h2>
 <div class="outline-text-2" id="text-3">
@@ -209,7 +209,6 @@ setup_version : <span class="org-variable-name">string</span> = <span class="org
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-1-2" class="outline-4">
 <h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Logging priority</h4>
 <div class="outline-text-4" id="text-3-1-2">
@@ -221,7 +220,6 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-1-3" class="outline-4">
 <h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> Geometry factory</h4>
 <div class="outline-text-4" id="text-3-1-3">
@@ -238,6 +236,7 @@ factory.logging.priority : <span class="org-variable-name">string</span> = <span
 </div>
 </div>
 </li>
+
 <li>Geometry files<br  /><div class="outline-text-5" id="text-3-1-3-2">
 <div class="org-src-container">
 
@@ -251,6 +250,7 @@ factory.geom_files : string[3] as <span class="org-variable-name">path</span> = 
 </div>
 </li></ul>
 </div>
+
 <div id="outline-container-sec-3-1-4" class="outline-4">
 <h4 id="sec-3-1-4"><span class="section-number-4">3.1.4</span> ID manager</h4>
 <div class="outline-text-4" id="text-3-1-4">
@@ -263,6 +263,7 @@ id_mgr.logging.priority : <span class="org-variable-name">string</span> = <span 
 </div>
 </div>
 </li>
+
 <li>Category list<br  /><div class="outline-text-5" id="text-3-1-4-2">
 <p>
 Categories are used to assign a unique id number (integer) to a geometrical
@@ -278,7 +279,6 @@ id_mgr.categories_list : string as <span class="org-variable-name">path</span> =
 </div>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-3-1-5" class="outline-4">
 <h4 id="sec-3-1-5"><span class="section-number-4">3.1.5</span> Mapping configuration</h4>
 <div class="outline-text-4" id="text-3-1-5">
@@ -293,7 +293,6 @@ mapping.max_depth : <span class="org-variable-name">integer</span> = 100
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-1-6" class="outline-4">
 <h4 id="sec-3-1-6"><span class="section-number-4">3.1.6</span> Plugins configuration</h4>
 <div class="outline-text-4" id="text-3-1-6">
@@ -313,6 +312,7 @@ plugins.configuration_files : string[1] as <span class="org-variable-name">path<
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-2" class="outline-3">
 <h3 id="sec-3-2"><span class="section-number-3">3.2</span> Geometry models</h3>
 <div class="outline-text-3" id="text-3-2">
@@ -330,7 +330,6 @@ plugins.configuration_files : string[1] as <span class="org-variable-name">path<
 </div>
 </div>
 </li>
-
 <li>Petri box<br  /><div class="outline-text-5" id="text-3-2-1-2">
 <div class="org-src-container">
 
@@ -343,7 +342,6 @@ material.ref : <span class="org-variable-name">string</span> = <span class="org-
 </div>
 </div>
 </li>
-
 <li>Source model<br  /><div class="outline-text-5" id="text-3-2-1-3">
 <p>
 Use standard IEAE RGU-1
@@ -360,7 +358,6 @@ material.ref : <span class="org-variable-name">string</span> = <span class="org-
 </div>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-3-2-2" class="outline-4">
 <h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> HPGe planar model</h4>
 <div class="outline-text-4" id="text-3-2-2">
@@ -375,7 +372,6 @@ material.ref : <span class="org-variable-name">string</span> = <span class="org-
 </div>
 </div>
 </li>
-
 <li>Germanium model<br  /><div class="outline-text-5" id="text-3-2-2-2">
 <div class="org-src-container">
 
@@ -388,7 +384,6 @@ material.ref       : <span class="org-variable-name">string</span> = <span class
 </div>
 </div>
 </li>
-
 <li>Internal lead model<br  /><div class="outline-text-5" id="text-3-2-2-3">
 <div class="org-src-container">
 
@@ -401,7 +396,6 @@ material.ref      : <span class="org-variable-name">string</span> = <span class=
 </div>
 </div>
 </li>
-
 <li>Contact lead<br  /><div class="outline-text-5" id="text-3-2-2-4">
 <div class="org-src-container">
 
@@ -415,7 +409,6 @@ material.ref      : <span class="org-variable-name">string</span> = <span class=
 </div>
 </div>
 </li>
-
 <li>Support model<br  /><div class="outline-text-5" id="text-3-2-2-5">
 <div class="org-src-container">
 
@@ -449,7 +442,6 @@ mapping.filled.daughter_id.contact_lead      : <span class="org-variable-name">s
 </div>
 </div>
 </li>
-
 <li>Front window<br  /><div class="outline-text-5" id="text-3-2-2-6">
 <div class="org-src-container">
 
@@ -462,7 +454,6 @@ material.ref      : <span class="org-variable-name">string</span> = <span class=
 </div>
 </div>
 </li>
-
 <li>Air gap<br  /><div class="outline-text-5" id="text-3-2-2-7">
 <div class="org-src-container">
 
@@ -475,7 +466,6 @@ material.ref      : <span class="org-variable-name">string</span> = <span class=
 </div>
 </div>
 </li>
-
 <li>Support + window model<br  /><div class="outline-text-5" id="text-3-2-2-8">
 <div class="org-src-container">
 
@@ -501,7 +491,6 @@ mapping.daughter_id.front_window : <span class="org-variable-name">string</span>
 </div>
 </div>
 </li>
-
 <li>Endcap model<br  /><div class="outline-text-5" id="text-3-2-2-9">
 <div class="org-src-container">
 
@@ -515,7 +504,6 @@ material.ref      : <span class="org-variable-name">string</span> = <span class=
 </div>
 </div>
 </li>
-
 <li>Detector model<br  /><div class="outline-text-5" id="text-3-2-2-10">
 <div class="org-src-container">
 
@@ -539,7 +527,6 @@ mapping.daughter_id.endcap                 : <span class="org-variable-name">str
 </div>
 </div>
 </li>
-
 <li>Full setup model<br  /><div class="outline-text-5" id="text-3-2-2-11">
 <div class="org-src-container">
 
@@ -566,7 +553,6 @@ mapping.daughter_id.source   : <span class="org-variable-name">string</span> = <
 </div>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-3-2-3" class="outline-4">
 <h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> World volume</h4>
 <div class="outline-text-4" id="text-3-2-3">
@@ -581,7 +567,6 @@ mapping.daughter_id.source   : <span class="org-variable-name">string</span> = <
 </div>
 </div>
 </li>
-
 <li>World volume<br  /><div class="outline-text-5" id="text-3-2-3-2">
 <div class="org-src-container">
 
@@ -627,7 +612,6 @@ mapping.daughter_id.setup : <span class="org-variable-name">string</span>  = <sp
 </li></ul>
 </div>
 </div>
-
 <div id="outline-container-sec-3-3" class="outline-3">
 <h3 id="sec-3-3"><span class="section-number-3">3.3</span> Mapping categories</h3>
 <div class="outline-text-3" id="text-3-3">
@@ -679,7 +663,6 @@ inherits : <span class="org-variable-name">string</span>   = <span class="org-st
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-4" class="outline-3">
 <h3 id="sec-3-4"><span class="section-number-3">3.4</span> Materials plugin</h3>
 <div class="outline-text-3" id="text-3-4">
@@ -704,6 +687,7 @@ to change the source sample isotope.
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-4-2" class="outline-4">
 <h4 id="sec-3-4-2"><span class="section-number-4">3.4.2</span> Logging priority</h4>
 <div class="outline-text-4" id="text-3-4-2">
@@ -715,6 +699,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-4-3" class="outline-4">
 <h4 id="sec-3-4-3"><span class="section-number-4">3.4.3</span> Files</h4>
 <div class="outline-text-4" id="text-3-4-3">
@@ -730,7 +715,6 @@ materials.files : string[4] as <span class="org-variable-name">path</span> =   <
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-4-4" class="outline-4">
 <h4 id="sec-3-4-4"><span class="section-number-4">3.4.4</span> Material aliases</h4>
 <div class="outline-text-4" id="text-3-4-4">
@@ -787,6 +771,7 @@ composition.fraction_mass : real   [1]  =   1.0
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-5" class="outline-3">
 <h3 id="sec-3-5"><span class="section-number-3">3.5</span> Visualization settings</h3>
 <div class="outline-text-3" id="text-3-5">
@@ -814,7 +799,6 @@ background_color : <span class="org-variable-name">integer</span>[3] =   0   0  
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-5-2" class="outline-4">
 <h4 id="sec-3-5-2"><span class="section-number-4">3.5.2</span> Geometry settings</h4>
 <div class="outline-text-4" id="text-3-5-2">
@@ -859,7 +843,6 @@ internal_lead.category.color : <span class="org-variable-name">integer</span>[3]
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-5-3" class="outline-4">
 <h4 id="sec-3-5-3"><span class="section-number-4">3.5.3</span> Particle settings</h4>
 <div class="outline-text-4" id="text-3-5-3">
@@ -877,7 +860,6 @@ delta_ray_from_alpha.color : <span class="org-variable-name">string</span> = <sp
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-5-4" class="outline-4">
 <h4 id="sec-3-5-4"><span class="section-number-4">3.5.4</span> Misc.</h4>
 <div class="outline-text-4" id="text-3-5-4">
@@ -899,6 +881,7 @@ save.prefix    : <span class="org-variable-name">string</span> = <span class="or
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> Pipeline general configuration</h2>
 <div class="outline-text-2" id="text-4">
@@ -945,6 +928,7 @@ factory.no_preload : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-1-2" class="outline-4">
 <h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> Service manager configuration</h4>
 <div class="outline-text-4" id="text-4-1-2">
@@ -957,6 +941,7 @@ service_manager.configuration : string[1] as <span class="org-variable-name">pat
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-1-3" class="outline-4">
 <h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> Configuration files for modules</h4>
 <div class="outline-text-4" id="text-4-1-3">
@@ -971,6 +956,7 @@ modules.configuration_files : string[2] as <span class="org-variable-name">path<
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-2" class="outline-3">
 <h3 id="sec-4-2"><span class="section-number-3">4.2</span> Service manager</h3>
 <div class="outline-text-3" id="text-4-2">
@@ -986,7 +972,6 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-2-2" class="outline-4">
 <h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> Name &amp; description</h4>
 <div class="outline-text-4" id="text-4-2-2">
@@ -1001,7 +986,6 @@ description : <span class="org-variable-name">string</span> = <span class="org-s
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-2-3" class="outline-4">
 <h4 id="sec-4-2-3"><span class="section-number-4">4.2.3</span> List of service files</h4>
 <div class="outline-text-4" id="text-4-2-3">
@@ -1015,6 +999,7 @@ services.configuration_files : string[1] as <span class="org-variable-name">path
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-3" class="outline-3">
 <h3 id="sec-4-3"><span class="section-number-3">4.3</span> DLL loader</h3>
 <div class="outline-text-3" id="text-4-3">
@@ -1066,7 +1051,6 @@ named <code>hpge_simulation</code>. The following table sets the libraries
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5" class="outline-2">
 <h2 id="sec-5"><span class="section-number-2">5</span> Modules</h2>
 <div class="outline-text-2" id="text-5">
@@ -1093,7 +1077,6 @@ module configuration to analyse simulated data.
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-1-2" class="outline-4">
 <h4 id="sec-5-1-2"><span class="section-number-4">5.1.2</span> Declaration &amp; description</h4>
 <div class="outline-text-4" id="text-5-1-2">
@@ -1106,6 +1089,7 @@ module configuration to analyse simulated data.
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-1-3" class="outline-4">
 <h4 id="sec-5-1-3"><span class="section-number-4">5.1.3</span> Logging priority</h4>
 <div class="outline-text-4" id="text-5-1-3">
@@ -1117,6 +1101,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-1-4" class="outline-4">
 <h4 id="sec-5-1-4"><span class="section-number-4">5.1.4</span> Bank &amp; service labels</h4>
 <div class="outline-text-4" id="text-5-1-4">
@@ -1134,7 +1119,6 @@ erase_former_SD_bank : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-1-5" class="outline-4">
 <h4 id="sec-5-1-5"><span class="section-number-4">5.1.5</span> Seed values</h4>
 <div class="outline-text-4" id="text-5-1-5">
@@ -1164,7 +1148,6 @@ manager.prng_states_save_modulo : <span class="org-variable-name">integer</span>
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-1-6" class="outline-4">
 <h4 id="sec-5-1-6"><span class="section-number-4">5.1.6</span> G4 manager</h4>
 <div class="outline-text-4" id="text-5-1-6">
@@ -1188,7 +1171,6 @@ manager.configuration_filename : string as <span class="org-variable-name">path<
 </div>
 </div>
 </li>
-
 <li>Manager section<br  /><div class="outline-text-6" id="text-5-1-6-1-2">
 <div class="org-src-container">
 
@@ -1209,7 +1191,6 @@ g4_visualization      : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 </li>
-
 <li>Event generator section<br  /><div class="outline-text-6" id="text-5-1-6-1-3">
 <div class="org-src-container">
 
@@ -1222,7 +1203,6 @@ manager.config : string as <span class="org-variable-name">path</span> = <span c
 </div>
 </div>
 </li>
-
 <li>Vertex generator section<br  /><div class="outline-text-6" id="text-5-1-6-1-4">
 <div class="org-src-container">
 
@@ -1235,7 +1215,6 @@ manager.config : string as <span class="org-variable-name">path</span> = <span c
 </div>
 </div>
 </li>
-
 <li>Detector construction<br  /><div class="outline-text-6" id="text-5-1-6-1-5">
 <div class="org-src-container">
 
@@ -1277,7 +1256,6 @@ sensitive.germanium_SD.track_neutron                  : <span class="org-variabl
 </div>
 </div>
 </li>
-
 <li>Physics list<br  /><div class="outline-text-6" id="text-5-1-6-1-6">
 <div class="org-src-container">
 
@@ -1308,7 +1286,6 @@ physics_constructors.em.config        : string as <span class="org-variable-name
 </div>
 </div>
 </li>
-
 <li>Run, event, tracking&#x2026; actions<br  /><div class="outline-text-6" id="text-5-1-6-1-7">
 <div class="org-src-container">
 
@@ -1349,7 +1326,6 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </li></ul>
 </li>
-
 <li>Physics list<br  /><ul class="org-ul"><li>Particles<br  /><div class="outline-text-6" id="text-5-1-6-2-1">
 <div class="org-src-container">
 
@@ -1400,7 +1376,6 @@ use_generic_ion          : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
-
 <li>EM processes<br  /><div class="outline-text-6" id="text-5-1-6-2-2">
 <div class="org-src-container">
 
@@ -1466,6 +1441,7 @@ use_generic_ion          : <span class="org-variable-name">boolean</span> = 1
 </div>
 </li></ul>
 </li>
+
 <li>Step hit processors<br  /><div class="outline-text-5" id="text-5-1-6-3">
 </div>
 <ul class="org-ul"><li>Preamble<br  /><div class="outline-text-6" id="text-5-1-6-3-1">
@@ -1478,7 +1454,6 @@ use_generic_ion          : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
-
 <li>Crystal hit processor<br  /><div class="outline-text-6" id="text-5-1-6-3-2">
 <div class="org-src-container">
 
@@ -1501,7 +1476,6 @@ cluster.space_range   : real as <span class="org-variable-name">length</span> = 
 </div>
 </div>
 </li>
-
 <li>Visualization hit processors<br  /><div class="outline-text-6" id="text-5-1-6-3-3">
 <div class="org-src-container">
 
@@ -1520,7 +1494,6 @@ geometry.volumes.all : <span class="org-variable-name">boolean</span> = 1
 </li></ul>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-5-1-7" class="outline-4">
 <h4 id="sec-5-1-7"><span class="section-number-4">5.1.7</span> Vertex generator</h4>
 <div class="outline-text-4" id="text-5-1-7">
@@ -1552,7 +1525,6 @@ vg_list : string[1] as <span class="org-variable-name">path</span> = <span class
 </div>
 </div>
 </li>
-
 <li>Vertex generator definitions<br  /><div class="outline-text-5" id="text-5-1-7-2">
 </div>
 <ul class="org-ul"><li>Preamble<br  /><div class="outline-text-6" id="text-5-1-7-2-1">
@@ -1565,7 +1537,6 @@ vg_list : string[1] as <span class="org-variable-name">path</span> = <span class
 </div>
 </div>
 </li>
-
 <li>Point source vertex<br  /><div class="outline-text-6" id="text-5-1-7-2-2">
 <p>
 Generate vertex from an arbitrary point of the experimental setup
@@ -1589,7 +1560,6 @@ spot.z : real as <span class="org-variable-name">length</span> =    0.0 mm
 </div>
 </div>
 </li>
-
 <li>Source bulk<br  /><div class="outline-text-6" id="text-5-1-7-2-3">
 <p>
 Generate vertex in the bulk volume of the sample
@@ -1612,7 +1582,6 @@ mode   : <span class="org-variable-name">string</span>  = <span class="org-strin
 </li></ul>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-5-1-8" class="outline-4">
 <h4 id="sec-5-1-8"><span class="section-number-4">5.1.8</span> Event generator</h4>
 <div class="outline-text-4" id="text-5-1-8">
@@ -1639,7 +1608,6 @@ generators.configuration_files : string[2] as <span class="org-variable-name">pa
 </div>
 </div>
 </li>
-
 <li>Event generator definitions<br  /><ul class="org-ul"><li>Background events<br  /><div class="outline-text-6" id="text-5-1-8-2-1">
 <div class="org-src-container">
 
@@ -1661,7 +1629,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>234</sup>Th<br  /><div class="outline-text-7" id="text-5-1-8-2-1-2">
 <div class="org-src-container">
 
@@ -1672,7 +1639,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>214</sup>Pb<br  /><div class="outline-text-7" id="text-5-1-8-2-1-3">
 <div class="org-src-container">
 
@@ -1683,7 +1649,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>214</sup>Bi<br  /><div class="outline-text-7" id="text-5-1-8-2-1-4">
 <div class="org-src-container">
 
@@ -1694,7 +1659,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>210</sup>Pb<br  /><div class="outline-text-7" id="text-5-1-8-2-1-5">
 <div class="org-src-container">
 
@@ -1705,7 +1669,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>210</sup>Pb+&nbsp;<sup>210</sup>Bi<br  /><div class="outline-text-7" id="text-5-1-8-2-1-6">
 <div class="org-src-container">
 
@@ -1716,7 +1679,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>212</sup>Pb<br  /><div class="outline-text-7" id="text-5-1-8-2-1-7">
 <div class="org-src-container">
 
@@ -1727,7 +1689,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>212</sup>Bi+&nbsp;<sup>212</sup>Po<br  /><div class="outline-text-7" id="text-5-1-8-2-1-8">
 <div class="org-src-container">
 
@@ -1738,7 +1699,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>214</sup>Bi+&nbsp;<sup>214</sup>Po<br  /><div class="outline-text-7" id="text-5-1-8-2-1-9">
 <div class="org-src-container">
 
@@ -1749,7 +1709,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>22</sup>Na<br  /><div class="outline-text-7" id="text-5-1-8-2-1-10">
 <div class="org-src-container">
 
@@ -1760,7 +1719,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </div>
 </li>
-
 <li>&nbsp;<sup>54</sup>Mn<br  /><div class="outline-text-7" id="text-5-1-8-2-1-11">
 <div class="org-src-container">
 
@@ -1772,7 +1730,6 @@ decay_isotope   : <span class="org-variable-name">string</span>  = <span class="
 </div>
 </li></ul>
 </li>
-
 <li>Misc. generators<br  /><div class="outline-text-6" id="text-5-1-8-2-2">
 <div class="org-src-container">
 
@@ -1805,7 +1762,6 @@ max_energy            : real as <span class="org-variable-name">energy</span> = 
 </div>
 </div>
 </li>
-
 <li>1 MeV electron beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-2">
 <div class="org-src-container">
 
@@ -1818,7 +1774,6 @@ randomized_direction  : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
-
 <li>27 keV gamma beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-3">
 <div class="org-src-container">
 
@@ -1831,7 +1786,6 @@ randomized_direction  : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
-
 <li>186 keV gamma beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-4">
 <div class="org-src-container">
 
@@ -1844,7 +1798,6 @@ randomized_direction  : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
-
 <li>352 keV gamma beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-5">
 <div class="org-src-container">
 
@@ -1857,7 +1810,6 @@ randomized_direction  : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
-
 <li>1 GeV muon beam<br  /><div class="outline-text-7" id="text-5-1-8-2-2-6">
 <div class="org-src-container">
 
@@ -1874,7 +1826,6 @@ randomized_direction  : <span class="org-variable-name">boolean</span> = 1
 </li></ul>
 </div>
 </div>
-
 <div id="outline-container-sec-5-2" class="outline-3">
 <h3 id="sec-5-2"><span class="section-number-3">5.2</span> Analysis modules</h3>
 <div class="outline-text-3" id="text-5-2">
@@ -1891,7 +1842,6 @@ randomized_direction  : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-2-2" class="outline-4">
 <h4 id="sec-5-2-2"><span class="section-number-4">5.2.2</span> Basic analysis module</h4>
 <div class="outline-text-4" id="text-5-2-2">
@@ -1913,7 +1863,6 @@ ROOT_filename : string as <span class="org-variable-name">path</span> = <span cl
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-2-3" class="outline-4">
 <h4 id="sec-5-2-3"><span class="section-number-4">5.2.3</span> Simulation &rarr; Analysis chain</h4>
 <div class="outline-text-4" id="text-5-2-3">
@@ -1934,7 +1883,6 @@ modules : string [2] = <span class="org-sh-escaped-newline">\</span>
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> Services</h2>
 <div class="outline-text-2" id="text-6">
@@ -1957,6 +1905,7 @@ software components, including other services or data processing modules (see
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-2" class="outline-3">
 <h3 id="sec-6-2"><span class="section-number-3">6.2</span> Context service</h3>
 <div class="outline-text-3" id="text-6-2">
@@ -1979,6 +1928,7 @@ backup.file : string as <span class="org-variable-name">path</span> = <span clas
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-3" class="outline-3">
 <h3 id="sec-6-3"><span class="section-number-3">6.3</span> Geometry service</h3>
 <div class="outline-text-3" id="text-6-3">
@@ -2010,6 +1960,7 @@ manager.no_excluded_categories : <span class="org-variable-name">boolean</span> 
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-7" class="outline-2">
 <h2 id="sec-7"><span class="section-number-2">7</span> Running SN@ilWare processing chain</h2>
 <div class="outline-text-2" id="text-7">
@@ -2023,6 +1974,7 @@ run <code>make</code> within this working directory.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-7-2" class="outline-3">
 <h3 id="sec-7-2"><span class="section-number-3">7.2</span> Source code compilation</h3>
 <div class="outline-text-3" id="text-7-2">
@@ -2046,6 +1998,7 @@ make install
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-7-3" class="outline-3">
 <h3 id="sec-7-3"><span class="section-number-3">7.3</span> Use and execute <code>hpge_simulation</code> module</h3>
 <div class="outline-text-3" id="text-7-3">
@@ -2118,20 +2071,13 @@ name. You can change the output directory and output file name in <i>this sectio
 <h2 class="footnotes"> </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
-At the time of writing this document, emacs version is 24.3.1
-</p></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
-Emacs lisp function can be run using <code>ALT-x</code> command and typing the function
-name.
-</p></div>
 
 
 </div>
 </div></div>
 <div id="postamble" class="status">
-File under git version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/92312965f8de22c1c092eb693f2114b381d09d83">9231296</a> - 2014-04-16
+File under git version control - commit <a href="https://github.com/xgarrido/emacs-starter-kit/commit/418c55adf6993acb788e0f08bcf6987b3aff86b6">418c55a</a> - 2014-04-19
 </div>
 </body>
 </html>

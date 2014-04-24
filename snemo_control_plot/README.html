@@ -140,6 +140,7 @@ programs.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> Content</h2>
 <div class="outline-text-2" id="text-2">
@@ -148,13 +149,13 @@ The code is organised as follow :
 </p>
 
 <dl class="org-dl">
-<dt> <code>README.org</code> </dt><dd>This file holds the pipeline configuration + the documentation
+<dt><code>README.org</code></dt><dd>This file holds the pipeline configuration + the documentation
 on how to use the <code>snemo_control_plot</code> module.
 </dd>
-<dt> <code>Makefile</code> </dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
+<dt><code>Makefile</code></dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
 parsing and tangling this file <i>i.e.</i> <code>README.org</code> (see below).
 </dd>
-<dt> <code>source</code> </dt><dd>This directory holds the source code of the <code>snemo_control_plot</code>
+<dt><code>source</code></dt><dd>This directory holds the source code of the <code>snemo_control_plot</code>
 module. It also has a <code>CMakeLists.txt</code> file in order to compile,
 build and install all the software pieces through <code>cmake</code> rules.
 </dd>
@@ -168,7 +169,7 @@ the basic idea is to give a "literate" way to navigate through the different
 sections, each of them representing a part of the pipeline
 configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
 hide and the user can focus on relevant parts.
-</p>
+ <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara"> At the time of writing this document, emacs version is 24.3.1 </p></div>
 
 <p>
 To export the different configuration files, you can run <code>org-babel-tangle</code>
@@ -176,9 +177,10 @@ which will tangle each code block into the given file<sup><a id="fnr.2" class="f
 <code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
 process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
 "occupies" emacs during its execution).
-</p>
+ <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara"> Emacs lisp function can be run using <code>ALT-x</code> command and typing the function name. </p></div>
 </div>
 </div>
+
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><span class="section-number-2">3</span> Pipeline general configuration</h2>
 <div class="outline-text-2" id="text-3">
@@ -225,6 +227,7 @@ factory.no_preload : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-1-2" class="outline-4">
 <h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Service manager configuration</h4>
 <div class="outline-text-4" id="text-3-1-2">
@@ -237,6 +240,7 @@ service_manager.configuration : string[1] as <span class="org-variable-name">pat
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-1-3" class="outline-4">
 <h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> Configuration files for modules</h4>
 <div class="outline-text-4" id="text-3-1-3">
@@ -250,6 +254,7 @@ modules.configuration_files : string[1] as <span class="org-variable-name">path<
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-2" class="outline-3">
 <h3 id="sec-3-2"><span class="section-number-3">3.2</span> Service manager</h3>
 <div class="outline-text-3" id="text-3-2">
@@ -265,7 +270,6 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-2-2" class="outline-4">
 <h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Name &amp; description</h4>
 <div class="outline-text-4" id="text-3-2-2">
@@ -280,7 +284,6 @@ description : <span class="org-variable-name">string</span> = <span class="org-s
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-2-3" class="outline-4">
 <h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> List of service files</h4>
 <div class="outline-text-4" id="text-3-2-3">
@@ -294,6 +297,7 @@ services.configuration_files : string[1] as <span class="org-variable-name">path
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-3" class="outline-3">
 <h3 id="sec-3-3"><span class="section-number-3">3.3</span> DLL loader</h3>
 <div class="outline-text-3" id="text-3-3">
@@ -322,7 +326,6 @@ receives a table list and builds the corresponding <code>dlls.conf</code> file.
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-3-2" class="outline-4">
 <h4 id="sec-3-3-2"><span class="section-number-4">3.3.2</span> Libraries</h4>
 <div class="outline-text-4" id="text-3-3-2">
@@ -367,7 +370,6 @@ named <code>snemo_bb0nu_studies</code>. The following table sets the libraries
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> SuperNEMO &beta;&beta;0&nu; modules</h2>
 <div class="outline-text-2" id="text-4">
@@ -398,7 +400,6 @@ processing a file is <code>scp_module</code>.
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-1-2" class="outline-4">
 <h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> Declaration &amp; description</h4>
 <div class="outline-text-4" id="text-4-1-2">
@@ -411,6 +412,7 @@ processing a file is <code>scp_module</code>.
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-1-3" class="outline-4">
 <h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> Logging priority</h4>
 <div class="outline-text-4" id="text-4-1-3">
@@ -422,6 +424,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-1-4" class="outline-4">
 <h4 id="sec-4-1-4"><span class="section-number-4">4.1.4</span> Histogram service label</h4>
 <div class="outline-text-4" id="text-4-1-4">
@@ -437,6 +440,7 @@ Histo_label : <span class="org-variable-name">string</span> = <span class="org-s
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-2" class="outline-3">
 <h3 id="sec-4-2"><span class="section-number-3">4.2</span> Histogram declarations</h3>
 <div class="outline-text-3" id="text-4-2">
@@ -471,6 +475,7 @@ histograms all belong to the <code>__template</code> group.
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4-2-2" class="outline-4">
 <h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> Simulated data bank histograms</h4>
 <div class="outline-text-4" id="text-4-2-2">
@@ -510,6 +515,7 @@ display.yaxis.label : <span class="org-variable-name">string</span> = <span clas
 </div>
 </div>
 </li>
+
 <li>Number of calorimeter hits<br  /><div class="outline-text-5" id="text-4-2-2-2">
 <div class="org-src-container">
 
@@ -553,6 +559,7 @@ display.color : <span class="org-variable-name">string</span> = <span class="org
 </div>
 </li></ul>
 </div>
+
 <div id="outline-container-sec-4-2-3" class="outline-4">
 <h4 id="sec-4-2-3"><span class="section-number-4">4.2.3</span> Calibrated data bank histograms</h4>
 <div class="outline-text-4" id="text-4-2-3">
@@ -592,6 +599,7 @@ display.yaxis.label : <span class="org-variable-name">string</span> = <span clas
 </div>
 </div>
 </li>
+
 <li>Number of calibrated calorimeter hits<br  /><div class="outline-text-5" id="text-4-2-3-2">
 <div class="org-src-container">
 
@@ -635,6 +643,7 @@ display.color : <span class="org-variable-name">string</span> = <span class="org
 </div>
 </li></ul>
 </div>
+
 <div id="outline-container-sec-4-2-4" class="outline-4">
 <h4 id="sec-4-2-4"><span class="section-number-4">4.2.4</span> Tracker clustering data bank histograms</h4>
 <div class="outline-text-4" id="text-4-2-4">
@@ -677,6 +686,7 @@ display.yaxis.label : <span class="org-variable-name">string</span> = <span clas
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5" class="outline-2">
 <h2 id="sec-5"><span class="section-number-2">5</span> Services</h2>
 <div class="outline-text-2" id="text-5">
@@ -699,6 +709,7 @@ software components, including other services or data processing modules (see
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-2" class="outline-3">
 <h3 id="sec-5-2"><span class="section-number-3">5.2</span> Context service</h3>
 <div class="outline-text-3" id="text-5-2">
@@ -721,6 +732,7 @@ backup.file : string as <span class="org-variable-name">path</span> = <span clas
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-3" class="outline-3">
 <h3 id="sec-5-3"><span class="section-number-3">5.3</span> Histogram service</h3>
 <div class="outline-text-3" id="text-5-3">
@@ -768,6 +780,7 @@ output_files : string[1] as <span class="org-variable-name">path</span> =       
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> Running SN@ilWare processing chain</h2>
 <div class="outline-text-2" id="text-6">
@@ -781,6 +794,7 @@ run <code>make</code> within this working directory.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-6-2" class="outline-3">
 <h3 id="sec-6-2"><span class="section-number-3">6.2</span> Source code compilation</h3>
 <div class="outline-text-3" id="text-6-2">
@@ -804,6 +818,7 @@ make install
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-3" class="outline-3">
 <h3 id="sec-6-3"><span class="section-number-3">6.3</span> Use and execute <code>snemo_control_plot</code> module</h3>
 <div class="outline-text-3" id="text-6-3">
@@ -849,7 +864,7 @@ It will run the <code>scp_module</code> over the input file<sup><a id="fnr.3" cl
 file containing several histograms. This file is located by default, in
 <code>/tmp/${USER}/snemo.d</code> directory under the <code>snemo_control_plot_histos.root</code>
 name. You can change the output directory and output file name in <a href="#sec-5-3">this section</a>.
-</p>
+ <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara"> here we assume that you already have generated a data record. The <code>snemo_control_plot</code> only generate the plot and does not neither simulation nor reconstruction. </p></div>
 </div>
 </div>
 </div>
@@ -857,26 +872,14 @@ name. You can change the output directory and output file name in <a href="#sec-
 <h2 class="footnotes"> </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
-At the time of writing this document, emacs version is 24.3.1
-</p></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
-Emacs lisp function can be run using <code>ALT-x</code> command and typing the function
-name.
-</p></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
-here we assume that you already have generated a data record. The
-<code>snemo_control_plot</code> only generate the plot and does not neither simulation nor
-reconstruction.
-</p></div>
 
 
 </div>
 </div></div>
 <div id="postamble" class="status">
-File under git version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/92312965f8de22c1c092eb693f2114b381d09d83">9231296</a> - 2014-04-16
+File under git version control - commit <a href="https://github.com/xgarrido/emacs-starter-kit/commit/418c55adf6993acb788e0f08bcf6987b3aff86b6">418c55a</a> - 2014-04-19
 </div>
 </body>
 </html>

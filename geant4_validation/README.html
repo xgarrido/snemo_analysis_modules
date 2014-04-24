@@ -154,6 +154,7 @@ programs.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> Content</h2>
 <div class="outline-text-2" id="text-2">
@@ -162,13 +163,13 @@ The code is organised as follow :
 </p>
 
 <dl class="org-dl">
-<dt> <code>README.org</code> </dt><dd>This file holds the pipeline configuration + the documentation
+<dt><code>README.org</code></dt><dd>This file holds the pipeline configuration + the documentation
 on how to use the <code>geant4_validation</code> module.
 </dd>
-<dt> <code>Makefile</code> </dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
+<dt><code>Makefile</code></dt><dd>The <code>Makefile</code> allows to generate the pipeline configuration by
 parsing and tangling this file <i>i.e.</i> <code>README.org</code> (see below).
 </dd>
-<dt> <code>source</code> </dt><dd>This directory holds the source code of the <code>geant4_validation</code>
+<dt><code>source</code></dt><dd>This directory holds the source code of the <code>geant4_validation</code>
 module. It also has a <code>CMakeLists.txt</code> file in order to compile,
 build and install all the software pieces through <code>cmake</code> rules.
 </dd>
@@ -182,7 +183,7 @@ the basic idea is to give a "literate" way to navigate through the different
 sections, each of them representing a part of the pipeline
 configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
 hide and the user can focus on relevant parts.
-</p>
+ <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara"> At the time of writing this document, emacs version is 24.3.1 </p></div>
 
 <p>
 To export the different configuration files, you can run <code>org-babel-tangle</code>
@@ -190,7 +191,7 @@ which will tangle each code block into the given file<sup><a id="fnr.2" class="f
 <code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
 process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
 "occupies" emacs during its execution).
-</p>
+ <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara"> Emacs lisp function can be run using <code>ALT-x</code> command and typing the function name. </p></div>
 </div>
 </div>
 
@@ -218,7 +219,6 @@ setup_version : <span class="org-variable-name">string</span> = <span class="org
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-1-2" class="outline-4">
 <h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Logging priority</h4>
 <div class="outline-text-4" id="text-3-1-2">
@@ -230,7 +230,6 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-1-3" class="outline-4">
 <h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> Geometry factory</h4>
 <div class="outline-text-4" id="text-3-1-3">
@@ -247,6 +246,7 @@ factory.logging.priority : <span class="org-variable-name">string</span> = <span
 </div>
 </div>
 </li>
+
 <li>Geometry files<br  /><div class="outline-text-5" id="text-3-1-3-2">
 <div class="org-src-container">
 
@@ -260,6 +260,7 @@ factory.geom_files : string[3] as <span class="org-variable-name">path</span> = 
 </div>
 </li></ul>
 </div>
+
 <div id="outline-container-sec-3-1-4" class="outline-4">
 <h4 id="sec-3-1-4"><span class="section-number-4">3.1.4</span> ID manager</h4>
 <div class="outline-text-4" id="text-3-1-4">
@@ -272,6 +273,7 @@ id_mgr.logging.priority : <span class="org-variable-name">string</span> = <span 
 </div>
 </div>
 </li>
+
 <li>Category list<br  /><div class="outline-text-5" id="text-3-1-4-2">
 <p>
 Categories are used to assign a unique id number (integer) to a geometrical
@@ -287,7 +289,6 @@ id_mgr.categories_list : string as <span class="org-variable-name">path</span> =
 </div>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-3-1-5" class="outline-4">
 <h4 id="sec-3-1-5"><span class="section-number-4">3.1.5</span> Mapping configuration</h4>
 <div class="outline-text-4" id="text-3-1-5">
@@ -302,7 +303,6 @@ mapping.max_depth : <span class="org-variable-name">integer</span> = 100
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-1-6" class="outline-4">
 <h4 id="sec-3-1-6"><span class="section-number-4">3.1.6</span> Plugins configuration</h4>
 <div class="outline-text-4" id="text-3-1-6">
@@ -323,6 +323,7 @@ plugins.configuration_files : string[2] as <span class="org-variable-name">path<
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-2" class="outline-3">
 <h3 id="sec-3-2"><span class="section-number-3">3.2</span> Geometry models</h3>
 <div class="outline-text-3" id="text-3-2">
@@ -340,7 +341,6 @@ plugins.configuration_files : string[2] as <span class="org-variable-name">path<
 </div>
 </div>
 </li>
-
 <li>Wrapping model<br  /><ul class="org-ul"><li>z-position (front) wrapping<br  /><div class="outline-text-6" id="text-3-2-1-2-1">
 <div class="org-src-container">
 
@@ -366,7 +366,6 @@ material.ref : <span class="org-variable-name">string</span>  = <span class="org
 </div>
 </div>
 </li>
-
 <li>x-sides wrapping<br  /><ul class="org-ul"><li>Model<br  /><div class="outline-text-7" id="text-3-2-1-2-2-1">
 <div class="org-src-container">
 
@@ -392,7 +391,6 @@ material.ref      : <span class="org-variable-name">string</span>  = <span class
 </div>
 </div>
 </li>
-
 <li>Positionning<br  /><div class="outline-text-7" id="text-3-2-1-2-2-2">
 <div class="org-src-container">
 
@@ -441,6 +439,7 @@ material.ref      : <span class="org-variable-name">string</span>  = <span class
 </div>
 </li></ul>
 </li>
+
 <li>y-sides wrapping<br  /><ul class="org-ul"><li>Model<br  /><div class="outline-text-7" id="text-3-2-1-2-3-1">
 <div class="org-src-container">
 
@@ -466,7 +465,6 @@ material.ref : <span class="org-variable-name">string</span> = <span class="org-
 </div>
 </div>
 </li>
-
 <li>Positionning<br  /><div class="outline-text-7" id="text-3-2-1-2-3-2">
 <div class="org-src-container">
 
@@ -516,7 +514,6 @@ material.ref      : <span class="org-variable-name">string</span>  = <span class
 </li></ul>
 </li></ul>
 </li>
-
 <li>Scintillator model<br  /><ul class="org-ul"><li>Block model<br  /><div class="outline-text-6" id="text-3-2-1-3-1">
 <p>
 We first design the shape and the dimensions of the block
@@ -555,7 +552,7 @@ material.ref      : <span class="org-variable-name">string</span> = <span class=
 <p>
 Finally, we attach to it a sensitive category to ease the interface between
 <code>mctools</code> and Geant4 digitization<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>
-</p>
+ <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara"> We recommend that you name any sensitive category with the <code>_SD</code> suffix. This is to ease the reading of other configuration files at the simulation level (step hit processors). Also note that if you prefix the sensitive category name with two underscores (example: <code>__test_SD</code>), then the sensitive category is considered as "private" (non official) and may be processed in some special way by the simulation engine. </p></div>
 <div class="org-src-container">
 
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The 'sensitive' category attached to this detector volume</span>
@@ -564,7 +561,6 @@ sensitive.category : <span class="org-variable-name">string</span>  = <span clas
 </div>
 </div>
 </li>
-
 <li>Wrapped block model<br  /><div class="outline-text-6" id="text-3-2-1-3-2">
 <p>
 The wrapped model consists of wrapping with mylar the previous "nude" block. We
@@ -645,7 +641,6 @@ mapping.daughter_id.top_wrapping       : <span class="org-variable-name">string<
 </div>
 </li></ul>
 </li>
-
 <li>Light guide model<br  /><ul class="org-ul"><li>Basic light guide<br  /><div class="outline-text-6" id="text-3-2-1-4-1">
 <div class="org-src-container">
 
@@ -680,12 +675,10 @@ material.ref : <span class="org-variable-name">string</span>  = <span class="org
 </div>
 </div>
 </li>
-
 <li>Rotated light guide<br  /><div class="outline-text-6" id="text-3-2-1-4-2">
 <div class="org-src-container">
 
-<pre class="src src-sh"><span class="org-comment-delimiter">########################################################################</span>
-[<span class="org-variable-name">name</span>=<span class="org-string">"rotated_light_guide.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::rotated_boxed_model"</span>]
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"rotated_light_guide.model"</span> <span class="org-variable-name">type</span>=<span class="org-string">"geomtools::rotated_boxed_model"</span>]
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@config The configuration parameters for the rotated light guide</span>
 
@@ -714,7 +707,6 @@ material.ref  : <span class="org-variable-name">string</span>  = <span class="or
 </div>
 </li></ul>
 </li>
-
 <li>PMT model<br  /><div class="outline-text-5" id="text-3-2-1-5">
 <div class="org-src-container">
 
@@ -746,7 +738,6 @@ material.ref : <span class="org-variable-name">string</span>  = <span class="org
 </div>
 </div>
 </li>
-
 <li>Optical module<br  /><div class="outline-text-5" id="text-3-2-1-6">
 <p>
 Given the previous model, we stack them to get a full optical module from PMT &rarr;
@@ -792,7 +783,6 @@ mapping.daughter_id.light_guide : <span class="org-variable-name">string</span> 
 </div>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-3-2-2" class="outline-4">
 <h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Source</h4>
 <div class="outline-text-4" id="text-3-2-2">
@@ -807,7 +797,6 @@ mapping.daughter_id.light_guide : <span class="org-variable-name">string</span> 
 </div>
 </div>
 </li>
-
 <li>Film model<br  /><div class="outline-text-5" id="text-3-2-2-2">
 <div class="org-src-container">
 
@@ -830,7 +819,6 @@ material.ref : <span class="org-variable-name">string</span> = <span class="org-
 </div>
 </div>
 </li>
-
 <li>Source support model<br  /><div class="outline-text-5" id="text-3-2-2-3">
 <div class="org-src-container">
 
@@ -856,6 +844,7 @@ material.ref : <span class="org-variable-name">string</span> = <span class="org-
 </div>
 </div>
 </li>
+
 <li>Source model<br  /><div class="outline-text-5" id="text-3-2-2-4">
 <p>
 The source model will used the two previous models by placing them "internally"
@@ -915,7 +904,6 @@ mapping.daughter_id.support : <span class="org-variable-name">string</span>  = <
 </div>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-3-2-3" class="outline-4">
 <h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> Laboratory &amp; world volume</h4>
 <div class="outline-text-4" id="text-3-2-3">
@@ -930,7 +918,6 @@ mapping.daughter_id.support : <span class="org-variable-name">string</span>  = <
 </div>
 </div>
 </li>
-
 <li>Absorber<br  /><div class="outline-text-5" id="text-3-2-3-2">
 <div class="org-src-container">
 
@@ -956,7 +943,6 @@ material.ref      : <span class="org-variable-name">string</span>  = <span class
 </div>
 </div>
 </li>
-
 <li>Black box<br  /><div class="outline-text-5" id="text-3-2-3-3">
 <div class="org-src-container">
 
@@ -991,7 +977,6 @@ material.ref : <span class="org-variable-name">string</span>  = <span class="org
 </div>
 </div>
 </li>
-
 <li>Lab. model<br  /><div class="outline-text-5" id="text-3-2-3-4">
 <div class="org-src-container">
 
@@ -1050,7 +1035,6 @@ mapping.daughter_id.detector : <span class="org-variable-name">string</span>  = 
 </div>
 </div>
 </li>
-
 <li>World volume<br  /><div class="outline-text-5" id="text-3-2-3-5">
 <div class="org-src-container">
 
@@ -1096,7 +1080,6 @@ mapping.daughter_id.setup : <span class="org-variable-name">string</span>  = <sp
 </li></ul>
 </div>
 </div>
-
 <div id="outline-container-sec-3-3" class="outline-3">
 <h3 id="sec-3-3"><span class="section-number-3">3.3</span> Mapping categories</h3>
 <div class="outline-text-3" id="text-3-3">
@@ -1201,7 +1184,6 @@ inherits : <span class="org-variable-name">string</span>[1] = <span class="org-s
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-4" class="outline-3">
 <h3 id="sec-3-4"><span class="section-number-3">3.4</span> Materials plugin</h3>
 <div class="outline-text-3" id="text-3-4">
@@ -1226,6 +1208,7 @@ to change the source foil isotope.
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-4-2" class="outline-4">
 <h4 id="sec-3-4-2"><span class="section-number-4">3.4.2</span> Logging priority</h4>
 <div class="outline-text-4" id="text-3-4-2">
@@ -1237,6 +1220,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-4-3" class="outline-4">
 <h4 id="sec-3-4-3"><span class="section-number-4">3.4.3</span> Files</h4>
 <div class="outline-text-4" id="text-3-4-3">
@@ -1252,7 +1236,6 @@ materials.configuration_files : string[4] as <span class="org-variable-name">pat
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-4-4" class="outline-4">
 <h4 id="sec-3-4-4"><span class="section-number-4">3.4.4</span> Material aliases</h4>
 <div class="outline-text-4" id="text-3-4-4">
@@ -1307,6 +1290,7 @@ material : <span class="org-variable-name">string</span> = <span class="org-stri
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-5" class="outline-3">
 <h3 id="sec-3-5"><span class="section-number-3">3.5</span> Magnetic field plugin</h3>
 <div class="outline-text-3" id="text-3-5">
@@ -1326,6 +1310,7 @@ material : <span class="org-variable-name">string</span> = <span class="org-stri
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-5-2" class="outline-4">
 <h4 id="sec-3-5-2"><span class="section-number-4">3.5.2</span> Logging priority</h4>
 <div class="outline-text-4" id="text-3-5-2">
@@ -1337,6 +1322,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-5-3" class="outline-4">
 <h4 id="sec-3-5-3"><span class="section-number-4">3.5.3</span> EM field manager configuration</h4>
 <div class="outline-text-4" id="text-3-5-3">
@@ -1380,6 +1366,7 @@ manager.geom_map.associations.lab.field_name : <span class="org-variable-name">s
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-3-5-4" class="outline-4">
 <h4 id="sec-3-5-4"><span class="section-number-4">3.5.4</span> Magnetic fields</h4>
 <div class="outline-text-4" id="text-3-5-4">
@@ -1394,7 +1381,6 @@ manager.geom_map.associations.lab.field_name : <span class="org-variable-name">s
 </div>
 </div>
 </li>
-
 <li>Constant magnetic field<br  /><div class="outline-text-5" id="text-3-5-4-2">
 <div class="org-src-container">
 
@@ -1413,6 +1399,7 @@ magnetic_field.coordinates : <span class="org-variable-name">real</span>[3] = 0.
 </li></ul>
 </div>
 </div>
+
 <div id="outline-container-sec-3-6" class="outline-3">
 <h3 id="sec-3-6"><span class="section-number-3">3.6</span> Visualization settings</h3>
 <div class="outline-text-3" id="text-3-6">
@@ -1440,7 +1427,6 @@ background_color : <span class="org-variable-name">integer</span>[3] =   0   0  
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-6-2" class="outline-4">
 <h4 id="sec-3-6-2"><span class="section-number-4">3.6.2</span> Geometry settings</h4>
 <div class="outline-text-4" id="text-3-6-2">
@@ -1482,7 +1468,6 @@ source_support.gc.color      : <span class="org-variable-name">integer</span>[3]
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-6-3" class="outline-4">
 <h4 id="sec-3-6-3"><span class="section-number-4">3.6.3</span> Particle settings</h4>
 <div class="outline-text-4" id="text-3-6-3">
@@ -1497,7 +1482,6 @@ electron.color : <span class="org-variable-name">string</span> = <span class="or
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3-6-4" class="outline-4">
 <h4 id="sec-3-6-4"><span class="section-number-4">3.6.4</span> Misc.</h4>
 <div class="outline-text-4" id="text-3-6-4">
@@ -1519,6 +1503,7 @@ save.prefix    : <span class="org-variable-name">string</span> = <span class="or
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> Simulation setup</h2>
 <div class="outline-text-2" id="text-4">
@@ -1539,7 +1524,6 @@ logging.priority      : <span class="org-variable-name">string</span> = <span cl
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-1-2" class="outline-4">
 <h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> Event generator</h4>
 <div class="outline-text-4" id="text-4-1-2">
@@ -1558,7 +1542,6 @@ manager.config : string as <span class="org-variable-name">path</span> = <span c
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-1-3" class="outline-4">
 <h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> Vertex generator</h4>
 <div class="outline-text-4" id="text-4-1-3">
@@ -1577,7 +1560,6 @@ manager.config : string as <span class="org-variable-name">path</span> = <span c
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-1-4" class="outline-4">
 <h4 id="sec-4-1-4"><span class="section-number-4">4.1.4</span> Detector construction</h4>
 <div class="outline-text-4" id="text-4-1-4">
@@ -1596,12 +1578,13 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
+
 <li>GDML scheme and options<br  /><div class="outline-text-5" id="text-4-1-4-2">
 <p>
 The Geometry Description Markup Language is an application-indepedent geometry
-description format based on XML<sup><a id="fnr.1.100" class="footref" href="#fn.1">1</a></sup>. It is used as Geant4 toolkit bindings
+description format based on XML<sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup>. It is used as Geant4 toolkit bindings
 through <code>gemotools</code> converters.
-</p>
+ <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> <p class="footpara"> <a href="http://gdml.web.cern.ch/GDML">http://gdml.web.cern.ch/GDML</a> </p></div>
 
 <div class="org-src-container">
 
@@ -1617,6 +1600,7 @@ gdml.no_validation   : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 </li>
+
 <li>Step hit processors<br  /><div class="outline-text-5" id="text-4-1-4-3">
 <p>
 Step hit processors are used to convert Geant4 steps into detector hits for
@@ -1634,6 +1618,7 @@ hit_processor_factory.config : string as <span class="org-variable-name">path</s
 </div>
 </div>
 </li>
+
 <li>Sensitive detectors<br  /><div class="outline-text-5" id="text-4-1-4-4">
 <p>
 This category defines sensitive detectors where special treatments of Geant4 steps
@@ -1668,6 +1653,7 @@ sensitive.scin_SD.track_gamma                     : <span class="org-variable-na
 </div>
 </div>
 </li>
+
 <li>Geant4 step hit limits<br  /><div class="outline-text-5" id="text-4-1-4-5">
 <p>
 The following code defines geometry models where Geant4 steps are size limited.
@@ -1692,7 +1678,6 @@ limits.max_step.lab.model.log                : real as <span class="org-variable
 </div>
 </div>
 </li>
-
 <li>Geant4 regions<br  /><div class="outline-text-5" id="text-4-1-4-6">
 <p>
 Definition of Geant4 regions.
@@ -1714,6 +1699,7 @@ regions.source.volumes       : <span class="org-variable-name">string</span>[1] 
 </div>
 </div>
 </li>
+
 <li>Magnetic field<br  /><div class="outline-text-5" id="text-4-1-4-7">
 <div class="org-src-container">
 
@@ -1736,6 +1722,7 @@ magnetic_field.miss_distance : real as <span class="org-variable-name">length</s
 </div>
 </li></ul>
 </div>
+
 <div id="outline-container-sec-4-1-5" class="outline-4">
 <h4 id="sec-4-1-5"><span class="section-number-4">4.1.5</span> Physics list</h4>
 <div class="outline-text-4" id="text-4-1-5">
@@ -1761,6 +1748,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
+
 <li>Plugins<br  /><div class="outline-text-5" id="text-4-1-5-2">
 <div class="org-src-container">
 
@@ -1837,6 +1825,7 @@ use_generic_ion          : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
+
 <li>EM physics process<br  /><div class="outline-text-6" id="text-4-1-5-2-2">
 </div>
 <ul class="org-ul"><li>General settings<br  /><div class="outline-text-7" id="text-4-1-5-2-2-1">
@@ -1850,7 +1839,6 @@ em.model : <span class="org-variable-name">string</span> = <span class="org-stri
 </div>
 </div>
 </li>
-
 <li>Electrons/positrons<br  /><div class="outline-text-7" id="text-4-1-5-2-2-2">
 <div class="org-src-container">
 
@@ -1878,7 +1866,6 @@ em.positron.annihilation         : <span class="org-variable-name">boolean</span
 </div>
 </div>
 </li>
-
 <li>Gammas<br  /><div class="outline-text-7" id="text-4-1-5-2-2-3">
 <div class="org-src-container">
 
@@ -1900,7 +1887,6 @@ em.gamma.conversion_to_muons  : <span class="org-variable-name">boolean</span> =
 </div>
 </div>
 </li>
-
 <li>Muons<br  /><div class="outline-text-7" id="text-4-1-5-2-2-4">
 <div class="org-src-container">
 
@@ -1922,7 +1908,6 @@ em.muon.step_limiter         : <span class="org-variable-name">boolean</span> = 
 </div>
 </div>
 </li>
-
 <li>Ions<br  /><div class="outline-text-7" id="text-4-1-5-2-2-5">
 <div class="org-src-container">
 
@@ -1938,7 +1923,6 @@ em.ion.step_limiter         : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
-
 <li>Deexcitation<br  /><div class="outline-text-7" id="text-4-1-5-2-2-6">
 <div class="org-src-container">
 
@@ -1980,6 +1964,7 @@ em.ion.step_limiter         : <span class="org-variable-name">boolean</span> = 1
 </li></ul>
 </li></ul>
 </li>
+
 <li>Using Geant4 region cuts<br  /><div class="outline-text-5" id="text-4-1-5-3">
 <p>
 These cuts are related to some production processes and then, define some
@@ -2036,6 +2021,7 @@ production_cuts.regions.source.electron : real as <span class="org-variable-name
 </div>
 </li></ul>
 </div>
+
 <div id="outline-container-sec-4-1-6" class="outline-4">
 <h4 id="sec-4-1-6"><span class="section-number-4">4.1.6</span> Geant4 related action</h4>
 <div class="outline-text-4" id="text-4-1-6">
@@ -2062,6 +2048,7 @@ file.no_save : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </li>
+
 <li>Event action<br  /><div class="outline-text-5" id="text-4-1-6-2">
 <div class="org-src-container">
 
@@ -2073,6 +2060,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
+
 <li>Primary generator action<br  /><div class="outline-text-5" id="text-4-1-6-3">
 <div class="org-src-container">
 
@@ -2086,7 +2074,6 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
-
 <li>Tracking action<br  /><div class="outline-text-5" id="text-4-1-6-4">
 <div class="org-src-container">
 
@@ -2098,6 +2085,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
+
 <li>Stepping action<br  /><div class="outline-text-5" id="text-4-1-6-5">
 <div class="org-src-container">
 
@@ -2109,6 +2097,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
+
 <li>Stacking action<br  /><div class="outline-text-5" id="text-4-1-6-6">
 <div class="org-src-container">
 
@@ -2131,6 +2120,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </li></ul>
 </div>
 </div>
+
 <div id="outline-container-sec-4-2" class="outline-3">
 <h3 id="sec-4-2"><span class="section-number-3">4.2</span> Genbb configuration</h3>
 <div class="outline-text-3" id="text-4-2">
@@ -2170,7 +2160,6 @@ generators.configuration_files : string[2] as <span class="org-variable-name">pa
 </div>
 </div>
 </li>
-
 <li>Bi207<br  /><div class="outline-text-5" id="text-4-2-1-2">
 <div class="org-src-container">
 
@@ -2183,7 +2172,6 @@ decay_isotope    : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
-
 <li>Co60<br  /><div class="outline-text-5" id="text-4-2-1-3">
 <div class="org-src-container">
 
@@ -2197,7 +2185,6 @@ decay_isotope    : <span class="org-variable-name">string</span> = <span class="
 </div>
 </li></ul>
 </div>
-
 <div id="outline-container-sec-4-2-2" class="outline-4">
 <h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> Guns configuration</h4>
 <div class="outline-text-4" id="text-4-2-2">
@@ -2212,7 +2199,6 @@ decay_isotope    : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </li>
-
 <li>1 MeV electron<br  /><div class="outline-text-5" id="text-4-2-2-2">
 <div class="org-src-container">
 
@@ -2237,7 +2223,6 @@ energy        : real as <span class="org-variable-name">energy</span>  = 1000 ke
 </div>
 </div>
 </li>
-
 <li>1 MeV cone electron<br  /><div class="outline-text-5" id="text-4-2-2-3">
 <div class="org-src-container">
 
@@ -2271,6 +2256,7 @@ energy        : real as <span class="org-variable-name">energy</span> = 1000 keV
 </div>
 </div>
 </li>
+
 <li>1 MeV cone gamma<br  /><div class="outline-text-5" id="text-4-2-2-4">
 <div class="org-src-container">
 
@@ -2306,6 +2292,7 @@ energy        : real as <span class="org-variable-name">energy</span> = 1000 keV
 </li></ul>
 </div>
 </div>
+
 <div id="outline-container-sec-4-3" class="outline-3">
 <h3 id="sec-4-3"><span class="section-number-3">4.3</span> Vertex configuration</h3>
 <div class="outline-text-3" id="text-4-3">
@@ -2337,7 +2324,6 @@ vg_list : string[1] as <span class="org-variable-name">path</span> = <span class
 </div>
 </div>
 </li>
-
 <li>From the source bulk<br  /><div class="outline-text-5" id="text-4-3-1-2">
 <div class="org-src-container">
 
@@ -2357,7 +2343,6 @@ mode   : <span class="org-variable-name">string</span>  = <span class="org-strin
 </div>
 </div>
 </li>
-
 <li>From the source surface<br  /><div class="outline-text-5" id="text-4-3-1-3">
 <div class="org-src-container">
 
@@ -2388,6 +2373,7 @@ mode.surface.bottom : <span class="org-variable-name">boolean</span> = 1
 </li></ul>
 </div>
 </div>
+
 <div id="outline-container-sec-4-4" class="outline-3">
 <h3 id="sec-4-4"><span class="section-number-3">4.4</span> Step hit processor configuration</h3>
 <div class="outline-text-3" id="text-4-4">
@@ -2404,7 +2390,6 @@ mode.surface.bottom : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-4-2" class="outline-4">
 <h4 id="sec-4-4-2"><span class="section-number-4">4.4.2</span> Scintillator/calorimeter hits</h4>
 <div class="outline-text-4" id="text-4-4-2">
@@ -2460,7 +2445,6 @@ sensitive.category : <span class="org-variable-name">string</span>  = <span clas
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-4-4-3" class="outline-4">
 <h4 id="sec-4-4-3"><span class="section-number-4">4.4.3</span> Enabling all volumes</h4>
 <div class="outline-text-4" id="text-4-4-3">
@@ -2487,6 +2471,7 @@ geometry.volumes.all : <span class="org-variable-name">boolean</span> = 1
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5" class="outline-2">
 <h2 id="sec-5"><span class="section-number-2">5</span> Pipeline general configuration</h2>
 <div class="outline-text-2" id="text-5">
@@ -2533,6 +2518,7 @@ factory.no_preload : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-1-2" class="outline-4">
 <h4 id="sec-5-1-2"><span class="section-number-4">5.1.2</span> Service manager configuration</h4>
 <div class="outline-text-4" id="text-5-1-2">
@@ -2545,6 +2531,7 @@ service_manager.configuration : string[1] as <span class="org-variable-name">pat
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-1-3" class="outline-4">
 <h4 id="sec-5-1-3"><span class="section-number-4">5.1.3</span> Configuration files for modules</h4>
 <div class="outline-text-4" id="text-5-1-3">
@@ -2559,6 +2546,7 @@ modules.configuration_files : string[2] as <span class="org-variable-name">path<
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-2" class="outline-3">
 <h3 id="sec-5-2"><span class="section-number-3">5.2</span> Service manager</h3>
 <div class="outline-text-3" id="text-5-2">
@@ -2574,7 +2562,6 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-2-2" class="outline-4">
 <h4 id="sec-5-2-2"><span class="section-number-4">5.2.2</span> Name &amp; description</h4>
 <div class="outline-text-4" id="text-5-2-2">
@@ -2589,7 +2576,6 @@ description : <span class="org-variable-name">string</span> = <span class="org-s
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-2-3" class="outline-4">
 <h4 id="sec-5-2-3"><span class="section-number-4">5.2.3</span> List of service files</h4>
 <div class="outline-text-4" id="text-5-2-3">
@@ -2603,6 +2589,7 @@ services.configuration_files : string[1] as <span class="org-variable-name">path
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-3" class="outline-3">
 <h3 id="sec-5-3"><span class="section-number-3">5.3</span> DLL loader</h3>
 <div class="outline-text-3" id="text-5-3">
@@ -2638,7 +2625,6 @@ receives a table list and builds the corresponding <code>dlls.conf</code> file.
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-5-3-2" class="outline-4">
 <h4 id="sec-5-3-2"><span class="section-number-4">5.3.2</span> Libraries</h4>
 <div class="outline-text-4" id="text-5-3-2">
@@ -2678,7 +2664,6 @@ named <code>geant4_validation</code>. The following table sets the libraries
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> Modules configuration</h2>
 <div class="outline-text-2" id="text-6">
@@ -2699,6 +2684,7 @@ named <code>geant4_validation</code>. The following table sets the libraries
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-1-2" class="outline-4">
 <h4 id="sec-6-1-2"><span class="section-number-4">6.1.2</span> Declaration &amp; description</h4>
 <div class="outline-text-4" id="text-6-1-2">
@@ -2711,6 +2697,7 @@ named <code>geant4_validation</code>. The following table sets the libraries
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-1-3" class="outline-4">
 <h4 id="sec-6-1-3"><span class="section-number-4">6.1.3</span> Logging priority</h4>
 <div class="outline-text-4" id="text-6-1-3">
@@ -2722,6 +2709,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-1-4" class="outline-4">
 <h4 id="sec-6-1-4"><span class="section-number-4">6.1.4</span> Bank &amp; service labels</h4>
 <div class="outline-text-4" id="text-6-1-4">
@@ -2739,7 +2727,6 @@ erase_former_SD_bank : <span class="org-variable-name">boolean</span> = 0
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-6-1-5" class="outline-4">
 <h4 id="sec-6-1-5"><span class="section-number-4">6.1.5</span> Seed values</h4>
 <div class="outline-text-4" id="text-6-1-5">
@@ -2769,7 +2756,6 @@ manager.prng_states_save_modulo : <span class="org-variable-name">integer</span>
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-6-1-6" class="outline-4">
 <h4 id="sec-6-1-6"><span class="section-number-4">6.1.6</span> Vertex generator</h4>
 <div class="outline-text-4" id="text-6-1-6">
@@ -2781,7 +2767,6 @@ manager.vertex_generator_name : <span class="org-variable-name">string</span>  =
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-6-1-7" class="outline-4">
 <h4 id="sec-6-1-7"><span class="section-number-4">6.1.7</span> Event generator</h4>
 <div class="outline-text-4" id="text-6-1-7">
@@ -2793,7 +2778,6 @@ manager.event_generator_name  : <span class="org-variable-name">string</span>  =
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-6-1-8" class="outline-4">
 <h4 id="sec-6-1-8"><span class="section-number-4">6.1.8</span> Simulation manager</h4>
 <div class="outline-text-4" id="text-6-1-8">
@@ -2807,6 +2791,7 @@ manager.configuration_filename : string as <span class="org-variable-name">path<
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-2" class="outline-3">
 <h3 id="sec-6-2"><span class="section-number-3">6.2</span> Validation module</h3>
 <div class="outline-text-3" id="text-6-2">
@@ -2832,7 +2817,6 @@ Here, we just set up the module declaration.
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-6-2-2" class="outline-4">
 <h4 id="sec-6-2-2"><span class="section-number-4">6.2.2</span> Declaration &amp; description</h4>
 <div class="outline-text-4" id="text-6-2-2">
@@ -2845,6 +2829,7 @@ Here, we just set up the module declaration.
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-2-3" class="outline-4">
 <h4 id="sec-6-2-3"><span class="section-number-4">6.2.3</span> Logging priority</h4>
 <div class="outline-text-4" id="text-6-2-3">
@@ -2856,6 +2841,7 @@ logging.priority : <span class="org-variable-name">string</span> = <span class="
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-6-2-4" class="outline-4">
 <h4 id="sec-6-2-4"><span class="section-number-4">6.2.4</span> Histogram service label</h4>
 <div class="outline-text-4" id="text-6-2-4">
@@ -2892,6 +2878,7 @@ histograms:
 </div>
 </div>
 </li>
+
 <li>Energy template<br  /><div class="outline-text-6" id="text-6-2-4-1-2">
 <div class="org-src-container">
 
@@ -2936,6 +2923,7 @@ max : <span class="org-variable-name">real</span> = 3200.0
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-7" class="outline-2">
 <h2 id="sec-7"><span class="section-number-2">7</span> Services</h2>
 <div class="outline-text-2" id="text-7">
@@ -2958,6 +2946,7 @@ software components, including other services or data processing modules (see
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-7-2" class="outline-3">
 <h3 id="sec-7-2"><span class="section-number-3">7.2</span> Context service</h3>
 <div class="outline-text-3" id="text-7-2">
@@ -2980,6 +2969,7 @@ backup.file : string as <span class="org-variable-name">path</span> = <span clas
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-7-3" class="outline-3">
 <h3 id="sec-7-3"><span class="section-number-3">7.3</span> Geometry service</h3>
 <div class="outline-text-3" id="text-7-3">
@@ -3010,6 +3000,7 @@ manager.no_excluded_categories : <span class="org-variable-name">boolean</span> 
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-7-4" class="outline-3">
 <h3 id="sec-7-4"><span class="section-number-3">7.4</span> Histogram service</h3>
 <div class="outline-text-3" id="text-7-4">
@@ -3053,6 +3044,7 @@ output_files : string[2] as <span class="org-variable-name">path</span> =       
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-8" class="outline-2">
 <h2 id="sec-8"><span class="section-number-2">8</span> Running SN@ilWare processing chain</h2>
 <div class="outline-text-2" id="text-8">
@@ -3066,6 +3058,7 @@ run <code>make</code> within this working directory.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-8-2" class="outline-3">
 <h3 id="sec-8-2"><span class="section-number-3">8.2</span> Source code compilation</h3>
 <div class="outline-text-3" id="text-8-2">
@@ -3089,6 +3082,7 @@ make install
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-8-3" class="outline-3">
 <h3 id="sec-8-3"><span class="section-number-3">8.3</span> Use and execute <code>geant4_validation</code> module</h3>
 <div class="outline-text-3" id="text-8-3">
@@ -3161,29 +3155,15 @@ name. You can change the output directory and output file name in <a href="#sec-
 <h2 class="footnotes"> </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
-<a href="http://gdml.web.cern.ch/GDML">http://gdml.web.cern.ch/GDML</a>
-</p></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
-Emacs lisp function can be run using <code>ALT-x</code> command and typing the function
-name.
-</p></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
-We recommend that you name any sensitive category with the <code>_SD</code>
-suffix. This is to ease the reading of other configuration files at the
-simulation level (step hit processors). Also note that if you prefix the
-sensitive category name with two underscores (example: <code>__test_SD</code>), then the
-sensitive category is considered as "private" (non official) and may be
-processed in some special way by the simulation engine.
-</p></div>
+
 
 
 </div>
 </div></div>
 <div id="postamble" class="status">
-File under git version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/92312965f8de22c1c092eb693f2114b381d09d83">9231296</a> - 2014-04-16
+File under git version control - commit <a href="https://github.com/xgarrido/emacs-starter-kit/commit/418c55adf6993acb788e0f08bcf6987b3aff86b6">418c55a</a> - 2014-04-19
 </div>
 </body>
 </html>
