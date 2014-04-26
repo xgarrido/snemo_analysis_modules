@@ -56,19 +56,24 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script><script type="text/javascript">
-function displayTOC() {
-    var first = document.getElementById("text-table-of-contents").innerHTML;
-    if (first != "") {
-        var maincontent = '<a class="button"><i class="fa fa-list"></i></a>'
-        maincontent += "<div>" + first + "</div>";
-        document.getElementById("toc").innerHTML = maincontent;
-    } else {
-        document.getElementById("toc").style.display = "none";
-    }
-   }
-</script>
+  function displayTOC() {
+      var first = document.getElementById("text-table-of-contents").innerHTML;
+      if (first != "") {
+          var maincontent = '<a class="button"><i class="fa fa-list"></i></a>'
+          maincontent += "<div>" + first + "</div>";
+          document.getElementById("toc").innerHTML = maincontent;
+      } else {
+          document.getElementById("toc").style.display = "none";
+      }
+     }
+  function randomLinkColor() {
+      var colors = ['#ff0000', '#00ff00', '#0000ff'];
+      var random_color = colors[Math.floor(Math.random() * colors.length)];
+      document.getElementById('title').style.color = random_color;
+  }
+  </script>
 </head>
-<body onload="displayTOC()"><div id="toc"></div>
+<body onload="displayTOC();"><div id="toc"></div>
 <div id="content">
 <h1 class="title">SN@ilWare Simulation Modules</h1>
 <p>
@@ -99,7 +104,7 @@ to analysis modules to perform High Purity Germanium simulations.
 </dl>
 </div>
 <div id="postamble" class="status">
-File under git version control - commit <a href="https://github.com/xgarrido/emacs-starter-kit/commit/418c55adf6993acb788e0f08bcf6987b3aff86b6">418c55a</a> - 2014-04-19
+File under <i class="fa fa-github"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/0664a2cf6c3b200a3f8b9e69af22d4b1447a388f">0664a2c</a> - 2014-04-24
 </div>
 </body>
 </html>
