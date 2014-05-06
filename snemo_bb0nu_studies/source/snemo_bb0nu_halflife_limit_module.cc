@@ -11,8 +11,8 @@
 
 // SuperNEMO event model
 #include <mctools/utils.h>
-#include <sncore/models/data_model.h>
-#include <sncore/models/event_header.h>
+#include <snemo/datamodels/data_model.h>
+#include <snemo/datamodels/event_header.h>
 #include <snanalysis/models/data_model.h>
 #include <snanalysis/models/particle_track_data.h>
 
@@ -198,16 +198,15 @@ namespace analysis {
                  "Module '" << get_name () << "' is not initialized !");
 
     // Check if the 'event header' record bank is available :
-    const std::string eh_label = snemo::core::model::data_info::EVENT_HEADER_LABEL;
-    namespace scm = snemo::core::model;
+    const std::string eh_label = snemo::datamodel::data_info::EVENT_HEADER_LABEL;
     if (! data_record_.has (eh_label))
       {
         DT_LOG_ERROR (get_logging_priority (), "Could not find any bank with label '"
                       << eh_label << "' !");
         return dpp::base_module::PROCESS_STOP;
       }
-    const snemo::core::model::event_header & eh
-      = data_record_.get<snemo::core::model::event_header>(eh_label);
+    const snemo::datamodel::event_header & eh
+      = data_record_.get<snemo::datamodel::event_header>(eh_label);
 
     // Check if the 'particle track' record bank is available :
     const std::string ptd_label = snemo::analysis::model::data_info::PARTICLE_TRACK_DATA_LABEL;
