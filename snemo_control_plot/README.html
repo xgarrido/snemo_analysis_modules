@@ -7,9 +7,9 @@
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Xavier Garrido" />
-<link rel="stylesheet" href="../css/styles.css">
-                 <link rel="stylesheet" href="../css/org-pygments.css">
-                 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="../css/styles.css" />
+               <link rel="stylesheet" href="../css/org-pygments.css" />
+               <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -56,24 +56,31 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script><script type="text/javascript">
+  function randomLinkColor() {
+      var colors = ['#f1c40f','#e74c3c','#3399cc','#e67e22','#67ad00','#8e44ad','#1abc9c','#003399'];
+      var random_color = colors[Math.floor(Math.random() * colors.length)];
+      var elements = document.querySelectorAll('a');
+      [].slice.call(elements).forEach(function(elem) {
+          //elem.style.color = random_color;
+      });
+  }
   function displayTOC() {
-      var first = document.getElementById("text-table-of-contents").innerHTML;
-      if (first != "") {
+      var ttoc = document.getElementById("text-table-of-contents");
+      if (ttoc) {
           var maincontent = '<a class="button"><i class="fa fa-list"></i></a>'
-          maincontent += "<div>" + first + "</div>";
+          maincontent += "<div>" + ttoc.innerHTML + "</div>";
           document.getElementById("toc").innerHTML = maincontent;
       } else {
           document.getElementById("toc").style.display = "none";
+          document.getElementById("preamble").style.top = "10px";
       }
      }
-  function randomLinkColor() {
-      var colors = ['#ff0000', '#00ff00', '#0000ff'];
-      var random_color = colors[Math.floor(Math.random() * colors.length)];
-      document.getElementById('title').style.color = random_color;
-  }
   </script>
 </head>
-<body onload="displayTOC();"><div id="toc"></div>
+<body onload="randomLinkColor();displayTOC();"><div id="toc"></div>
+<div id="preamble" class="status">
+<a href="../index.html"><i class="fa fa-home"></i></a><br/> <a href="https://github.com/xgarrido/snemo_simulation_modules"><i class="fa fa-github"></i></a><br/> 
+</div>
 <div id="content">
 <h1 class="title">SuperNEMO control plot module</h1>
 <div id="table-of-contents">
@@ -174,7 +181,8 @@ the basic idea is to give a "literate" way to navigate through the different
 sections, each of them representing a part of the pipeline
 configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
 hide and the user can focus on relevant parts.
- <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara"> At the time of writing this document, emacs version is 24.3.1 </p></div>
+ <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara"> At the time of writing this document, emacs version is 24.3.1 </p><br/></div>
+</p>
 
 <p>
 To export the different configuration files, you can run <code>org-babel-tangle</code>
@@ -182,7 +190,8 @@ which will tangle each code block into the given file<sup><a id="fnr.2" class="f
 <code>Makefile</code>. The author recommends to use the <code>Makefile</code> since the tangling
 process is asynchronous and thus, does not freeze your emacs (<code>org-babel-tangle</code>
 "occupies" emacs during its execution).
- <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara"> Emacs lisp function can be run using <code>ALT-x</code> command and typing the function name. </p></div>
+ <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara"> Emacs lisp function can be run using <code>ALT-x</code> command and typing the function name. </p><br/></div>
+</p>
 </div>
 </div>
 
@@ -869,7 +878,8 @@ It will run the <code>scp_module</code> over the input file<sup><a id="fnr.3" cl
 file containing several histograms. This file is located by default, in
 <code>/tmp/${USER}/snemo.d</code> directory under the <code>snemo_control_plot_histos.root</code>
 name. You can change the output directory and output file name in <a href="#sec-5-3">this section</a>.
- <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara"> here we assume that you already have generated a data record. The <code>snemo_control_plot</code> only generate the plot and does not neither simulation nor reconstruction. </p></div>
+ <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara"> here we assume that you already have generated a data record. The <code>snemo_control_plot</code> only generate the plot and does not neither simulation nor reconstruction. </p><br/></div>
+</p>
 </div>
 </div>
 </div>
@@ -884,7 +894,7 @@ name. You can change the output directory and output file name in <a href="#sec-
 </div>
 </div></div>
 <div id="postamble" class="status">
-File under <i class="fa fa-github-alt"> </i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/0664a2cf6c3b200a3f8b9e69af22d4b1447a388f">0664a2c</a> - 2014-04-24
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/5d6da691c928b4c9fd2d87a3ef0566aae2e8450e">5d6da69</a> - 2014-05-22
 </div>
 </body>
 </html>
