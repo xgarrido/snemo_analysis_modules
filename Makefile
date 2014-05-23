@@ -15,7 +15,7 @@ all: $(files_tangle)
 .%.tangle: %.org
 	@echo "NOTICE: Tangling $<..."
 	@$(BATCH) --visit "$<" --funcall org-babel-tangle > /dev/null 2>&1
-	@(find config -type f -print0 | xargs -0 sed -i 's#@SNEMO_SIMULATION_MODULES_DIR@#'`pwd`'#g')
+	@(find config -type f -print0 | xargs -0 sed -i 's#@SNEMO_SIMULATION_MODULES_DIR@#'`pwd`'/config#g')
 	@touch $@
 
 clean:
