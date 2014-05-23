@@ -26,7 +26,7 @@ second item is related to histogram declarations.
 ** Module declaration
 :PROPERTIES:
 :MKDIRP: yes
-:TANGLE: ../config/snemo_bb0nu_studies_modules.conf
+:TANGLE: ../config/snemo_bb0nu_studies_module.conf
 :END:
 
 The module name is =bb0nu_halflife_limit_module= which is needed when using
