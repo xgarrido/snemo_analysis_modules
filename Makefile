@@ -7,7 +7,7 @@ BATCH = $(EMACS) --batch --no-init-file					\
 		'((shell . t)))"					\
 	--eval "(setq org-confirm-babel-evaluate nil)"
 
-files_org    = $(shell find . -name "*.org")
+files_org    = $(shell find */ -name "*.org") README.org
 files_tangle = $(shell echo $(files_org) | sed 's/README.org/.README.tangle/g')
 
 all: $(files_tangle)
