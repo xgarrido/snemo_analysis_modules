@@ -1,187 +1,37 @@
 #+TITLE:  SuperNEMO control plot module
 #+AUTHOR: Xavier Garrido
-#+DATE:   2013-11-01
-#+OPTIONS: ^:{}
+#+DATE:   2014-05-23
+#+OPTIONS: ^:{} num:nil
 #+STARTUP: entitiespretty
-
-* Introduction
 
 This repository holds a SN@ilWare configuration to run SuperNEMO simulations and
 to produce several "control" plots. It provides one SN@ilWare module which
 automatically plot physical quantities from different data banks. For example,
 it shows the distribution of the number of Geiger hits from the =simulated_data=
 bank and from the =calibrated_data= bank. The purpose of this module is to have
-some fundamental and key plots to check differences between software releases,
-new software implementations and so on.
+some fundamental key plots to check differences between software releases, new
+software implementations and so on.
 
 The current version is hosted at
 [[https://github.com/xgarrido/snemo_simulation_modules/snemo_control_plot]] under
-=git= version control. You can clone this repository by doing
+=git= version control.
 
-#+BEGIN_SRC sh
-  git clone https://github.com/xgarrido/snemo_simulation_modules/snemo_control_plot snemo_control_plot
-#+END_SRC
+The code itself is implemented in the =source= directory which holds the
+=snemo_control_plot_module.*= source code as well as a =CMakeLists.txt=
+file in order to compile, build and install the module following =cmake= rules.
 
-This will create a directory =snemo_control_plot= in the working directory
-containing all the source files needed to configure and to setup SN@ilWare
-programs.
+* Module declaration
 
-* Content
-
-The code is organised as follow :
-
-- =README.org= :: This file holds the pipeline configuration + the documentation
-                  on how to use the =snemo_control_plot= module.
-- =Makefile= :: The =Makefile= allows to generate the pipeline configuration by
-                parsing and tangling this file /i.e./ =README.org= (see below).
-- =source= :: This directory holds the source code of the =snemo_control_plot=
-              module. It also has a =CMakeLists.txt= file in order to compile,
-              build and install all the software pieces through =cmake= rules.
-
-The =README.org= file is organised using [[http://orgmode.org/worg/org-contrib/babel/index.html][org-babel]] and its ability to execute
-source code. It requires then a recent installation of emacs[1] which bundles
-=org=. Without entering into too much details regarding =org-babel= abilities,
-the basic idea is to give a "literate" way to navigate through the different
-sections, each of them representing a part of the pipeline
-configuration. Moreover, using =org= folding/unfolding capability, item can be
-hide and the user can focus on relevant parts.
-
-To export the different configuration files, you can run =org-babel-tangle=
-which will tangle each code block into the given file[2] or use the associated
-=Makefile=. The author recommends to use the =Makefile= since the tangling
-process is asynchronous and thus, does not freeze your emacs (=org-babel-tangle=
-"occupies" emacs during its execution).
-
-[1] At the time of writing this document, emacs version is 24.3.1
-[2] Emacs lisp function can be run using =ALT-x= command and typing the function
-name.
-
-* Pipeline general configuration
-
-SN@ilWare implements the concept of data processing pipeline. An event record
-object is passed through a chain of data processing modules, each of them being
-responsible for a given task. Modules and services are declared in Section
-[[Modules]] and Section [[Services]]. For more details on running SuperNEMO simulations
-and the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given
-by F. Mauger.
-
-The =@SNEMO_CONTROL_PLOT_DIR@= corresponds to the directory where configuration
-files are going to be stored. This variable which varies from one installation
-to the other, is automatically change when the tangle process occurs. This is
-done /via/ the =Makefile= which parse and replace this variable.
-
-** Module manager
-:PROPERTIES:
-:MKDIRP: yes
-:TANGLE: config/module_manager.conf
-:END:
-This file is the main and central piece of code for loading all modules/services
-needed by =dpp_processing= binary. It provides links to module files and
-service files.
-*** Logging priority
-#+BEGIN_SRC sh
-  #@description Module manager logging priority
-  logging.priority : string = "warning"
-
-  #@description Embedded module factory debug flag
-  factory.debug : boolean = 0
-
-  #@description Embedded module factory 'no preload' flag
-  factory.no_preload : boolean = 0
-#+END_SRC
-
-*** Service manager configuration
-#+BEGIN_SRC sh
-  #@description The configuration file of the embedded service manager
-  service_manager.configuration : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/service_manager.conf"
-#+END_SRC
-
-*** Configuration files for modules
-#+BEGIN_SRC sh
-  #@description The configuration files for modules
-  modules.configuration_files : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/snemo_control_plot_module.conf"
-#+END_SRC
-
-** Service manager
-:PROPERTIES:
-:TANGLE: config/service_manager.conf
-:END:
-*** Logging priority
-#+BEGIN_SRC sh
-  #@description Service manager logging priority
-  logging.priority : string = "warning"
-#+END_SRC
-*** Name & description
-#+BEGIN_SRC sh
-  #@description The name of the service manager
-  name : string = "sn_service_manager"
-
-  #@description The description of the service manager
-  description : string = "A SuperNEMO service manager"
-#+END_SRC
-*** List of service files
-#+BEGIN_SRC sh
-  #@description The list of files that describe services
-  services.configuration_files : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/services.conf"
-#+END_SRC
-
-** DLL loader
-*** Code generator
-:PROPERTIES:
-:TANGLE: no
-:RESULTS: output
-:END:
-This skeleton code ease the declaration of dll loader since it
-receives a table list and builds the corresponding =dlls.conf= file.
-
-#+NAME: dll_loader
-#+HEADERS: :var list=""
-#+BEGIN_SRC sh
-  echo '#@description A sample list of setups'
-  echo '#@key_label   "name"'
-  echo '#@meta_label  "filename"'
-  for i in $list
-  do
-      dll=$(echo $i | sed '/(/ s/("\|")//g')
-      echo '[name="'$dll'" filename=""]'
-      echo '#config The '$dll' library'
-      echo 'autoload : boolean = 1'
-      echo
-  done
-#+END_SRC
-*** Libraries
-:PROPERTIES:
-:TANGLE: config/dlls.conf
-:END:
-This part set the different libraries to be loaded at runtime. This is needed
-since event data models are defined in other libraries than the one currently
-named =snemo_bb0nu_studies=. The following table sets the libraries
-
-#+CAPTION: Libraries to be used by =snemo_bb0nu_studies= modules
-#+TBLNAME: dll_libraries
-|---------------------|
-| mctools_bio         |
-| sncore_bio          |
-|---------------------|
-
-#+BEGIN_SRC sh :noweb yes
-  <<dll_loader(dll_libraries[*,0])>>
-#+END_SRC
-* SuperNEMO \beta\beta0\nu modules
-
-The next item holds the configuration for the SuperNEMO \beta\beta modules. The
-second item is related to histogram declarations.
+The next item holds the configuration of the module. The second item is related
+to histogram declarations.
 
 ** Module declaration
 :PROPERTIES:
-:TANGLE: config/snemo_control_plot_module.conf
+:MKDIRP: yes
+:TANGLE: ../config/snemo_control_plot_module.conf
 :END:
 
-Here, we just set up the module declaration. The module name to be used when
-processing a file is =scp_module=.
+The module name to be used when processing a file is =scp_module=.
 
 *** File preamble
 #+BEGIN_SRC sh
@@ -211,7 +61,8 @@ Set the same histogram service label as defined [[Histogram service][here]]
 
 ** Histogram declarations
 :PROPERTIES:
-:TANGLE: config/histogram_templates.conf
+:MKDIRP: yes
+:TANGLE: ../config/histogram_templates.conf
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this
@@ -410,130 +261,3 @@ histograms all belong to the =__template= group.
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
 #+END_SRC
-
-* Services
-:PROPERTIES:
-:TANGLE: config/services.conf
-:END:
-
-A service generally hosts a specific resource that can be shared by many other
-software components, including other services or data processing modules (see
-[[https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice][SN@ilWare FAQ]]).
-
-** Preamble
-
-#+BEGIN_SRC sh
-  #@description A sample list of setups
-  #@key_label   "name"
-  #@meta_label  "type"
-#+END_SRC
-
-** Context service
-
-#+BEGIN_SRC sh
-  [name="Ctx" type="dpp::context_service"]
-
-  #@description Logging priority
-  logging.priority : string = "warning"
-
-  #@description File from which the context is to be loaded at program start
-  load.file : string as path  = "/tmp/${USER}/snemo.d/snemo_context.conf"
-
-  #@description File to store the context at program termination
-  store.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_end.conf"
-
-  #@description Flag to backup the former context load file
-  backup.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_bak.conf"
-#+END_SRC
-
-** Histogram service
-
-The histogram service provides an esay way to handle histogram plot from
-different modules (mainly plot modules). It provides a service where 1D or 2D
-histograms can be added to a histogram dictionnary.
-
-#+BEGIN_SRC sh
-  [name="Histo" type="dpp::histogram_service"]
-
-  #@description Logging priority
-  logging.priority : string = "warning"
-
-  #@description The description string of the embedded pool of histograms
-  pool.description : string = "SuperNEMO histograms"
-#+END_SRC
-
-Embedded histograms are declared into a dedicated file defines in
-[[file:snanalysis_manager.org][snanalysis_manager.org]]
-#+BEGIN_SRC sh
-  #@description The main configuration file for the embedded histogram manager
-  pool.histo.setups : string[1] as path = \
-      "@SNEMO_CONTROL_PLOT_DIR@/histogram_templates.conf"
-#+END_SRC
-
-Finally, all histograms created can be stored inside ROOT files or XML archives.
-#+BEGIN_SRC sh
-  #@description The ouput file where to store the histograms
-  output_files : string[1] as path =                        \
-      "/tmp/${USER}/snemo.d/snemo_control_plot_histos.root" \
-      "/tmp/${USER}/snemo.d/snemo_control_plot_histos.xml"
-#+END_SRC
-
-* Running SN@ilWare processing chain
-** Tangling configuration
-First, you need to tangle this file. As explained in the [[Content][Content]] section, you
-may use the dedicated =Makefile= to generate the pipeline configuration. Just
-run =make= within this working directory.
-
-** Source code compilation
-Second, you need to compile the =snemo_control_plot= module files. The build
-system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
-setup the dependences. Nevertheless, this implies that you have already and
-correctly installed [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael][Cadfael]], [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux][Bayeux]] and Falaise. Then, you can configure, build
-and install the =snemo_control_plot= module by doing
-#+BEGIN_SRC sh
-  mkdir {build,install} && cd build
-  cmake                                               \
-      -DCMAKE_PREFIX_PATH="<path to Falaise install>" \
-      -DCMAKE_INSTALL_PREFIX=../install               \
-      ../source
-  make install
-  cd ..
-#+END_SRC
-
-** Use and execute =snemo_control_plot= module
-After a successful build, you will get an =install= directory holding the
-=libsnemo_control_plot.so= file. Assuming you are under =bash= shell, you will
-need to add it to your =LD_LIBRARY_PATH= by doing
-#+BEGIN_SRC sh
-  export LD_LIBRARY_PATH=${PWD}/install/lib:${LD_LIBRARY_PATH}
-#+END_SRC
-
-Running processing pipeline is done by the =dpp_processing= program provided by
-=dpp= library. Its call is pretty simple and only implies to have a module
-manager file and the name of the module to be run /i.e./
-=scp_module=. Nevertheless, you need to load the dynamically load the
-library(ies) which holds the needed modules.
-
-#+BEGIN_SRC sh
-  dpp_processing                                                       \
-      --module-manager-config $PWD/config/module_manager.conf \
-      --module scp_module                                              \
-      --load-dll snemo_control_plot                                    \
-      --load-dll <library>_bio                                         \
-      --input-file <path to a data record>
-#+END_SRC
-
-=<library>_bio= represents libraries which holds event data models such as
-=mctools_bio= and =sncore_bio=. Regarding the input data file and its content,
-you will need to load both to be able to retrieve =simulated_data= bank
-(=mctools_bio=) or specific SuperNEMO banks (=sncore_bio=).
-
-It will run the =scp_module= over the input file[3] and it will generate a ROOT
-file containing several histograms. This file is located by default, in
-=/tmp/${USER}/snemo.d= directory under the =snemo_control_plot_histos.root=
-name. You can change the output directory and output file name in [[Histogram
-service][this section]].
-
-[3] here we assume that you already have generated a data record. The
-=snemo_control_plot= only generate the plot and does not neither simulation nor
-reconstruction.

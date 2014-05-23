@@ -1,10 +1,8 @@
 #+TITLE:  SuperNEMO - \beta\beta studies
 #+AUTHOR: Xavier Garrido
-#+DATE:   2013-12-06
-#+OPTIONS: ^:{}
+#+DATE:   2014-05-23
+#+OPTIONS: ^:{} num:nil
 #+STARTUP: entitiespretty
-
-* Introduction
 
 This repository holds a SN@ilWare configuration + source code to calculate \beta\beta0\nu
 sensitivity for SuperNEMO experiment. Given 2\beta simulations (maybe data one day)
@@ -16,37 +14,11 @@ The current version is hosted at
 [[https://github.com/xgarrido/snemo_simulation_modules/snemo_bb0nu_studies]] under
 =git= version control.
 
-* Content
+The code itself is implemented in the =source= directory which holds the
+=snemo_bb0nu_halflife_limit_module.*= source code as well as a =CMakeLists.txt=
+file in order to compile, build and install the module following =cmake= rules.
 
-The code is organised as follow :
-
-- =README.org= :: This file holds the pipeline configuration + the documentation
-                  on how to use the =snemo_bb0nu_studies= module.
-- =Makefile= :: The =Makefile= allows to generate the pipeline configuration by
-                parsing and tangling this file /i.e./ =README.org= (see below).
-- =source= :: This directory holds the source code of the =snemo_bb0nu_studies=
-              module. It also has a =CMakeLists.txt= file in order to compile,
-              build and install all the software pieces through =cmake= rules.
-
-The =README.org= file is organised using [[http://orgmode.org/worg/org-contrib/babel/index.html][org-babel]] and its ability to execute
-source code. It requires then a recent installation of emacs[1] which bundles
-=org=. Without entering into too much details regarding =org-babel= abilities,
-the basic idea is to give a "literate" way to navigate through the different
-sections, each of them representing a part of the pipeline
-configuration. Moreover, using =org= folding/unfolding capability, item can be
-hide and the user can focus on relevant parts.
-
-To export the different configuration files, you can run =org-babel-tangle=
-which will tangle each code block into the given file[2] or use the associated
-=Makefile=. The author recommends to use the =Makefile= since the tangling
-process is asynchronous and thus, does not freeze your emacs (=org-babel-tangle=
-"occupies" emacs during its execution).
-
-[1] At the time of writing this document, emacs version is 24.3.1
-[2] Emacs lisp function can be run using =ALT-x= command and typing the function
-name.
-
-* SuperNEMO \beta\beta0\nu modules
+* SuperNEMO \beta\beta0\nu module declaration
 
 The next item holds the configuration for the SuperNEMO \beta\beta modules. The
 second item is related to histogram declarations.
@@ -57,7 +29,8 @@ second item is related to histogram declarations.
 :TANGLE: ../config/snemo_bb0nu_studies_modules.conf
 :END:
 
-Here, we just set up the module declaration.
+The module name is =bb0nu_halflife_limit_module= which is needed when using
+=bxdpp_processing= as explained in the top [[../README.org][README]] file.
 
 *** File preamble
 #+BEGIN_SRC sh
@@ -122,13 +95,15 @@ halflife, exposure are used.
 
 ** Histogram declarations
 :PROPERTIES:
+:MKDIRP: yes
 :TANGLE: ../config/histogram_templates.conf
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this
-section which is organized by data bank related plots. There are two kinds of
-histograms:
-- /template/ histogram which may be used by several data bank.
+section. There are mostly /template/ histogram in such way, their declarations
+may be used as templates for several histograms. For instance, the [[Energy
+template]] defines an histogram that can be mimic by different analysis channels
+/i.e./ O\nu energy distribution to background energy distribution.
 
 *** Mandatory preamble
 #+BEGIN_SRC sh
