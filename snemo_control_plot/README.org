@@ -73,7 +73,7 @@ done /via/ the =Makefile= which parse and replace this variable.
 ** Module manager
 :PROPERTIES:
 :MKDIRP: yes
-:TANGLE: config/pipeline/module_manager.conf
+:TANGLE: config/module_manager.conf
 :END:
 This file is the main and central piece of code for loading all modules/services
 needed by =dpp_processing= binary. It provides links to module files and
@@ -106,7 +106,7 @@ service files.
 
 ** Service manager
 :PROPERTIES:
-:TANGLE: config/pipeline/service_manager.conf
+:TANGLE: config/service_manager.conf
 :END:
 *** Logging priority
 #+BEGIN_SRC sh
@@ -154,7 +154,7 @@ receives a table list and builds the corresponding =dlls.conf= file.
 #+END_SRC
 *** Libraries
 :PROPERTIES:
-:TANGLE: config/pipeline/dlls.conf
+:TANGLE: config/dlls.conf
 :END:
 This part set the different libraries to be loaded at runtime. This is needed
 since event data models are defined in other libraries than the one currently
@@ -177,7 +177,7 @@ second item is related to histogram declarations.
 
 ** Module declaration
 :PROPERTIES:
-:TANGLE: config/pipeline/snemo_control_plot_module.conf
+:TANGLE: config/snemo_control_plot_module.conf
 :END:
 
 Here, we just set up the module declaration. The module name to be used when
@@ -211,7 +211,7 @@ Set the same histogram service label as defined [[Histogram service][here]]
 
 ** Histogram declarations
 :PROPERTIES:
-:TANGLE: config/pipeline/histogram_templates.conf
+:TANGLE: config/histogram_templates.conf
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this
@@ -413,7 +413,7 @@ histograms all belong to the =__template= group.
 
 * Services
 :PROPERTIES:
-:TANGLE: config/pipeline/services.conf
+:TANGLE: config/services.conf
 :END:
 
 A service generally hosts a specific resource that can be shared by many other
@@ -516,7 +516,7 @@ library(ies) which holds the needed modules.
 
 #+BEGIN_SRC sh
   dpp_processing                                                       \
-      --module-manager-config $PWD/config/pipeline/module_manager.conf \
+      --module-manager-config $PWD/config/module_manager.conf \
       --module scp_module                                              \
       --load-dll snemo_control_plot                                    \
       --load-dll <library>_bio                                         \

@@ -53,7 +53,8 @@ second item is related to histogram declarations.
 
 ** Module declaration
 :PROPERTIES:
-:TANGLE: ../config/pipeline/snemo_bb0nu_studies_modules.conf
+:MKDIRP: yes
+:TANGLE: ../config/snemo_bb0nu_studies_modules.conf
 :END:
 
 Here, we just set up the module declaration.
@@ -121,7 +122,7 @@ halflife, exposure are used.
 
 ** Histogram declarations
 :PROPERTIES:
-:TANGLE: ../config/pipeline/histogram_templates.conf
+:TANGLE: ../config/histogram_templates.conf
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this
