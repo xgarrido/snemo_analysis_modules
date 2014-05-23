@@ -1,2 +1,4 @@
+*.tangle
 *doc
 *build/
+*config/
