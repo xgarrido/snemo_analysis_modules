@@ -1,7 +1,7 @@
 #+TITLE:  SN@ilWare Simulation Modules
 #+AUTHOR: Xavier Garrido
-#+DATE:   2013-11-01
-#+OPTIONS: ^:{}
+#+DATE:   2014-05-23
+#+OPTIONS: ^:{} num:nil
 
 This repository holds several modules, one per directory, for [[https://nemo.lpc-caen.in2p3.fr/wiki/Software/Falaise][SN@ilWare]]
 framework. It also contains the basic configuration to run the processing of
@@ -48,10 +48,14 @@ your =emacs= (=org-babel-tangle= "occupies" emacs during its execution).
 
 SN@ilWare implements the concept of data processing pipeline. An event record
 object is passed through a chain of data processing modules, each of them being
-responsible for a given task. Modules and services are declared in Section
-[[Modules]] and Section [[Services]]. For more details on running SuperNEMO simulations
-and the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given
-by F. Mauger.
+responsible for a given task.
+
+Modules are declared in each subdirectory, each one reponsible of a dedicated
+task. There is no need to include them by hand since =org-mode= will
+automatically build the list of module files. Services are declared in section
+[[Services configuration]]. For more details on running SuperNEMO simulations and
+the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given by
+F. Mauger.
 
 The =@SNEMO_SIMULATION_MODULES_DIR@= corresponds to the directory where
 configuration files are going to be stored. This variable which varies from one
@@ -116,7 +120,7 @@ service files.
 #+END_SRC
 
 ** DLL loader
-*** Code generator
+*** Code generator                                               :noexport:
 :PROPERTIES:
 :TANGLE: no
 :RESULTS: output
@@ -231,7 +235,7 @@ First, you need to tangle this file. As explained in the [[Content][Content]] se
 may use the dedicated =Makefile= to generate the pipeline configuration. Just
 run =make= within this working directory[fn:4].
 
-** Source code compilation                                     :toberefined:
+** Source code compilation                                        :noexport:
 Second, you need to compile the =snemo_bb0nu_studies= module files. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
 setup the dependences. Nevertheless, this implies that you have already and
@@ -247,7 +251,7 @@ and install the =snemo_bb0nu_studies= module by doing
   cd ..
 #+END_SRC
 
-** Use and execute =snemo_bb0nu_studies= module                :toberefined:
+** Use and execute =snemo_bb0nu_studies= module                   :noexport:
 After a successful build, you will get an =install= directory holding the
 =libsnemo_bb0nu_studies.so= file. Assuming you are under =bash= shell, you will
 need to add it to your =LD_LIBRARY_PATH= by doing

@@ -1,7 +1,7 @@
 #+TITLE:  SuperNEMO - \beta\beta studies
 #+AUTHOR: Xavier Garrido
 #+DATE:   2014-05-23
-#+OPTIONS: ^:{} num:nil
+#+OPTIONS: ^:{} num:nil toc:nil
 #+STARTUP: entitiespretty
 
 This repository holds a SN@ilWare configuration + source code to calculate \beta\beta0\nu
