@@ -45,9 +45,6 @@ file or use the associated =Makefile=. The author recommends to use the
 your =emacs= (=org-babel-tangle= "occupies" emacs during its execution).
 
 * Pipeline general configuration
-:PROPERTIES:
-:MKDIRP: yes
-:END:
 
 SN@ilWare implements the concept of data processing pipeline. An event record
 object is passed through a chain of data processing modules, each of them being
@@ -63,7 +60,7 @@ occurs. This is done /via/ the =Makefile= which parse and replace this variable.
 
 ** Module manager
 :PROPERTIES:
-:TANGLE: config/pipeline/module_manager.conf
+:TANGLE: config/module_manager.conf
 :END:
 This file is the main and central piece of code for loading all modules/services
 needed by =dpp_processing= binary. It provides links to module files and
@@ -88,15 +85,15 @@ service files.
 #+END_SRC
 
 *** Configuration files for modules
-#+BEGIN_SRC sh
+
+#+BEGIN_SRC sh :noweb yes
   #@description The configuration files for modules
-  modules.configuration_files : string[1] as path = \
-      "@SNEMO_SIMULATION_MODULES_DIR@/snemo_bb0nu_studies_modules.conf"
+  <<file_listing(prefix="modules.configuration_files", pattern="_module")>>
 #+END_SRC
 
 ** Service manager
 :PROPERTIES:
-:TANGLE: config/pipeline/service_manager.conf
+:TANGLE: config/service_manager.conf
 :END:
 *** Logging priority
 #+BEGIN_SRC sh
@@ -144,7 +141,7 @@ receives a table list and builds the corresponding =dlls.conf= file.
 #+END_SRC
 *** Libraries
 :PROPERTIES:
-:TANGLE: config/pipeline/dlls.conf
+:TANGLE: config/dlls.conf
 :END:
 This part set the different libraries to be loaded at runtime. This is needed
 since event data models are defined in other libraries than the one currently
@@ -161,7 +158,7 @@ named =snemo_bb0nu_studies=. The following table sets the libraries
 #+END_SRC
 * Services configuration
 :PROPERTIES:
-:TANGLE: config/pipeline/services.conf
+:TANGLE: config/services.conf
 :END:
 
 A service generally hosts a specific resource that can be shared by many other
@@ -215,10 +212,10 @@ Templates for histogram may be provided to reduce the amount of configuration of
 individual histogram. For instance, plotting the energy distributions of several
 channels may only need one general histogram definition which gives the x-axis
 boundaries and x-binning.
-#+BEGIN_SRC sh
-  #@description The main configuration file for the embedded histogram manager
-  pool.histo.setups : string[1] as path = \
-      "@SNEMO_BB0NU_STUDIES_DIR@/histogram_templates.conf"
+
+#+BEGIN_SRC sh :noweb yes
+  #@description The configuration files for modules
+  <<file_listing(prefix="pool.histo.setups", pattern="_template")>>
 #+END_SRC
 *** Histograms storage
 Finally, all histograms created can be stored inside ROOT files or XML archives.
@@ -273,7 +270,7 @@ library(ies) which holds the needed modules.
 
 #+BEGIN_SRC sh
   bxdpp_processing                                                     \
-      --module-manager-config $PWD/config/pipeline/module_manager.conf \
+      --module-manager-config $PWD/config/module_manager.conf \
       --module bb0nu_halflife_limit_module                             \
       --load-dll snemo_bb0nu_studies                                   \
       --load-dll <library>_bio                                         \
@@ -289,10 +286,10 @@ loader]] by writing
 
 #+BEGIN_SRC sh
   dpp_processing                                                       \
-      --module-manager-config $PWD/config/pipeline/module_manager.conf \
+      --module-manager-config $PWD/config/module_manager.conf \
       --module bb0nu_halflife_limit_module                             \
       --load-dll snemo_bb0nu_studies                                   \
-      --dll-config $PWD/config/pipeline/dlls.conf                      \
+      --dll-config $PWD/config/dlls.conf                      \
       --input-file <path to a data record>
 #+END_SRC
 
@@ -301,6 +298,20 @@ will generate a ROOT file containing several histograms. This file is located by
 default, in =/tmp/${USER}/snemo.d= directory under the
 =snemo_bb0nu_halflife_limit_histos.root= name. You can change the output
 directory and output file name in [[Histogram service][this section]].
+
+* Misc                                                             :noexport:
+** File listing
+#+NAME: file_listing
+#+HEADERS: :var prefix="" :var pattern="no_pattern"
+#+BEGIN_SRC sh :results output :tangle no :exports none
+  files=($(find config -name "*${pattern}*.conf"))
+  echo "${prefix} : string[${#files[@]}] as path = \\"
+  for file in ${files[@]}
+  do
+      echo -n "    \"@SNEMO_SIMULATION_MODULES_DIR@/${file/config\//}\""
+      if [ $file != ${files[${#files[@]}-1]} ]; then echo ' \'; fi
+  done
+#+END_SRC
 
 * Footnotes
 
