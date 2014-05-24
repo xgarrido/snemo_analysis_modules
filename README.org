@@ -243,14 +243,6 @@ boundaries and x-binning.
   #@description The configuration files for modules
   <<file_listing(prefix="pool.histo.setups", pattern="_template")>>
 #+END_SRC
-*** Histograms storage
-Finally, all histograms created can be stored inside ROOT files or XML archives.
-#+BEGIN_SRC sh
-  #@description The ouput file where to store the histograms
-  output_files : string[2] as path =                        \
-      "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.root" \
-      "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"
-#+END_SRC
 * Running SN@ilWare processing chain
 ** Tangling configuration
 First, you need to tangle this file. As explained in the [[Content][Content]] section, you
