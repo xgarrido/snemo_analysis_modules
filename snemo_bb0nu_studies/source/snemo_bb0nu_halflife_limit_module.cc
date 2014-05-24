@@ -31,7 +31,6 @@ namespace analysis {
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_bb0nu_halflife_limit_module,
                                     "analysis::snemo_bb0nu_halflife_limit_module");
 
-
   // Character separator between key for histogram dict.
   const char KEY_FIELD_SEPARATOR = '_';
 
@@ -143,6 +142,14 @@ namespace analysis {
         dpp::histogram_service & Histo
           = service_manager_.get<dpp::histogram_service> (histogram_label);
         set_histogram_pool (Histo.grab_pool ());
+        if (config_.has_key ("Histo_output_files"))
+          {
+            std::vector<std::string> output_files;
+            config_.fetch ("Histo_output_files", output_files);
+            for (size_t i = 0; i < output_files.size(); i++) {
+              Histo.add_output_file(output_files[i]);
+            }
+          }
       }
 
     // Tag the module as initialized :
@@ -249,7 +256,12 @@ namespace analysis {
       {
         const snemo::analysis::model::particle_track & a_particle = iparticle->get ();
 
-        if (! a_particle.has_associated_calorimeters ()) continue;
+        if (! a_particle.has_associated_calorimeters ())
+          {
+            DT_LOG_DEBUG(get_logging_priority(),
+                         "Particle track is not associated to any calorimeter block !");
+            continue;
+          }
 
         const snemo::analysis::model::particle_track::calorimeter_collection_type &
           the_calorimeters = a_particle.get_associated_calorimeters ();
@@ -308,6 +320,12 @@ namespace analysis {
       }
     // Add charge multiplicity
     key << nelectron << "e-" << npositron << "e+" << nundefined << "u";
+
+    DT_LOG_TRACE(get_logging_priority(), "Total energy = " << total_energy / CLHEP::keV << " keV");
+    DT_LOG_TRACE(get_logging_priority(), "Number of electrons = " << nelectron);
+    DT_LOG_TRACE(get_logging_priority(), "Number of positrons = " << npositron);
+    DT_LOG_TRACE(get_logging_priority(), "Number of undefined = " << nundefined);
+    DT_LOG_TRACE(get_logging_priority(), "Key = " << key.str());
 
     // Arbitrary selection of "two-particles" channel
     if (nelectron != 2)
