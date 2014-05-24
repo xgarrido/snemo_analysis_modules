@@ -40,18 +40,20 @@
 #include <map>
 #include <string>
 
-namespace analysis {
+namespace geomtools {
+  class manager;
+}
 
+namespace snemo {
   namespace geometry {
-    class manager;
-
-    namespace snemo {
-      class calo_locator;
-      class xcalo_locator;
-      class gveto_locator;
-      class gg_locator;
-    }
+    class calo_locator;
+    class xcalo_locator;
+    class gveto_locator;
+    class gg_locator;
   }
+}
+
+namespace analysis {
 
   class snemo_detector_efficiency_module : public dpp::base_module
   {
@@ -60,13 +62,10 @@ namespace analysis {
     typedef std::map<geomtools::geom_id, unsigned int> efficiency_dict;
 
     /// Set Geometry manager
-    void set_geom_manager (const snemo::geometry::manager & gmgr_);
+    void set_geometry_manager(const geomtools::manager & gmgr_);
 
     /// Get Geometry manager
-    const snemo::geometry::manager & get_geom_manager () const;
-
-    /// Has Geometry manager
-    bool has_geom_manager () const;
+    const geomtools::manager & get_geometry_manager() const;
 
     /// Constructor
     snemo_detector_efficiency_module(datatools::logger::priority = datatools::logger::PRIO_FATAL);
@@ -85,10 +84,10 @@ namespace analysis {
     /// Data record processing
     virtual process_status process(datatools::things & data_);
 
-    void dump_result (std::ostream      & out_    = std::clog,
-                      const std::string & title_  = "",
-                      const std::string & indent_ = "",
-                      bool inherit_               = false) const;
+    void dump_result(std::ostream      & out_    = std::clog,
+                     const std::string & title_  = "",
+                     const std::string & indent_ = "",
+                     bool inherit_               = false) const;
 
   protected:
 
@@ -107,15 +106,15 @@ namespace analysis {
     std::string _bank_label_;
 
     // The geometry manager :
-    const snemo::geometry::manager * _geom_manager_;
+    const geomtools::manager * _geometry_manager_;
 
     // Calorimeter locators
-    boost::scoped_ptr<snemo::geometry::snemo::calo_locator>  _calo_locator_;
-    boost::scoped_ptr<snemo::geometry::snemo::xcalo_locator> _xcalo_locator_;
-    boost::scoped_ptr<snemo::geometry::snemo::gveto_locator> _gveto_locator_;
+    boost::scoped_ptr<snemo::geometry::calo_locator>  _calo_locator_;
+    boost::scoped_ptr<snemo::geometry::xcalo_locator> _xcalo_locator_;
+    boost::scoped_ptr<snemo::geometry::gveto_locator> _gveto_locator_;
 
     // Geiger locators
-    boost::scoped_ptr<snemo::geometry::snemo::gg_locator> _gg_locator_;
+    boost::scoped_ptr<snemo::geometry::gg_locator> _gg_locator_;
 
     // The calorimeter block efficiency dictionnary
     efficiency_dict _calo_efficiencies_;
