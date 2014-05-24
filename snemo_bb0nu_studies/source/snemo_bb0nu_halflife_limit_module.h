@@ -3,7 +3,7 @@
  * Creation date : 2012-06-13
  * Last modified : 2012-08-27
  *
- * Copyright (C) 2012 Steven Calvez <calvez@lal.in2p3.fr>
+ * Copyright (C) 2012-2014 Steven Calvez <calvez@lal.in2p3.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
