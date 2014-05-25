@@ -76,9 +76,8 @@ sense that 0\nu halflife calculation can be done for different study purpose (ju
 change the =key_fields=).
 #+BEGIN_SRC sh
   #@description The key fields from 'Event Header' bank to build a unique key for histogram
-  key_fields : string[2] =     \
-      "analysis.decay_process" \
-      "analysis.source_isotope"
+  key_fields : string[1] = \
+      "event.genbb_label"
 #+END_SRC
 
 *** Experimental setup
