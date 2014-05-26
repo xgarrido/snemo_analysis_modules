@@ -293,7 +293,7 @@ It will run the =bb0nu_halflife_limit_module= over the input file[fn:5] and it
 will generate a ROOT file containing several histograms. This file is located by
 default, in =/tmp/${USER}/snemo.d= directory under the
 =snemo_bb0nu_halflife_limit_histos.root= name. You can change the output
-directory and output file name in [[file:snemo_bb0nu_studies/README.org::*Histogram declarations][this section]].
+directory and output file name in [[file:snemo_bb0nu_studies/README.org::*Histograms storage][this section]].
 
 * Misc                                                             :noexport:
 ** File listing
