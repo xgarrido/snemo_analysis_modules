@@ -9,7 +9,7 @@ SuperNEMO data through the concept of modules as described in [[http://nile.hep.
 the content of this file is to provide a minimal working environment in order to
 run the =bxdpp_processing= binary[fn:1].
 
-* Content
+* Repository content
 
 The following analysis modules are currently available :
 
@@ -324,7 +324,7 @@ directory and output file name in [[Histogram service][this section]].
 ** File listing
 #+NAME: file_listing
 #+HEADERS: :var prefix="" :var pattern="no_pattern"
-#+BEGIN_SRC sh :results output :tangle no :exports none
+#+BEGIN_SRC sh :results output :tangle no :exports none :shebang "#!/bin/bash"
   files=($(find config -name "*${pattern}*.conf"))
   echo "${prefix} : string[${#files[@]}] as path = \\"
   for file in ${files[@]}
