@@ -24,9 +24,9 @@
 #include <set>
 #include <numeric>
 
-// #include <boost/bind.hpp>
-
 #include <snemo_detector_efficiency_module.h>
+
+#include <boost/bind.hpp>
 
 // Third party:
 // - Bayeux/datatools:
@@ -44,6 +44,7 @@
 // #include <snanalysis/models/particle_track_data.h>
 
 // Geometry manager
+#include <falaise/snemo/geometry/locator_plugin.h>
 #include <falaise/snemo/geometry/calo_locator.h>
 #include <falaise/snemo/geometry/xcalo_locator.h>
 #include <falaise/snemo/geometry/gveto_locator.h>
@@ -55,35 +56,11 @@ namespace analysis {
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_detector_efficiency_module,
                                     "analysis::snemo_detector_efficiency_module");
 
-  void snemo_detector_efficiency_module::set_geometry_manager(const geomtools::manager & gmgr_)
-  {
-    DT_THROW_IF (is_initialized(), std::logic_error,
-                 "Module '" << get_name() << "' is already initialized ! ");
-    _geometry_manager_ = &gmgr_;
-
-    // Check setup label:
-    const std::string & setup_label = _geometry_manager_->get_setup_label ();
-    DT_THROW_IF(setup_label.find("snemo::") == std::string::npos,
-                std::logic_error,
-                "Setup label '" << setup_label << "' is not supported !");
-    return;
-  }
-
-  const geomtools::manager & snemo_detector_efficiency_module::get_geometry_manager() const
-  {
-    return *_geometry_manager_;
-  }
-
   void snemo_detector_efficiency_module::_set_defaults ()
   {
     _bank_label_ = "";
 
     _Geo_service_label_ = "";
-    _geometry_manager_  = 0;
-
-    _calo_locator_.reset ();
-    _xcalo_locator_.reset ();
-    _gveto_locator_.reset ();
 
     _calo_efficiencies_.clear ();
     _gg_efficiencies_.clear ();
@@ -149,28 +126,47 @@ namespace analysis {
       }
 
     // Geometry manager :
-    if (_geometry_manager_ == 0) {
-      std::string geo_label = snemo::processing::service_info::default_geometry_service_label();
-      if (config_.has_key("Geo_label")) {
-        geo_label = config_.fetch_string("Geo_label");
-      }
-      DT_THROW_IF (geo_label.empty(), std::logic_error,
-                   "Module '" << get_name() << "' has no valid '" << "Geo_label" << "' property !");
-      DT_THROW_IF (! service_manager_.has(geo_label) ||
-                   ! service_manager_.is_a<geomtools::geometry_service>(geo_label),
-                   std::logic_error,
-                   "Module '" << get_name() << "' has no '" << geo_label << "' service !");
-      geomtools::geometry_service & Geo
-        = service_manager_.get<geomtools::geometry_service>(geo_label);
-      set_geometry_manager(Geo.get_geom_manager());
+    std::string geo_label = snemo::processing::service_info::default_geometry_service_label();
+    if (config_.has_key("Geo_label")) {
+      geo_label = config_.fetch_string("Geo_label");
     }
+    DT_THROW_IF (geo_label.empty(), std::logic_error,
+                 "Module '" << get_name() << "' has no valid '" << "Geo_label" << "' property !");
+    DT_THROW_IF (! service_manager_.has(geo_label) ||
+                 ! service_manager_.is_a<geomtools::geometry_service>(geo_label),
+                 std::logic_error,
+                 "Module '" << get_name() << "' has no '" << geo_label << "' service !");
+    geomtools::geometry_service & Geo
+      = service_manager_.get<geomtools::geometry_service>(geo_label);
 
-    // Initialize locators
-    const int mn = 0;
-    _calo_locator_.reset  (new snemo::geometry::calo_locator  (get_geometry_manager (), mn));
-    _xcalo_locator_.reset (new snemo::geometry::xcalo_locator (get_geometry_manager (), mn));
-    _gveto_locator_.reset (new snemo::geometry::gveto_locator (get_geometry_manager (), mn));
-    _gg_locator_.reset    (new snemo::geometry::gg_locator    (get_geometry_manager (), mn));
+    // Get geometry locator plugin
+    const geomtools::manager & geo_mgr = Geo.get_geom_manager();
+    std::string locator_plugin_name;
+    if (config_.has_key ("locator_plugin_name"))
+      {
+        locator_plugin_name = config_.fetch_string ("locator_plugin_name");
+      }
+    else
+      {
+        // If no locator plugin name is set, then search for the first one
+        const geomtools::manager::plugins_dict_type & plugins = geo_mgr.get_plugins ();
+        for (geomtools::manager::plugins_dict_type::const_iterator ip = plugins.begin ();
+             ip != plugins.end ();
+             ip++) {
+          const std::string & plugin_name = ip->first;
+          if (geo_mgr.is_plugin_a<snemo::geometry::locator_plugin> (plugin_name)) {
+            DT_LOG_DEBUG (get_logging_priority (), "Find locator plugin with name = " << plugin_name);
+            locator_plugin_name = plugin_name;
+            break;
+          }
+        }
+      }
+    // Access to a given plugin by name and type :
+    DT_THROW_IF (! geo_mgr.has_plugin (locator_plugin_name) ||
+                 ! geo_mgr.is_plugin_a<snemo::geometry::locator_plugin> (locator_plugin_name),
+                 std::logic_error,
+                 "Found no locator plugin named '" << locator_plugin_name << "'");
+    _locator_plugin_ = &geo_mgr.get_plugin<snemo::geometry::locator_plugin> (locator_plugin_name);
 
     // Tag the module as initialized :
     _set_initialized (true);
@@ -284,81 +280,89 @@ namespace analysis {
     return dpp::base_module::PROCESS_SUCCESS;
   }
 
-  void snemo_detector_efficiency_module::_compute_efficiency() {}
-  // {
-  //   // Handling geom_id is done in this place where geom_id are split into
-  //   // main wall, xwall and gveto calorimeters. For such task we use
-  //   // sngeometry locators
+  void snemo_detector_efficiency_module::_compute_efficiency()
+  {
+    // Handling geom_id is done in this place where geom_id are split into
+    // main wall, xwall and gveto calorimeters. For such task we use
+    // sngeometry locators
 
-  //   std::ofstream fout ("/tmp/efficiency.dat");
-  //   {
-  //     efficiency_dict::const_iterator found =
-  //       std::max_element (_calo_efficiencies_.begin (), _calo_efficiencies_.end (),
-  //                         (boost::bind(&efficiency_dict::value_type::second, _1) <
-  //                          boost::bind(&efficiency_dict::value_type::second, _2)));
-  //     const int calo_total = found->second;
+    std::ofstream fout ("/tmp/efficiency.dat");
+    {
+      efficiency_dict::const_iterator found =
+        std::max_element(_calo_efficiencies_.begin (), _calo_efficiencies_.end (),
+                         (boost::bind(&efficiency_dict::value_type::second, _1) <
+                          boost::bind(&efficiency_dict::value_type::second, _2)));
+      const int calo_total = found->second;
 
-  //     for (efficiency_dict::const_iterator i = _calo_efficiencies_.begin ();
-  //          i != _calo_efficiencies_.end (); ++i)
-  //       {
-  //         const geomtools::geom_id & a_gid = i->first;
+      for (efficiency_dict::const_iterator i = _calo_efficiencies_.begin ();
+           i != _calo_efficiencies_.end (); ++i)
+        {
+          const geomtools::geom_id & a_gid = i->first;
 
-  //         if (_calo_locator_->is_calo_block_in_current_module (a_gid))
-  //           {
-  //             fout << "calo ";
-  //             geomtools::vector_3d position;
-  //             _calo_locator_->get_block_position (a_gid, position);
-  //             fout << position.x () << " "
-  //                  << position.y () << " "
-  //                  << position.z () << " ";
-  //           }
-  //         else if (_xcalo_locator_->is_calo_block_in_current_module (a_gid))
-  //           {
-  //             fout << "xcalo ";
-  //             geomtools::vector_3d position;
-  //             _xcalo_locator_->get_block_position (a_gid, position);
-  //             fout << position.x () << " "
-  //                  << position.y () << " "
-  //                  << position.z () << " ";
-  //           }
-  //         else if (_gveto_locator_->is_calo_block_in_current_module (a_gid))
-  //           {
-  //             fout << "gveto ";
-  //             geomtools::vector_3d position;
-  //             _gveto_locator_->get_block_position (a_gid, position);
-  //             fout << position.x () << " "
-  //                  << position.y () << " "
-  //                  << position.z () << " ";
-  //           }
-  //         fout << i->second/double (calo_total) << std::endl;
-  //       }
-  //   }
+          const snemo::geometry::calo_locator & calo_locator
+            = dynamic_cast<const snemo::geometry::calo_locator&>(_locator_plugin_->get_calo_locator());
+          if (calo_locator.is_calo_block_in_current_module(a_gid))
+            {
+              fout << "calo ";
+              geomtools::vector_3d position;
+              calo_locator.get_block_position(a_gid, position);
+              fout << position.x () << " "
+                   << position.y () << " "
+                   << position.z () << " ";
+            }
+          const snemo::geometry::xcalo_locator & xcalo_locator
+            = dynamic_cast<const snemo::geometry::xcalo_locator&>(_locator_plugin_->get_xcalo_locator());
+          if (xcalo_locator.is_calo_block_in_current_module(a_gid))
+            {
+              fout << "xcalo ";
+              geomtools::vector_3d position;
+              xcalo_locator.get_block_position (a_gid, position);
+              fout << position.x () << " "
+                   << position.y () << " "
+                   << position.z () << " ";
+            }
+          const snemo::geometry::gveto_locator & gveto_locator
+            = dynamic_cast<const snemo::geometry::gveto_locator&>(_locator_plugin_->get_gveto_locator());
+          if (gveto_locator.is_calo_block_in_current_module(a_gid))
+            {
+              fout << "gveto ";
+              geomtools::vector_3d position;
+              gveto_locator.get_block_position(a_gid, position);
+              fout << position.x () << " "
+                   << position.y () << " "
+                   << position.z () << " ";
+            }
+          fout << i->second/double (calo_total) << std::endl;
+        }
+    }
 
-  //   {
-  //     efficiency_dict::const_iterator found =
-  //       std::max_element (_gg_efficiencies_.begin (), _gg_efficiencies_.end (),
-  //                         (boost::bind(&efficiency_dict::value_type::second, _1) <
-  //                          boost::bind(&efficiency_dict::value_type::second, _2)));
-  //     const int gg_total = found->second;
+    {
+      efficiency_dict::const_iterator found =
+        std::max_element(_gg_efficiencies_.begin (), _gg_efficiencies_.end (),
+                         (boost::bind(&efficiency_dict::value_type::second, _1) <
+                          boost::bind(&efficiency_dict::value_type::second, _2)));
+      const int gg_total = found->second;
 
-  //     for (efficiency_dict::const_iterator i = _gg_efficiencies_.begin ();
-  //          i != _gg_efficiencies_.end (); ++i)
-  //       {
-  //         const geomtools::geom_id & a_gid = i->first;
+      for (efficiency_dict::const_iterator i = _gg_efficiencies_.begin ();
+           i != _gg_efficiencies_.end (); ++i)
+        {
+          const geomtools::geom_id & a_gid = i->first;
 
-  //         if (_gg_locator_->is_drift_cell_volume_in_current_module (a_gid))
-  //           {
-  //             fout << "gg ";
-  //             geomtools::vector_3d position;
-  //             _gg_locator_->get_cell_position (a_gid, position);
-  //             fout << position.x () << " " << position.y () << " ";
-  //           }
-  //         fout << i->second/double (gg_total) << std::endl;
-  //       }
-  //   }
+          const snemo::geometry::gg_locator & gg_locator
+            = dynamic_cast<const snemo::geometry::gg_locator&>(_locator_plugin_->get_gg_locator());
+          if (gg_locator.is_drift_cell_volume_in_current_module(a_gid))
+            {
+              fout << "gg ";
+              geomtools::vector_3d position;
+              gg_locator.get_cell_position(a_gid, position);
+              fout << position.x () << " " << position.y () << " ";
+            }
+          fout << i->second/double (gg_total) << std::endl;
+        }
+    }
 
-  //   return;
-  // }
+    return;
+  }
 
   void snemo_detector_efficiency_module::dump_result(std::ostream      & out_,
                                                      const std::string & title_,
