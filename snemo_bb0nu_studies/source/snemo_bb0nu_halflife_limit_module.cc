@@ -150,6 +150,14 @@ namespace analysis {
               Histo.add_output_file(output_files[i]);
             }
           }
+        if (config_.has_key ("Histo_template_files"))
+          {
+            std::vector<std::string> template_files;
+            config_.fetch ("Histo_template_files", template_files);
+            for (size_t i = 0; i < template_files.size(); i++) {
+              Histo.grab_pool().load(template_files[i]);
+            }
+          }
       }
 
     // Tag the module as initialized :

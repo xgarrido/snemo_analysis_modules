@@ -259,16 +259,6 @@ histograms can be added to a histogram dictionnary.
   #@description The description string of the embedded pool of histograms
   pool.description : string = "SuperNEMO histograms"
 #+END_SRC
-*** Histogram templates
-Templates for histogram may be provided to reduce the amount of configuration of
-individual histogram. For instance, plotting the energy distributions of several
-channels may only need one general histogram definition which gives the x-axis
-boundaries and x-binning.
-
-#+BEGIN_SRC sh :noweb yes
-  #@description The configuration files for modules
-  <<file_listing(prefix="pool.histo.setups", pattern="_template")>>
-#+END_SRC
 * Running SN@ilWare processing chain
 
 ** Source code compilation
