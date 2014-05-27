@@ -174,7 +174,6 @@ namespace analysis {
 
     // Compute efficiency
     _compute_efficiency_();
-
     // Compute neutrinoless halflife limit
     _compute_halflife_();
 
@@ -184,6 +183,10 @@ namespace analysis {
         DT_LOG_NOTICE(get_logging_priority (), "bb0nu dump: ");
         dump_result();
       }
+
+    // // temporary dump
+    // DT_LOG_WARNING(get_logging_priority (), std::endl<<std::endl<<"bb0nu dump: ----------------------------------------------------------------------- ");
+    // dump_result();
 
     // Tag the module as un-initialized :
     _set_initialized(false);
@@ -284,7 +287,7 @@ namespace analysis {
         for (size_t i = 0; i < the_calorimeters.size (); ++i)
           {
             const geomtools::geom_id & gid = the_calorimeters.at (i).get ().get_geom_id ();
-            if (gids.find (gid) != gids.end ()) continue;
+            if (gids.find (gid) != gids.end ()) continue;   // ??_check_
             gids.insert (gid);
             total_energy += the_calorimeters.at (i).get ().get_energy ();
           }
@@ -338,7 +341,8 @@ namespace analysis {
     // Arbitrary selection of "two-particles" channel
     if (nelectron != 2)
       {
-        DT_LOG_WARNING (get_logging_priority (), "Selecting only two-electrons events!");
+        DT_LOG_WARNING (get_logging_priority (), "Selecting only two-electrons events!  Event #" << eh.get_id ());
+        //ptd.tree_dump ();
         return dpp::base_module::PROCESS_CONTINUE;
       }
 
@@ -451,7 +455,7 @@ namespace analysis {
 
             // Flag signal/background histogram
             datatools::properties & a_aux = a_new_histogram.grab_auxiliaries ();
-            if (a_name.find ("bb0nu") != std::string::npos)
+            if (a_name.find ("0nubb") != std::string::npos)
               {
                 a_aux.update_flag ("__signal");
               }
@@ -576,6 +580,9 @@ namespace analysis {
             a_new_histogram.set (i, halflife);
           }
         DT_LOG_NOTICE (get_logging_priority (),
+                       "Best halflife limit for bb0nu process is " << best_halflife_limit << " yr");
+
+        DT_LOG_WARNING (get_logging_priority (),
                        "Best halflife limit for bb0nu process is " << best_halflife_limit << " yr");
       }// end of signal loop
   }
