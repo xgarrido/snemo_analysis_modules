@@ -451,7 +451,7 @@ namespace analysis {
 
             // Flag signal/background histogram
             datatools::properties & a_aux = a_new_histogram.grab_auxiliaries ();
-            if (a_name.find ("bb0nu") != std::string::npos)
+            if (a_name.find ("0nubb") != std::string::npos)
               {
                 a_aux.update_flag ("__signal");
               }
