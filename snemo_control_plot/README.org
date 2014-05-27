@@ -62,7 +62,7 @@ Set the same histogram service label as defined [[Histogram service][here]]
 ** Histogram declarations
 :PROPERTIES:
 :MKDIRP: yes
-:TANGLE: ../config/histogram_templates.conf
+:TANGLE: ../config/scp_histogram_templates.conf
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this

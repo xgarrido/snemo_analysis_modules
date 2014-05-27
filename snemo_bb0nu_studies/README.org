@@ -104,7 +104,7 @@ halflife, exposure are used.
 
 ** Histogram declarations
 :PROPERTIES:
-:TANGLE: ../config/histogram_templates.conf
+:TANGLE: ../config/bb0nu_histogram_templates.conf
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this
