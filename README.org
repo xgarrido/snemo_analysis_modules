@@ -220,6 +220,29 @@ software components, including other services or data processing modules (see
   backup.file : string as path = "/tmp/${USER}/snemo.d/snemo_context_bak.conf"
 #+END_SRC
 
+** Geometry service
+The following code block declares the geometry service to properly load all the
+geometry and material construction of the detector. This service, only declared
+here, can be used by several operations like calibration, particle track
+reconstruction ... but all of them will use the same geometry.
+
+#+BEGIN_SRC sh
+  [name="Geo" type="geomtools::geometry_service"]
+
+  #@description Logging priority
+  logging.priority : string = "warning"
+
+  #@description Embedded SuperNEMO geometry manager main configuration file
+  manager.configuration_file : string as path = \
+      "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf"
+
+  #@description Embedded SuperNEMO geometry manager must build its mapping lookup table
+  manager.build_mapping : boolean = 1
+
+  #@description Embedded geometry manager's mapping lookup table does not exclude any geometry category
+  manager.no_excluded_categories : boolean = 1
+#+END_SRC
+
 ** Histogram service
 
 The histogram service provides an esay way to handle histogram plot from
