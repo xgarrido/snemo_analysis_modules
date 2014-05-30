@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef ANALYSIS_SNEMO_DETECTOR_EFFICIENCY_MODULE_H_
-#define ANALYSIS_SNEMO_DETECTOR_EFFICIENCY_MODULE_H_ 1
+#ifndef ANALYSIS_SNEMO_DETECTOR_EFFICIENCY_MODULE_H
+#define ANALYSIS_SNEMO_DETECTOR_EFFICIENCY_MODULE_H 1
 
 // Data processing module abstract base class
 #include <dpp/base_module.h>
@@ -112,7 +112,7 @@ namespace analysis {
 
 } // namespace analysis
 
-#endif // ANALYSIS_SNEMO_DETECTOR_EFFICIENCY_MODULE_H_
+#endif // ANALYSIS_SNEMO_DETECTOR_EFFICIENCY_MODULE_H
 
 // end of snemo_detector_efficiency_module.h
 /*

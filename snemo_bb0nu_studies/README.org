@@ -50,7 +50,7 @@ The module name is =bb0nu_halflife_limit_module= which is needed when using
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "trace"
+  logging.priority : string = "error"
 #+END_SRC
 
 *** Histogram service label

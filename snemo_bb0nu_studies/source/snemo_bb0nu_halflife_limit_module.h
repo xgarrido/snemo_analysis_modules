@@ -30,8 +30,8 @@
  *
  */
 
-#ifndef ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_
-#define ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_ 1
+#ifndef ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
+#define ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H 1
 
 // Data processing module abstract base class
 #include <dpp/base_module.h>
@@ -119,7 +119,7 @@ namespace analysis {
 
 } // namespace analysis
 
-#endif // ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H_
+#endif // ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
 
 // end of snemo_bb0nu_halflife_limit_module.h
 /*
