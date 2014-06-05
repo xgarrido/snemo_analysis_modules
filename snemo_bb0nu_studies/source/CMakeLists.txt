@@ -15,14 +15,14 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # - Third party
-find_package(snanalysis 3.0.0 REQUIRED)
+find_package(Falaise 1.0.0 REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR} ${snanalysis_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR} ${Falaise_INCLUDE_DIRS})
 
 add_library(snemo_bb0nu_studies SHARED
   snemo_bb0nu_halflife_limit_module.h snemo_bb0nu_halflife_limit_module.cc)
 
-target_link_libraries(snemo_bb0nu_studies ${snanalysis_LIBRARIES})
+target_link_libraries(snemo_bb0nu_studies ${Falaise_LIBRARIES})
 
 install(FILES
   ${PROJECT_BINARY_DIR}/libsnemo_bb0nu_studies${CMAKE_SHARED_LIBRARY_SUFFIX}

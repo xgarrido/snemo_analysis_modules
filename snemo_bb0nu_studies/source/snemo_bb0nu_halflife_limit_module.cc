@@ -13,8 +13,7 @@
 #include <mctools/utils.h>
 #include <snemo/datamodels/data_model.h>
 #include <snemo/datamodels/event_header.h>
-#include <snanalysis/models/data_model.h>
-#include <snanalysis/models/particle_track_data.h>
+#include <snemo/datamodels/particle_track_data.h>
 
 // Service manager
 #include <datatools/service_manager.h>
@@ -213,7 +212,7 @@ namespace analysis {
                  "Module '" << get_name () << "' is not initialized !");
 
     // Check if the 'event header' record bank is available :
-    const std::string eh_label = snemo::datamodel::data_info::EVENT_HEADER_LABEL;
+    const std::string eh_label = snemo::datamodel::data_info::default_event_header_label();
     if (! data_record_.has (eh_label))
       {
         DT_LOG_ERROR (get_logging_priority (), "Could not find any bank with label '"
@@ -224,15 +223,15 @@ namespace analysis {
       = data_record_.get<snemo::datamodel::event_header>(eh_label);
 
     // Check if the 'particle track' record bank is available :
-    const std::string ptd_label = snemo::analysis::model::data_info::PARTICLE_TRACK_DATA_LABEL;
+    const std::string ptd_label = snemo::datamodel::data_info::default_particle_track_data_label();
     if (! data_record_.has (ptd_label))
       {
         DT_LOG_ERROR (get_logging_priority (), "Could not find any bank with label '"
                       << ptd_label << "' !");
         return dpp::base_module::PROCESS_STOP;
       }
-    const snemo::analysis::model::particle_track_data & ptd
-      = data_record_.get<snemo::analysis::model::particle_track_data>(ptd_label);
+    const snemo::datamodel::particle_track_data & ptd
+      = data_record_.get<snemo::datamodel::particle_track_data>(ptd_label);
 
     if (get_logging_priority () >= datatools::logger::PRIO_DEBUG)
       {
@@ -254,15 +253,15 @@ namespace analysis {
     std::set<geomtools::geom_id> gids;
 
     // Loop over all saved particles
-    const snemo::analysis::model::particle_track_data::particle_collection_type &
+    const snemo::datamodel::particle_track_data::particle_collection_type &
       the_particles = ptd.get_particles ();
 
-    for (snemo::analysis::model::particle_track_data::particle_collection_type::const_iterator
+    for (snemo::datamodel::particle_track_data::particle_collection_type::const_iterator
            iparticle = the_particles.begin ();
          iparticle != the_particles.end ();
          ++iparticle)
       {
-        const snemo::analysis::model::particle_track & a_particle = iparticle->get ();
+        const snemo::datamodel::particle_track & a_particle = iparticle->get ();
 
         if (! a_particle.has_associated_calorimeters ())
           {
@@ -271,7 +270,7 @@ namespace analysis {
             continue;
           }
 
-        const snemo::analysis::model::particle_track::calorimeter_collection_type &
+        const snemo::datamodel::calibrated_calorimeter_hit::collection_type &
           the_calorimeters = a_particle.get_associated_calorimeters ();
 
         if (the_calorimeters.size () > 2)
@@ -289,8 +288,8 @@ namespace analysis {
             total_energy += the_calorimeters.at (i).get ().get_energy ();
           }
 
-        if      (a_particle.get_charge () == snemo::analysis::model::particle_track::negative) nelectron++;
-        else if (a_particle.get_charge () == snemo::analysis::model::particle_track::positive) npositron++;
+        if      (a_particle.get_charge () == snemo::datamodel::particle_track::negative) nelectron++;
+        else if (a_particle.get_charge () == snemo::datamodel::particle_track::positive) npositron++;
         else nundefined++;
       }
 
