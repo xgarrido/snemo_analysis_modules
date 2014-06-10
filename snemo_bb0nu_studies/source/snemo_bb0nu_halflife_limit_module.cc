@@ -56,6 +56,20 @@ namespace analysis {
     return number_of_excluded_events;
   }
 
+  // Setting signal flag name for histogram properties
+  const std::string & snemo_bb0nu_halflife_limit_module::signal_flag()
+  {
+    static const std::string flag("__signal");
+    return flag;
+  }
+
+  // Setting background flag name for histogram properties
+  const std::string & snemo_bb0nu_halflife_limit_module::background_flag()
+  {
+    static const std::string flag("__background");
+    return flag;
+  }
+
   // Set the histogram pool used by the module :
   void snemo_bb0nu_halflife_limit_module::set_histogram_pool (mygsl::histogram_pool & pool_)
   {
@@ -149,6 +163,14 @@ namespace analysis {
               Histo.add_output_file(output_files[i]);
             }
           }
+        if (config_.has_key ("Histo_input_files"))
+          {
+            std::vector<std::string> input_files;
+            config_.fetch ("Histo_input_files", input_files);
+            for (size_t i = 0; i < input_files.size(); i++) {
+              Histo.load_from_boost_file(input_files[i]);
+            }
+          }
         if (config_.has_key ("Histo_template_files"))
           {
             std::vector<std::string> template_files;
@@ -180,7 +202,7 @@ namespace analysis {
     // Dump result
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG)
       {
-        DT_LOG_NOTICE(get_logging_priority (), "bb0nu dump: ");
+        DT_LOG_NOTICE(get_logging_priority (), "Halflife limit module dump: ");
         dump_result();
       }
 
@@ -395,8 +417,7 @@ namespace analysis {
 
     // Sum of number of events
     std::map<std::string, double> m_event;
-    for (std::vector<std::string>::const_iterator
-           iname = hnames.begin ();
+    for (std::vector<std::string>::const_iterator iname = hnames.begin ();
          iname != hnames.end (); ++iname)
       {
         const std::string & a_name = *iname;
@@ -452,11 +473,11 @@ namespace analysis {
             datatools::properties & a_aux = a_new_histogram.grab_auxiliaries ();
             if (a_name.find ("0nubb") != std::string::npos)
               {
-                a_aux.update_flag ("__signal");
+                a_aux.update_flag (snemo_bb0nu_halflife_limit_module::signal_flag());
               }
-            else
+            else if (a_name.find ("2nubb") != std::string::npos)
               {
-                a_aux.update_flag ("__background");
+                a_aux.update_flag (snemo_bb0nu_halflife_limit_module::background_flag());
               }
           } // end of bin content
       }// end of histogram loop
@@ -480,7 +501,7 @@ namespace analysis {
 
     // Get names of 'signal' histograms
     std::vector<std::string> signal_names;
-    a_pool.names (signal_names, "flag=__signal");
+    a_pool.names (signal_names, "flag=" + snemo_bb0nu_halflife_limit_module::signal_flag());
     if (signal_names.empty ())
       {
         DT_LOG_WARNING (get_logging_priority (), "No 'signal' histograms have been stored !");
@@ -488,7 +509,7 @@ namespace analysis {
       }
     // Get names of 'background' histograms
     std::vector<std::string> bkg_names;
-    a_pool.names (bkg_names, "flag=__background");
+    a_pool.names (bkg_names, "flag=" + snemo_bb0nu_halflife_limit_module::background_flag());
     if (bkg_names.empty ())
       {
         DT_LOG_WARNING (get_logging_priority (), "No 'background' histograms have been stored !");
@@ -507,8 +528,7 @@ namespace analysis {
     // Loop over 'background' histograms
     // Save the total number of events
     std::vector<double> vbkg_counts;
-    for (std::vector<std::string>::const_iterator
-           iname = bkg_names.begin ();
+    for (std::vector<std::string>::const_iterator iname = bkg_names.begin ();
          iname != bkg_names.end (); ++iname)
       {
         const std::string & a_name = *iname;

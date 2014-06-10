@@ -60,6 +60,12 @@ namespace analysis {
 
   public:
 
+    /// Return the label of for the boolean property associated to 'signal'
+    static const std::string & signal_flag();
+
+    /// Return the label of for the boolean property associated to 'background'
+    static const std::string & background_flag();
+
     /// Setting histogram pool
     void set_histogram_pool(mygsl::histogram_pool & pool_);
 
