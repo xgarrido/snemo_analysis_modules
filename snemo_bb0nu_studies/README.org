@@ -50,7 +50,7 @@ The module name is =bb0nu_halflife_limit_module= which is needed when using
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "error"
+  logging.priority : string = "notice"
 #+END_SRC
 
 *** Histogram service label
@@ -69,11 +69,15 @@ ROOT files or XML archives.
       "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"
 #+END_SRC
 
-Histograms done from a previous run of the module can be load at startup
+Histograms done from a previous run of the module can be load at startup. This
+is useful when processing of a huge collection of files has been done and energy
+distribution as well as efficiency have been computed : then the output
+histograms can be set as new input for the =histogram_service= in such way, the
+processing does not to be redo for these peculiar files.
 #+BEGIN_SRC sh
-  # #@description The input files from where to load the histograms
-  # Histo_input_files : string[1] as path = \
-  #     "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"
+  #@description The input file from where to load the histograms
+  Histo_input_file : string as path = \
+      "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.saved.xml"
 #+END_SRC
 
 *** Histogram templates
@@ -117,13 +121,13 @@ halflife, exposure are used.
 **** Experiment exposure
 #+BEGIN_SRC sh
   #@description The exposure time of the experiment
-  experiment.exposure_time : real = 2.0 #year
+  experiment.exposure_time : real = 2.5 #year
 #+END_SRC
 
 **** Background activities
 #+BEGIN_SRC sh
   #@description The list of background element
-  experiment.background_list : string[2] = "Tl208" "Bi214"
+  experiment.background_list : string[1] = "Tl208" "Bi214"
 #+END_SRC
 
 ***** ^{208}Tl activity
