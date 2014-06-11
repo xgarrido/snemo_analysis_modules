@@ -130,12 +130,12 @@ halflife, exposure are used.
   experiment.background_list : string[1] = "Tl208" "Bi214"
 #+END_SRC
 
-***** ^{208}Tl activity
+***** \nbsp^{208}Tl activity
 #+BEGIN_SRC sh
   #@description The mass activity for internal Thallium-208 contamination
   experiment.Tl208.activity : real as mass_activity = 2 uBq/kg
 #+END_SRC
-***** ^{214}Bi activity
+***** \nbsp^{214}Bi activity
 #+BEGIN_SRC sh
   #@description The mass activity for internal Bismuth-214 contamination
   experiment.Bi214.activity : real as mass_activity = 10 uBq/kg
