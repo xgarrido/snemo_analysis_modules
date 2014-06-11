@@ -191,13 +191,10 @@ namespace analysis {
               Histo.add_output_file(output_files[i]);
             }
           }
-        if (config_.has_key ("Histo_input_files"))
+        if (config_.has_key ("Histo_input_file"))
           {
-            std::vector<std::string> input_files;
-            config_.fetch ("Histo_input_files", input_files);
-            for (size_t i = 0; i < input_files.size(); i++) {
-              Histo.load_from_boost_file(input_files[i]);
-            }
+            const std::string input_file = config_.fetch_string ("Histo_input_file");
+            Histo.load_from_boost_file(input_file);
           }
         if (config_.has_key ("Histo_template_files"))
           {
@@ -545,7 +542,8 @@ namespace analysis {
         return;
       }
 
-    // Loop over 'background' histograms
+    // Loop over 'background' histograms and count the number of background
+    // events within the energy window
     std::vector<double> vbkg_counts;
     for (std::vector<std::string>::const_iterator iname = bkg_names.begin ();
          iname != bkg_names.end (); ++iname)
@@ -593,9 +591,9 @@ namespace analysis {
         const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
         for (size_t i = 0; i < a_histogram.bins (); ++i)
           {
-            const double value = a_histogram.get (i) * norm_factor;
-            if (iname == bkg_names.begin()) vbkg_counts.push_back (value);
-            else                            vbkg_counts[i] += value;
+            const double value = a_histogram.get(i) * norm_factor;
+            if (vbkg_counts.empty()) vbkg_counts.assign(a_histogram.bins(), 0.0);
+            vbkg_counts.at(i) += value;
           }
       }// end of background loop
 
