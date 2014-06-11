@@ -1,28 +1,28 @@
 // snemo_bb0nu_halflife_limit_module.cc
 
+// Ourselves:
+#include <snemo_bb0nu_halflife_limit_module.h>
+
+// Standard library:
 #include <stdexcept>
 #include <sstream>
 #include <set>
 
-#include <snemo_bb0nu_halflife_limit_module.h>
-
-// Utilities
+// Third party:
+// - Bayeux/datatools:
 #include <datatools/clhep_units.h>
-
-// SuperNEMO event model
+#include <datatools/service_manager.h>
+// - Bayeux/mygsl
+#include <mygsl/histogram_pool.h>
+// - Bayeux/mtools
 #include <mctools/utils.h>
+// - Bayeux/dpp
+#include <dpp/histogram_service.h>
+
+// - Falaise
 #include <snemo/datamodels/data_model.h>
 #include <snemo/datamodels/event_header.h>
 #include <snemo/datamodels/particle_track_data.h>
-
-// Service manager
-#include <datatools/service_manager.h>
-
-// Services
-#include <dpp/histogram_service.h>
-
-// Histogram
-#include <mygsl/histogram_pool.h>
 
 namespace analysis {
 
@@ -34,11 +34,9 @@ namespace analysis {
   double get_number_of_excluded_events (const double number_of_events_)
   {
     double number_of_excluded_events = 0.0;
-
-    if ( number_of_events_ < 29.0 )
+    if (number_of_events_ < 29.0)
       {
         double x = number_of_events_;
-
         number_of_excluded_events =
           2.5617 + 0.747661 * x - 0.0666176 * pow (x,2)
           + 0.00432457 * pow (x,3) - 0.000139343 * pow (x,4)
@@ -48,10 +46,8 @@ namespace analysis {
       {
         number_of_excluded_events = 1.64 * sqrt (number_of_events_);
       }
-
     return number_of_excluded_events;
   }
-
 
   void snemo_bb0nu_halflife_limit_module::experiment_entry_type::initialize(const datatools::properties & config_)
   {
@@ -545,16 +541,16 @@ namespace analysis {
     // Loop over 'background' histograms and count the number of background
     // events within the energy window
     std::vector<double> vbkg_counts;
-    for (std::vector<std::string>::const_iterator iname = bkg_names.begin ();
-         iname != bkg_names.end (); ++iname)
+    for (std::vector<std::string>::const_iterator iname = bkg_names.begin();
+         iname != bkg_names.end(); ++iname)
       {
         const std::string & a_name = *iname;
-        DT_THROW_IF (! a_pool.has_1d (a_name), std::logic_error,
-                     "Histogram '" << a_name << "' is not 1D histogram !");
+        DT_THROW_IF(! a_pool.has_1d (a_name), std::logic_error,
+                    "Histogram '" << a_name << "' is not 1D histogram !");
         if (a_pool.get_group (a_name) != "efficiency")
           {
-            DT_LOG_ERROR (get_logging_priority (),
-                          "Histogram '" << a_name << "' does not belong to 'efficiency' group !");
+            DT_LOG_ERROR(get_logging_priority(),
+                         "Histogram '" << a_name << "' does not belong to 'efficiency' group !");
             continue;
           }
         // Get normalization factor
@@ -599,71 +595,71 @@ namespace analysis {
 
     // Get names of 'signal' histograms
     std::vector<std::string> signal_names;
-    a_pool.names (signal_names, "flag=" + snemo_bb0nu_halflife_limit_module::signal_flag());
-    if (signal_names.empty ())
+    a_pool.names(signal_names, "flag=" + snemo_bb0nu_halflife_limit_module::signal_flag());
+    if (signal_names.empty())
       {
-        DT_LOG_WARNING (get_logging_priority (), "No 'signal' histograms have been stored !");
+        DT_LOG_WARNING(get_logging_priority(), "No 'signal' histograms have been stored !");
         return;
       }
     // Loop over 'signal' histograms
-    for (std::vector<std::string>::const_iterator iname = signal_names.begin ();
-         iname != signal_names.end (); ++iname)
+    for (std::vector<std::string>::const_iterator iname = signal_names.begin();
+         iname != signal_names.end(); ++iname)
       {
         double best_halflife_limit = 0.0;
         const std::string & a_name = *iname;
-        DT_THROW_IF(! a_pool.has_1d (a_name), std::logic_error,
+        DT_THROW_IF(! a_pool.has_1d(a_name), std::logic_error,
                     "Histogram '" << a_name << "' is not 1D histogram !");
-        if (a_pool.get_group (a_name) != "efficiency")
+        if (a_pool.get_group(a_name) != "efficiency")
           {
-            DT_LOG_ERROR (get_logging_priority (),
-                          "Histogram '" << a_name << "' does not belongs to 'efficiency' group !");
+            DT_LOG_ERROR(get_logging_priority(),
+                         "Histogram '" << a_name << "' does not belongs to 'efficiency' group !");
             continue;
           }
-        const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
+        const mygsl::histogram_1d & a_histogram = a_pool.get_1d(a_name);
         // Loop over bin content
-        for (size_t i = 0; i < a_histogram.bins (); ++i)
+        for (size_t i = 0; i < a_histogram.bins(); ++i)
           {
-            const double value = a_histogram.get (i);
+            const double value = a_histogram.get(i);
 
             // Compute the number of event excluded for the same energy bin
-            const double nbkg = vbkg_counts.at (i);
-            const double nexcluded = analysis::get_number_of_excluded_events (nbkg);
+            const double nbkg = vbkg_counts.at(i);
+            const double nexcluded = analysis::get_number_of_excluded_events(nbkg);
             const double halflife = value / nexcluded * kbg * isotope_bb2nu_halflife;
 
             // Keeping larger limit
-            best_halflife_limit = std::max (best_halflife_limit, halflife);
+            best_halflife_limit = std::max(best_halflife_limit, halflife);
 
             // Adding histogram halflife
             const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "halflife";
-            if (!a_pool.has (key_str))
+            if (!a_pool.has(key_str))
               {
-                mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "halflife");
+                mygsl::histogram_1d & h = a_pool.add_1d(key_str, "", "halflife");
                 datatools::properties hconfig;
-                hconfig.store_string ("mode", "mimic");
-                hconfig.store_string ("mimic.histogram_1d", "halflife_template");
-                mygsl::histogram_pool::init_histo_1d (h, hconfig, &a_pool);
+                hconfig.store_string("mode", "mimic");
+                hconfig.store_string("mimic.histogram_1d", "halflife_template");
+                mygsl::histogram_pool::init_histo_1d(h, hconfig, &a_pool);
               }
 
             // Getting the current histogram
-            mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d (key_str);
-            a_new_histogram.set (i, halflife);
+            mygsl::histogram_1d & a_new_histogram = a_pool.grab_1d(key_str);
+            a_new_histogram.set(i, halflife);
           }
-        DT_LOG_NOTICE (get_logging_priority (),
-                       "Best halflife limit for bb0nu process is " << best_halflife_limit << " yr");
+        DT_LOG_NOTICE(get_logging_priority(),
+                      "Best halflife limit for bb0nu process is " << best_halflife_limit << " yr");
       }// end of signal loop
   }
 
-  void snemo_bb0nu_halflife_limit_module::dump_result (std::ostream      & out_,
-                                                       const std::string & title_,
-                                                       const std::string & indent_,
-                                                       bool inherit_) const
+  void snemo_bb0nu_halflife_limit_module::dump_result(std::ostream      & out_,
+                                                      const std::string & title_,
+                                                      const std::string & indent_,
+                                                      bool inherit_) const
   {
     std::string indent;
-    if (! indent_.empty ())
+    if (! indent_.empty())
       {
         indent = indent_;
       }
-    if ( !title_.empty () )
+    if (! title_.empty())
       {
         out_ << indent << title_ << std::endl;
       }
@@ -693,24 +689,24 @@ namespace analysis {
       // Histogram :
       out_ << indent << datatools::i_tree_dumpable::tag
            << "Particle energy histograms : ";
-      if (_histogram_pool_->empty ())
+      if (_histogram_pool_->empty())
         out_ << "<empty>";
       else
-        out_ << _histogram_pool_->size ();
+        out_ << _histogram_pool_->size();
       out_ << std::endl;;
 
       std::vector<std::string> hnames;
-      _histogram_pool_->names (hnames);
-      for (std::vector<std::string>::const_iterator i = hnames.begin ();
-           i != hnames.end (); ++i)
+      _histogram_pool_->names(hnames);
+      for (std::vector<std::string>::const_iterator i = hnames.begin();
+           i != hnames.end(); ++i)
         {
           const std::string & a_name = *i;
-          if (a_name.find ("template") != std::string::npos) continue;
+          if (a_name.find("template") != std::string::npos) continue;
 
           std::vector<std::string>::const_iterator j = i;
           out_ << indent;
           std::ostringstream indent_oss;
-          if (++j == hnames.end ())
+          if (++j == hnames.end())
             {
               out_  << datatools::i_tree_dumpable::last_tag;
               indent_oss << indent << datatools::i_tree_dumpable::last_skip_tag;
@@ -722,13 +718,13 @@ namespace analysis {
             }
 
           out_ << "Label " << a_name << std::endl;
-          const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d (a_name);
-          a_histogram.tree_dump (out_, "", indent_oss.str (), inherit_);
+          const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d(a_name);
+          a_histogram.tree_dump(out_, "", indent_oss.str(), inherit_);
 
-          if (get_logging_priority () >= datatools::logger::PRIO_DEBUG)
+          if (get_logging_priority() >= datatools::logger::PRIO_DEBUG)
             {
-              DT_LOG_DEBUG (get_logging_priority (), "Histogram " << a_name << " dump:");
-              a_histogram.print (std::clog);
+              DT_LOG_DEBUG(get_logging_priority(), "Histogram " << a_name << " dump:");
+              a_histogram.print(std::clog);
             }
         }
     }
