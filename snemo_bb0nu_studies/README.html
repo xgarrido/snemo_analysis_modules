@@ -152,7 +152,7 @@ The module name is <code>bb0nu_halflife_limit_module</code> which is needed when
 <div class="org-src-container">
 
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
-logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"trace"</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"notice"</span>
 </pre>
 </div>
 </div>
@@ -187,8 +187,24 @@ Histo_output_files : string[2] as <span class="org-variable-name">path</span> = 
     <span class="org-string">"/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"</span>
 </pre>
 </div>
+
+<p>
+Histograms done from a previous run of the module can be load at startup. This
+is useful when processing of a huge collection of files has been done and energy
+distribution as well as efficiency have been computed : then the output
+histograms can be set as new input for the <code>histogram_service</code> in such way, the
+processing does not to be redo for these peculiar files.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The input file from where to load the histograms</span>
+Histo_input_file : string as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.saved.xml"</span>
+</pre>
 </div>
 </div>
+</div>
+
 <div id="outline-container-sec-1-1-6" class="outline-4">
 <h4 id="sec-1-1-6">Histogram templates</h4>
 <div class="outline-text-4" id="text-1-1-6">
@@ -243,7 +259,7 @@ halflife, exposure are used.
 experiment.isotope_mass_number : <span class="org-variable-name">integer</span> = 82
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The total mass of the isotope</span>
-experiment.isotope_mass : real as <span class="org-variable-name">mass</span> = 5 kg
+experiment.isotope_mass : real as <span class="org-variable-name">mass</span> = 7 kg
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The bb2nu halflife of the isotope</span>
 experiment.isotope_bb2nu_halflife : <span class="org-variable-name">real</span> = 9.0e19 <span class="org-comment-delimiter">#</span><span class="org-comment">year</span>
@@ -256,14 +272,42 @@ experiment.isotope_bb2nu_halflife : <span class="org-variable-name">real</span> 
 <div class="org-src-container">
 
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The exposure time of the experiment</span>
-experiment.exposure_time : <span class="org-variable-name">real</span> = 2.0 <span class="org-comment-delimiter">#</span><span class="org-comment">year</span>
+experiment.exposure_time : <span class="org-variable-name">real</span> = 2.5 <span class="org-comment-delimiter">#</span><span class="org-comment">year</span>
+</pre>
+</div>
+</div>
+</li>
+
+<li>Background activities<br  /><div class="outline-text-5" id="text-1-1-8-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The list of background element</span>
+experiment.background_list : <span class="org-variable-name">string</span>[1] = <span class="org-string">"Tl208"</span> <span class="org-string">"Bi214"</span>
+</pre>
+</div>
+</div>
+
+<ul class="org-ul"><li>^{208}Tl activity<br  /><div class="outline-text-6" id="text-1-1-8-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The mass activity for internal Thallium-208 contamination</span>
+experiment.Tl208.activity : real as <span class="org-variable-name">mass_activity</span> = 2 uBq/kg
+</pre>
+</div>
+</div>
+</li>
+<li>^{214}Bi activity<br  /><div class="outline-text-6" id="text-1-1-8-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The mass activity for internal Bismuth-214 contamination</span>
+experiment.Bi214.activity : real as <span class="org-variable-name">mass_activity</span> = 10 uBq/kg
 </pre>
 </div>
 </div>
 </li></ul>
+</li></ul>
 </div>
 </div>
-
 <div id="outline-container-sec-1-2" class="outline-3">
 <h3 id="sec-1-2">Histogram declarations</h3>
 <div class="outline-text-3" id="text-1-2">
@@ -294,8 +338,7 @@ may be used as templates for several histograms. For instance, the <a href="#sec
 <div class="org-src-container">
 
 <pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"energy_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
-<span class="org-comment-delimiter">#</span><span class="org-comment">@description The title of the histogram (optional)</span>
-title : <span class="org-variable-name">string</span> = <span class="org-string">""</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram template of the energy distribution</span>
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
 group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
@@ -309,9 +352,6 @@ linear : <span class="org-variable-name">boolean</span> = 1
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
 display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"</span>
 
-<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis unit for display (a standard unit, typically SI or CLHEP)</span>
-display.xaxis.unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
-
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
 display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"dN/dE [A.U.]"</span>
 
@@ -322,10 +362,10 @@ number_of_bins : <span class="org-variable-name">integer</span> = 25
 unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
-min : <span class="org-variable-name">real</span> = 2000.0
+min : real as <span class="org-variable-name">energy</span> = 2000.0 keV
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
-max : <span class="org-variable-name">real</span> = 3200.0
+max : real as <span class="org-variable-name">energy</span> = 3200.0 keV
 </pre>
 </div>
 </div>
@@ -336,10 +376,7 @@ max : <span class="org-variable-name">real</span> = 3200.0
 <div class="org-src-container">
 
 <pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"efficiency_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
-<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram of the energy selection efficiency</span>
-
-<span class="org-comment-delimiter">#</span><span class="org-comment">@description The title of the histogram (optional)</span>
-title : <span class="org-variable-name">string</span> = <span class="org-string">""</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram template of the energy selection efficiency</span>
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
 group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
@@ -362,14 +399,11 @@ display.yaxis.label : <span class="org-variable-name">string</span> = <span clas
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
 number_of_bins : <span class="org-variable-name">integer</span> = 25
 
-<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
-unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
-
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
-min : <span class="org-variable-name">real</span> = 2000.0
+min : real as <span class="org-variable-name">energy</span> = 2000.0 keV
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
-max : <span class="org-variable-name">real</span> = 3200.0
+max : real as <span class="org-variable-name">energy</span> = 3200.0 keV
 </pre>
 </div>
 </div>
@@ -381,10 +415,7 @@ max : <span class="org-variable-name">real</span> = 3200.0
 <div class="org-src-container">
 
 <pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"halflife_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
-<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram of the energy selection efficiency</span>
-
-<span class="org-comment-delimiter">#</span><span class="org-comment">@description The title of the histogram (optional)</span>
-title : <span class="org-variable-name">string</span> = <span class="org-string">""</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram template of the halflife limit values</span>
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
 group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
@@ -407,14 +438,11 @@ display.yaxis.label : <span class="org-variable-name">string</span> = <span clas
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
 number_of_bins : <span class="org-variable-name">integer</span> = 25
 
-<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
-unit : <span class="org-variable-name">string</span> = <span class="org-string">"keV"</span>
-
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
-min : <span class="org-variable-name">real</span> = 2000.0
+min : real as <span class="org-variable-name">energy</span> = 2000.0 keV
 
 <span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
-max : <span class="org-variable-name">real</span> = 3200.0
+max : real as <span class="org-variable-name">energy</span> = 3200.0 keV
 </pre>
 </div>
 </div>
@@ -423,7 +451,7 @@ max : <span class="org-variable-name">real</span> = 3200.0
 </div>
 </div>
 <div id="postamble" class="status">
-File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/c7a9517a59adfe0a5306688ab4673c4be486de42">c7a9517</a> - 2014-05-27
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/245f65cb0c5772dc2ab17ea5b4c20dcdf847245c">245f65c</a> - 2014-06-11
 </div>
 </body>
 </html>
