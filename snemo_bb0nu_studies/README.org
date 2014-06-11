@@ -112,6 +112,22 @@ halflife, exposure are used.
   experiment.exposure_time : real = 2.0 #year
 #+END_SRC
 
+**** Background activities
+#+BEGIN_SRC sh
+  #@description The list of background element
+  experiment.background_list : string[2] = "208Tl" "214Bi"
+#+END_SRC
+
+***** ^{208}Tl activity
+#+BEGIN_SRC sh
+  #@description The mass activity for internal Thallium-208 contamination
+  experiment.208Tl.activity : real as mass_activity = 2 uBq/kg
+#+END_SRC
+***** ^{214}Bi activity
+#+BEGIN_SRC sh
+  #@description The mass activity for internal Bismuth-214 contamination
+  experiment.214Bi.activity : real as mass_activity = 10 uBq/kg
+#+END_SRC
 ** Histogram declarations
 :PROPERTIES:
 :TANGLE: ../config/snemo_bb0nu_histogram_templates.conf

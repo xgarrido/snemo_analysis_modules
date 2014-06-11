@@ -56,6 +56,9 @@ namespace analysis {
       double isotope_mass;
       double isotope_bb2nu_halflife;
       double exposure_time;
+      std::map<std::string, double> background_activities;
+
+      void initialize(const datatools::properties & config_);
     };
 
   public:
@@ -79,7 +82,7 @@ namespace analysis {
     virtual ~snemo_bb0nu_halflife_limit_module();
 
     /// Initialization
-    virtual void initialize(const datatools::properties  & setup_,
+    virtual void initialize(const datatools::properties  & config_,
                             datatools::service_manager   & service_manager_,
                             dpp::module_handle_dict_type & module_dict_);
 

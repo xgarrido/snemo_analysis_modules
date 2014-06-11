@@ -26,10 +26,6 @@
 
 namespace analysis {
 
-  // Registration instantiation macro :
-  DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_bb0nu_halflife_limit_module,
-                                    "analysis::snemo_bb0nu_halflife_limit_module");
-
   // Character separator between key for histogram dict.
   const char KEY_FIELD_SEPARATOR = '_';
 
@@ -55,6 +51,58 @@ namespace analysis {
 
     return number_of_excluded_events;
   }
+
+
+  void snemo_bb0nu_halflife_limit_module::experiment_entry_type::initialize(const datatools::properties & config_)
+  {
+    // Get experimental conditions
+    if (config_.has_key("isotope_mass_number"))
+      {
+        isotope_mass_number = config_.fetch_integer("isotope_mass_number");
+        isotope_mass_number *= CLHEP::g/CLHEP::mole;
+      }
+    if (config_.has_key("isotope_mass"))
+      {
+        isotope_mass = config_.fetch_real("isotope_mass");
+        if (! config_.has_explicit_unit("isotope_mass")) {
+          isotope_mass *= CLHEP::kg;
+        }
+      }
+    if (config_.has_key("isotope_bb2nu_halflife"))
+      {
+        isotope_bb2nu_halflife = config_.fetch_real("isotope_bb2nu_halflife");
+      }
+    if (config_.has_key("exposure_time"))
+      {
+        exposure_time = config_.fetch_real("exposure_time");
+      }
+    if (config_.has_key("background_list"))
+      {
+        std::vector<std::string> bkgs;
+        config_.fetch("background_list", bkgs);
+        for (std::vector<std::string>::const_iterator ibkg = bkgs.begin();
+             ibkg != bkgs.end(); ++ibkg)
+          {
+            const std::string & bkgname = *ibkg;
+            const std::string key = bkgname + ".activity";
+            DT_THROW_IF(! config_.has_key(key), std::logic_error,
+                        "No background activity for " << bkgname << " element");
+            background_activities[bkgname] = config_.fetch_real(key);
+            if (! config_.has_explicit_unit(key))
+              {
+                background_activities[bkgname] *= CLHEP::becquerel/CLHEP::kg;
+              }
+            DT_LOG_NOTICE(datatools::logger::PRIO_NOTICE,
+                          "Adding '" << bkgname << "' background with an activity of "
+                          << background_activities[bkgname]/CLHEP::becquerel*CLHEP::kg << " Bq/kg");
+          }
+      }
+    return;
+  }
+
+  // Registration instantiation macro :
+  DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_bb0nu_halflife_limit_module,
+                                    "analysis::snemo_bb0nu_halflife_limit_module");
 
   // Setting signal flag name for histogram properties
   const std::string & snemo_bb0nu_halflife_limit_module::signal_flag()
@@ -106,35 +154,15 @@ namespace analysis {
 
     dpp::base_module::_common_initialize (config_);
 
+    // Get the experimental conditions
+    datatools::properties exp_config;
+    config_.export_and_rename_starting_with(exp_config, "experiment.", "");
+    _experiment_conditions_.initialize(exp_config);
+
     // Get the keys from 'Event Header' bank
     if (config_.has_key ("key_fields"))
       {
         config_.fetch ("key_fields", _key_fields_);
-      }
-
-    // Get experiment conditions
-    if (config_.has_key ("experiment.isotope_mass_number"))
-      {
-        _experiment_conditions_.isotope_mass_number
-          = config_.fetch_integer ("experiment.isotope_mass_number");
-        _experiment_conditions_.isotope_mass_number *= CLHEP::g/CLHEP::mole;
-      }
-    if (config_.has_key ("experiment.isotope_mass"))
-      {
-        _experiment_conditions_.isotope_mass = config_.fetch_real ("experiment.isotope_mass");
-        if (! config_.has_explicit_unit ("experiment.isotope_mass")) {
-          _experiment_conditions_.isotope_mass *= CLHEP::kg;
-        }
-      }
-    if (config_.has_key ("experiment.isotope_bb2nu_halflife"))
-      {
-        _experiment_conditions_.isotope_bb2nu_halflife
-          = config_.fetch_real ("experiment.isotope_bb2nu_halflife");
-      }
-    if (config_.has_key ("experiment.exposure_time"))
-      {
-        _experiment_conditions_.exposure_time
-          = config_.fetch_real ("experiment.exposure_time");
       }
 
     // Service label
@@ -487,6 +515,16 @@ namespace analysis {
 
   void snemo_bb0nu_halflife_limit_module::_compute_halflife_ ()
   {
+    // Get SuperNEMO experiment setup
+    // Calculate signal to halflife limit constant
+    const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
+    const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
+    const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
+    const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
+    const double kbg
+      = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time
+      / isotope_molar_mass / isotope_bb2nu_halflife;
+
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool ();
 
@@ -499,14 +537,6 @@ namespace analysis {
         return;
       }
 
-    // Get names of 'signal' histograms
-    std::vector<std::string> signal_names;
-    a_pool.names (signal_names, "flag=" + snemo_bb0nu_halflife_limit_module::signal_flag());
-    if (signal_names.empty ())
-      {
-        DT_LOG_WARNING (get_logging_priority (), "No 'signal' histograms have been stored !");
-        return;
-      }
     // Get names of 'background' histograms
     std::vector<std::string> bkg_names;
     a_pool.names (bkg_names, "flag=" + snemo_bb0nu_halflife_limit_module::background_flag());
@@ -516,17 +546,7 @@ namespace analysis {
         return;
       }
 
-    // Calculate signal to halflife limit constant
-    const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
-    const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
-    const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
-    const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
-    const double kbg
-      = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time
-      / isotope_molar_mass / isotope_bb2nu_halflife;
-
     // Loop over 'background' histograms
-    // Save the total number of events
     std::vector<double> vbkg_counts;
     for (std::vector<std::string>::const_iterator iname = bkg_names.begin ();
          iname != bkg_names.end (); ++iname)
@@ -544,15 +564,26 @@ namespace analysis {
         // Loop over bin content
         for (size_t i = 0; i < a_histogram.bins (); ++i)
           {
-            const double value = a_histogram.get (i);
+            double value = a_histogram.get (i);
+            if (a_name.find("2nubb") != std::string::npos)
+              {
+                value *= kbg;
+              }
             if (iname == bkg_names.begin ()) vbkg_counts.push_back (value);
             else                             vbkg_counts[i] += value;
           }
       }// end of background loop
 
+    // Get names of 'signal' histograms
+    std::vector<std::string> signal_names;
+    a_pool.names (signal_names, "flag=" + snemo_bb0nu_halflife_limit_module::signal_flag());
+    if (signal_names.empty ())
+      {
+        DT_LOG_WARNING (get_logging_priority (), "No 'signal' histograms have been stored !");
+        return;
+      }
     // Loop over 'signal' histograms
-    for (std::vector<std::string>::const_iterator
-           iname = signal_names.begin ();
+    for (std::vector<std::string>::const_iterator iname = signal_names.begin ();
          iname != signal_names.end (); ++iname)
       {
         double best_halflife_limit = 0.0;
@@ -572,7 +603,7 @@ namespace analysis {
             const double value = a_histogram.get (i);
 
             // Compute the number of event excluded for the same energy bin
-            const double nbkg = kbg * vbkg_counts.at (i);
+            const double nbkg = vbkg_counts.at (i);
             const double nexcluded = analysis::get_number_of_excluded_events (nbkg);
             const double halflife = value / nexcluded * kbg * isotope_bb2nu_halflife;
 
