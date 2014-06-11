@@ -108,7 +108,7 @@ halflife, exposure are used.
   experiment.isotope_mass_number : integer = 82
 
   #@description The total mass of the isotope
-  experiment.isotope_mass : real as mass = 5 kg
+  experiment.isotope_mass : real as mass = 7 kg
 
   #@description The bb2nu halflife of the isotope
   experiment.isotope_bb2nu_halflife : real = 9.0e19 #year
