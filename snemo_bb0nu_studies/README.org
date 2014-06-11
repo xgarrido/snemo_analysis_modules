@@ -149,8 +149,7 @@ template]] defines an histogram that can be mimic by different analysis channels
 *** Energy template
 #+BEGIN_SRC sh
   [name="energy_template" type="mygsl::histogram_1d"]
-  #@description The title of the histogram (optional)
-  title : string = ""
+  #@config The histogram template of the energy distribution
 
   #@description The group of the histogram (optional)
   group : string = "__template"
@@ -164,9 +163,6 @@ template]] defines an histogram that can be mimic by different analysis channels
   #@description The X axis label
   display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"
 
-  #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
-  display.xaxis.unit : string = "keV"
-
   #@description The Y axis label
   display.yaxis.label : string = "dN/dE [A.U.]"
 
@@ -177,18 +173,15 @@ template]] defines an histogram that can be mimic by different analysis channels
   unit : string = "keV"
 
   #@description The lower bound of the histogram
-  min : real = 2000.0
+  min : real as energy = 2000.0 keV
 
   #@description The upper bound of the histogram
-  max : real = 3200.0
+  max : real as energy = 3200.0 keV
 #+END_SRC
 *** Efficiency template
 #+BEGIN_SRC sh
   [name="efficiency_template" type="mygsl::histogram_1d"]
-  #@config The histogram of the energy selection efficiency
-
-  #@description The title of the histogram (optional)
-  title : string = ""
+  #@config The histogram template of the energy selection efficiency
 
   #@description The group of the histogram (optional)
   group : string = "__template"
@@ -211,23 +204,17 @@ template]] defines an histogram that can be mimic by different analysis channels
   #@description The number of bins
   number_of_bins : integer = 25
 
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
-
   #@description The lower bound of the histogram
-  min : real = 2000.0
+  min : real as energy = 2000.0 keV
 
   #@description The upper bound of the histogram
-  max : real = 3200.0
+  max : real as energy = 3200.0 keV
 #+END_SRC
 
 *** Halflife limit template
 #+BEGIN_SRC sh
   [name="halflife_template" type="mygsl::histogram_1d"]
-  #@config The histogram of the energy selection efficiency
-
-  #@description The title of the histogram (optional)
-  title : string = ""
+  #@config The histogram template of the halflife limit values
 
   #@description The group of the histogram (optional)
   group : string = "__template"
@@ -250,12 +237,9 @@ template]] defines an histogram that can be mimic by different analysis channels
   #@description The number of bins
   number_of_bins : integer = 25
 
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
-
   #@description The lower bound of the histogram
-  min : real = 2000.0
+  min : real as energy = 2000.0 keV
 
   #@description The upper bound of the histogram
-  max : real = 3200.0
+  max : real as energy = 3200.0 keV
 #+END_SRC
