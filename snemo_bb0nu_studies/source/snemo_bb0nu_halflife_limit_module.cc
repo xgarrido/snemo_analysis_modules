@@ -519,11 +519,10 @@ namespace analysis {
     // Calculate signal to halflife limit constant
     const double exposure_time          = _experiment_conditions_.exposure_time;          // year;
     const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // year;
-    const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
-    const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
-    const double kbg
-      = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time
-      / isotope_molar_mass / isotope_bb2nu_halflife;
+    const double isotope_mass           = _experiment_conditions_.isotope_mass;
+    const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number;
+    const double kbg = log (2) * isotope_mass * CLHEP::Avogadro * exposure_time
+      / isotope_molar_mass / CLHEP::mole / isotope_bb2nu_halflife;
 
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool ();
@@ -579,16 +578,17 @@ namespace analysis {
                     DT_LOG_TRACE(get_logging_priority(),
                                  "Found background element '" << ibkg->first << "'");
                     const double year2sec = 3600 * 24 * 365;
-                    norm_factor = ibkg->second * exposure_time * year2sec * isotope_mass;
+                    norm_factor = ibkg->second/CLHEP::becquerel * exposure_time * year2sec * isotope_mass;
                   }
               }
           }
-        DT_LOG_TRACE(datatools::logger::PRIO_TRACE, "norm_factor = " << norm_factor);
         if (! datatools::is_valid(norm_factor)) {
           DT_LOG_WARNING(get_logging_priority(),
                          "No background activity has been found ! Skip histogram '" << a_name << "'");
           continue;
         }
+        DT_LOG_TRACE(get_logging_priority(),
+                     "Total number of decay for '" << a_name << "' = " << norm_factor);
 
         const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
         for (size_t i = 0; i < a_histogram.bins (); ++i)

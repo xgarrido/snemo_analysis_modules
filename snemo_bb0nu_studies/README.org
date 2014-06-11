@@ -68,6 +68,14 @@ ROOT files or XML archives.
       "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.root" \
       "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"
 #+END_SRC
+
+Histograms done from a previous run of the module can be load at startup
+#+BEGIN_SRC sh
+  # #@description The input files from where to load the histograms
+  # Histo_input_files : string[1] as path = \
+  #     "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.xml"
+#+END_SRC
+
 *** Histogram templates
 Templates for histogram may be provided to reduce the amount of configuration of
 individual histogram. For instance, plotting the energy distributions of several
@@ -115,7 +123,7 @@ halflife, exposure are used.
 **** Background activities
 #+BEGIN_SRC sh
   #@description The list of background element
-  experiment.background_list : string[0] = "Tl208" "Bi214"
+  experiment.background_list : string[2] = "Tl208" "Bi214"
 #+END_SRC
 
 ***** ^{208}Tl activity

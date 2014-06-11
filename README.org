@@ -252,7 +252,9 @@ histograms can be added to a histogram dictionnary.
 *** Declaration
 #+BEGIN_SRC sh
   [name="Histo" type="dpp::histogram_service"]
-
+#+END_SRC
+*** Description & priority
+#+BEGIN_SRC sh
   #@description Logging priority
   logging.priority : string = "warning"
 
