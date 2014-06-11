@@ -149,7 +149,7 @@ The histogram declarations /i.e./ name, boundaries, binning... are set in this
 section. There are mostly /template/ histogram in such way, their declarations
 may be used as templates for several histograms. For instance, the [[Energy
 template]] defines an histogram that can be mimic by different analysis channels
-/i.e./ O\nu energy distribution to background energy distribution.
+/i.e./ 0\nu energy distribution to background energy distribution.
 
 *** Mandatory preamble
 #+BEGIN_SRC sh
