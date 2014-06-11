@@ -52,11 +52,13 @@ namespace analysis {
 
     struct experiment_entry_type
     {
+      typedef std::map<std::string, double> background_dict_type;
+
       double isotope_mass_number;
       double isotope_mass;
       double isotope_bb2nu_halflife;
       double exposure_time;
-      std::map<std::string, double> background_activities;
+      background_dict_type background_activities;
 
       void initialize(const datatools::properties & config_);
     };

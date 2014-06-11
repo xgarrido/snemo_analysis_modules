@@ -484,7 +484,7 @@ namespace analysis {
 
             // Adding histogram efficiency
             const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "efficiency";
-            if (!a_pool.has (key_str))
+            if (! a_pool.has (key_str))
               {
                 mygsl::histogram_1d & h = a_pool.add_1d (key_str, "", "efficiency");
                 datatools::properties hconfig;
@@ -503,7 +503,7 @@ namespace analysis {
               {
                 a_aux.update_flag (snemo_bb0nu_halflife_limit_module::signal_flag());
               }
-            else if (a_name.find ("2nubb") != std::string::npos)
+            else
               {
                 a_aux.update_flag (snemo_bb0nu_halflife_limit_module::background_flag());
               }
@@ -517,8 +517,8 @@ namespace analysis {
   {
     // Get SuperNEMO experiment setup
     // Calculate signal to halflife limit constant
-    const double exposure_time          = _experiment_conditions_.exposure_time;         // CLHEP::year;
-    const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // CLHEP::year;
+    const double exposure_time          = _experiment_conditions_.exposure_time;          // year;
+    const double isotope_bb2nu_halflife = _experiment_conditions_.isotope_bb2nu_halflife; // year;
     const double isotope_mass           = _experiment_conditions_.isotope_mass / CLHEP::g;
     const double isotope_molar_mass     = _experiment_conditions_.isotope_mass_number / CLHEP::g*CLHEP::mole;
     const double kbg
@@ -557,20 +557,45 @@ namespace analysis {
         if (a_pool.get_group (a_name) != "efficiency")
           {
             DT_LOG_ERROR (get_logging_priority (),
-                          "Histogram '" << a_name << "' does not belongs to 'efficiency' group !");
+                          "Histogram '" << a_name << "' does not belong to 'efficiency' group !");
             continue;
           }
+        // Get normalization factor
+        double norm_factor;
+        datatools::invalidate(norm_factor);
+        if (a_name.find("2nubb") != std::string::npos)
+          {
+            norm_factor = kbg;
+          }
+        else
+          {
+            const experiment_entry_type::background_dict_type & bkgs = _experiment_conditions_.background_activities;
+            for (experiment_entry_type::background_dict_type::const_iterator
+                   ibkg = bkgs.begin();
+                 ibkg != bkgs.end(); ++ibkg)
+              {
+                if (a_name.find(ibkg->first) != std::string::npos)
+                  {
+                    DT_LOG_TRACE(get_logging_priority(),
+                                 "Found background element '" << ibkg->first << "'");
+                    const double year2sec = 3600 * 24 * 365;
+                    norm_factor = ibkg->second * exposure_time * year2sec * isotope_mass;
+                  }
+              }
+          }
+        DT_LOG_TRACE(datatools::logger::PRIO_TRACE, "norm_factor = " << norm_factor);
+        if (! datatools::is_valid(norm_factor)) {
+          DT_LOG_WARNING(get_logging_priority(),
+                         "No background activity has been found ! Skip histogram '" << a_name << "'");
+          continue;
+        }
+
         const mygsl::histogram_1d & a_histogram = a_pool.get_1d (a_name);
-        // Loop over bin content
         for (size_t i = 0; i < a_histogram.bins (); ++i)
           {
-            double value = a_histogram.get (i);
-            if (a_name.find("2nubb") != std::string::npos)
-              {
-                value *= kbg;
-              }
-            if (iname == bkg_names.begin ()) vbkg_counts.push_back (value);
-            else                             vbkg_counts[i] += value;
+            const double value = a_histogram.get (i) * norm_factor;
+            if (iname == bkg_names.begin()) vbkg_counts.push_back (value);
+            else                            vbkg_counts[i] += value;
           }
       }// end of background loop
 
@@ -659,9 +684,11 @@ namespace analysis {
       out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::tag
            << "Isotope bb2nu halflife : " << _experiment_conditions_.isotope_bb2nu_halflife
            << " yr" << std::endl;
-      out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::last_tag
+      out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::tag
            << "Exposure time : " << _experiment_conditions_.exposure_time
            << " yr" << std::endl;
+      out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::last_tag
+           << "Backgrounds : " << _experiment_conditions_.background_activities.size() << std::endl;
     }
 
     {
