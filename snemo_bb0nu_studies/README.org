@@ -127,7 +127,7 @@ halflife, exposure are used.
 **** Background activities
 #+BEGIN_SRC sh
   #@description The list of background element
-  experiment.background_list : string[1] = "Tl208" "Bi214"
+  experiment.background_list : string[2] = "Tl208" "Bi214"
 #+END_SRC
 
 ***** \nbsp^{208}Tl activity
