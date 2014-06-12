@@ -53,6 +53,11 @@ Set the same geometry service label.
   #@description The Geometry Service label
   Geo_label : string = "Geo"
 #+END_SRC
+*** Bank label
+#+BEGIN_SRC sh
+  #@description The data bank label
+  bank_label : string = "CD"
+#+END_SRC
 *** Output file
 The result of the module is streamed to an ASCII file which path is defined
 below
