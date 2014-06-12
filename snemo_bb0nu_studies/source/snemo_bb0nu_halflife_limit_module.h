@@ -104,13 +104,11 @@ namespace analysis {
     /// Give default values to specific class members.
     void _set_defaults();
 
-  private:
+    /// Compute topology channel efficiencies.
+    void _compute_efficiency();
 
     /// Compute topology channel efficiencies.
-    void _compute_efficiency_();
-
-    /// Compute topology channel efficiencies.
-    void _compute_halflife_();
+    void _compute_halflife();
 
   private:
 
