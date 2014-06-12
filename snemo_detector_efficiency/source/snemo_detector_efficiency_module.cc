@@ -95,14 +95,15 @@ namespace analysis {
     _compute_efficiency();
 
     // Dump result
-    dump_result(std::clog,
-                "analysis::snemo_detector_efficiency_module::dump_result: ",
-                "NOTICE: ");
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG)
+      {
+        DT_LOG_DEBUG(get_logging_priority(), "snemo_detector_efficiency_module::dump_result:");
+        dump_result(std::clog);
+      }
 
     _set_defaults();
-
     // Tag the module as un-initialized :
-    _set_initialized (false);
+    _set_initialized(false);
     return;
   }
 
@@ -379,11 +380,42 @@ namespace analysis {
       }
 
     {
+      out_ << indent << datatools::i_tree_dumpable::tag
+           << "Calorimeters efficiency [" << _calo_efficiencies_.size() << "]"
+           << std::endl;
       for (efficiency_dict::const_iterator i = _calo_efficiencies_.begin ();
            i != _calo_efficiencies_.end (); ++i)
         {
-          // out_ << indent << datatools::utils::i_tree_dumpable::tag
-          //      << i->first << " = " << i->second << std::endl;
+          out_ << indent << datatools::i_tree_dumpable::skip_tag;
+          efficiency_dict::const_iterator j = i;
+          if (++j == _calo_efficiencies_.end())
+            {
+              out_ << datatools::i_tree_dumpable::last_tag;
+            }
+          else
+            {
+              out_ << datatools::i_tree_dumpable::tag;
+            }
+          out_ << i->first << " = " << i->second << std::endl;
+        }
+    }
+    {
+      out_ << indent << datatools::i_tree_dumpable::last_tag
+           << "Tracker efficiency [" << _gg_efficiencies_.size() << "]" << std::endl;
+      for (efficiency_dict::const_iterator i = _gg_efficiencies_.begin();
+           i != _gg_efficiencies_.end(); ++i)
+        {
+          out_ << indent << datatools::i_tree_dumpable::last_skip_tag;
+          efficiency_dict::const_iterator j = i;
+          if (++j == _gg_efficiencies_.end())
+            {
+              out_ << datatools::i_tree_dumpable::last_tag;
+            }
+          else
+            {
+              out_ << datatools::i_tree_dumpable::tag;
+            }
+          out_ << i->first << " = " << i->second << std::endl;
         }
     }
 
