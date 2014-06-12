@@ -94,6 +94,7 @@ namespace analysis {
     /// Data record processing
     virtual process_status process(datatools::things & data_);
 
+    /// Dump
     void dump_result (std::ostream      & out_    = std::clog,
                       const std::string & title_  = "",
                       const std::string & indent_ = "",
