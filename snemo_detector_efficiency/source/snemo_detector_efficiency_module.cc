@@ -36,12 +36,11 @@
 #include <geomtools/manager.h>
 
 // SuperNEMO event model
+#include <falaise/snemo/processing/services.h>
 #include <falaise/snemo/datamodels/data_model.h>
 #include <falaise/snemo/datamodels/calibrated_data.h>
 #include <falaise/snemo/datamodels/tracker_trajectory.h>
-#include <falaise/snemo/processing/services.h>
-// #include <snanalysis/models/data_model.h>
-// #include <snanalysis/models/particle_track_data.h>
+#include <falaise/snemo/datamodels/particle_track_data.h>
 
 // Geometry manager
 #include <falaise/snemo/geometry/locator_plugin.h>
@@ -56,19 +55,17 @@ namespace analysis {
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_detector_efficiency_module,
                                     "analysis::snemo_detector_efficiency_module");
 
-  void snemo_detector_efficiency_module::_set_defaults ()
+  void snemo_detector_efficiency_module::_set_defaults()
   {
-    _bank_label_ = "";
-
+    _bank_label_        = "";
     _Geo_service_label_ = "";
+    _output_filename_   = "";
 
-    _calo_efficiencies_.clear ();
-    _gg_efficiencies_.clear ();
+    _calo_efficiencies_.clear();
+    _gg_efficiencies_.clear();
 
     return;
   }
-
-  /*** Implementation of the interface ***/
 
   // Constructor :
   snemo_detector_efficiency_module::snemo_detector_efficiency_module(datatools::logger::priority logging_priority_)
@@ -83,7 +80,7 @@ namespace analysis {
   {
     // Make sure all internal resources are terminated
     // before destruction :
-    if (is_initialized ()) reset ();
+    if (is_initialized()) reset();
     return;
   }
 
@@ -114,16 +111,18 @@ namespace analysis {
                                                     datatools::service_manager   & service_manager_,
                                                     dpp::module_handle_dict_type & module_dict_)
   {
-    DT_THROW_IF (is_initialized(),
-                 std::logic_error,
-                 "Module '" << get_name() << "' is already initialized ! ");
+    DT_THROW_IF(is_initialized(),
+                std::logic_error,
+                "Module '" << get_name() << "' is already initialized ! ");
 
     dpp::base_module::_common_initialize(config_);
 
-    if (config_.has_key("bank_label"))
-      {
-        _bank_label_ = config_.fetch_string("bank_label");
-      }
+    DT_THROW_IF(!config_.has_key("bank_label"), std::logic_error, "Missing bank label !");
+    _bank_label_ = config_.fetch_string("bank_label");
+
+    DT_THROW_IF(!config_.has_key("output_filename"), std::logic_error, "Missing output filename !");
+    _output_filename_ = config_.fetch_string("output_filename");
+    datatools::fetch_path_with_env(_output_filename_);
 
     // Geometry manager :
     std::string geo_label = snemo::processing::service_info::default_geometry_service_label();
@@ -181,7 +180,7 @@ namespace analysis {
                  "Module '" << get_name() << "' is not initialized !");
 
     namespace sdm = snemo::datamodel;
-    if (_bank_label_ == sdm::data_info::CALIBRATED_DATA_LABEL)
+    if (_bank_label_ == sdm::data_info::default_calibrated_data_label())
       {
         // Check if the 'calibrated data' record bank is available :
         if (!data_record_.has(_bank_label_))
@@ -213,65 +212,65 @@ namespace analysis {
             _gg_efficiencies_[a_hit.get_geom_id ()]++;
           }
       }
-    // else if (_bank_label_ == snemo::analysis::model::data_info::PARTICLE_TRACK_DATA_LABEL)
-    //   {
-    //     // Check if the 'particle track' record bank is available :
-    //     if (!data_record_.has(_bank_label_))
-    //       {
-    //         DT_LOG_ERROR(get_logging_priority(),
-    //                      "Could not find any bank with label '" << _bank_label_ << "' !");
-    //         return STOP;
-    //       }
-    //     const snemo::analysis::model::particle_track_data & ptd
-    //       = data_record_.get<snemo::analysis::model::particle_track_data>(_bank_label_);
+    else if (_bank_label_ == sdm::data_info::default_particle_track_data_label())
+      {
+        // Check if the 'particle track' record bank is available :
+        if (!data_record_.has(_bank_label_))
+          {
+            DT_LOG_ERROR(get_logging_priority(),
+                         "Could not find any bank with label '" << _bank_label_ << "' !");
+            return dpp::base_module::PROCESS_STOP;
+          }
+        const sdm::particle_track_data & ptd
+          = data_record_.get<sdm::particle_track_data>(_bank_label_);
 
-    //     // Store geom_id to avoid double inclusion of calorimeter hits
-    //     std::set<geomtools::geom_id> gids;
+        // Store geom_id to avoid double inclusion of calorimeter hits
+        std::set<geomtools::geom_id> gids;
 
-    //     // Loop over all saved particles
-    //     const snemo::analysis::model::particle_track_data::particle_collection_type & the_particles
-    //       = ptd.get_particles ();
+        // Loop over all saved particles
+        const sdm::particle_track_data::particle_collection_type & the_particles
+          = ptd.get_particles ();
 
-    //     for (snemo::analysis::model::particle_track_data::particle_collection_type::const_iterator
-    //            iparticle = the_particles.begin ();
-    //          iparticle != the_particles.end ();
-    //          ++iparticle)
-    //       {
-    //         const snemo::analysis::model::particle_track & a_particle = iparticle->get ();
+        for (sdm::particle_track_data::particle_collection_type::const_iterator
+               iparticle = the_particles.begin ();
+             iparticle != the_particles.end ();
+             ++iparticle)
+          {
+            const sdm::particle_track & a_particle = iparticle->get ();
 
-    //         if (!a_particle.has_associated_calorimeters ()) continue;
+            if (!a_particle.has_associated_calorimeters ()) continue;
 
-    //         const snemo::analysis::model::particle_track::calorimeter_collection_type & the_calorimeters
-    //           = a_particle.get_associated_calorimeters ();
+            const sdm::calibrated_calorimeter_hit::collection_type & the_calorimeters
+              = a_particle.get_associated_calorimeters ();
 
-    //         if (the_calorimeters.size () > 2)
-    //           {
-    //             DT_LOG_DEBUG(get_logging_priority(),
-    //                          "The particle is associated to more than 2 calorimeters !");
-    //             continue;
-    //           }
+            if (the_calorimeters.size () > 2)
+              {
+                DT_LOG_DEBUG(get_logging_priority(),
+                             "The particle is associated to more than 2 calorimeters !");
+                continue;
+              }
 
-    //         for (size_t i = 0; i < the_calorimeters.size (); ++i)
-    //           {
-    //             const geomtools::geom_id & a_gid = the_calorimeters.at (i).get ().get_geom_id ();
-    //             if (gids.find (a_gid) != gids.end ()) continue;
-    //             gids.insert (a_gid);
-    //             _calo_efficiencies_[a_gid]++;
-    //           }
+            for (size_t i = 0; i < the_calorimeters.size (); ++i)
+              {
+                const geomtools::geom_id & a_gid = the_calorimeters.at (i).get ().get_geom_id ();
+                if (gids.find (a_gid) != gids.end ()) continue;
+                gids.insert (a_gid);
+                _calo_efficiencies_[a_gid]++;
+              }
 
-    //         // Get trajectory and attached geiger cells
-    //         const sdm::tracker_trajectory & a_trajectory = a_particle.get_trajectory ();
-    //         const sdm::tracker_cluster & a_cluster = a_trajectory.get_cluster ();
-    //         const sdm::calibrated_tracker_hit::collection_type & the_hits = a_cluster.get_hits ();
-    //         for (size_t i = 0; i < the_hits.size (); ++i)
-    //           {
-    //             const geomtools::geom_id & a_gid = the_hits.at (i).get ().get_geom_id ();
-    //             if (gids.find (a_gid) != gids.end ()) continue;
-    //             gids.insert (a_gid);
-    //             _gg_efficiencies_[a_gid]++;
-    //           }
-    //       }
-    //   }
+            // Get trajectory and attached geiger cells
+            const sdm::tracker_trajectory & a_trajectory = a_particle.get_trajectory ();
+            const sdm::tracker_cluster & a_cluster = a_trajectory.get_cluster ();
+            const sdm::calibrated_tracker_hit::collection_type & the_hits = a_cluster.get_hits ();
+            for (size_t i = 0; i < the_hits.size (); ++i)
+              {
+                const geomtools::geom_id & a_gid = the_hits.at (i).get ().get_geom_id ();
+                if (gids.find (a_gid) != gids.end ()) continue;
+                gids.insert (a_gid);
+                _gg_efficiencies_[a_gid]++;
+              }
+          }
+      }
     else
       {
         DT_THROW_IF(true, std::logic_error,
@@ -286,7 +285,7 @@ namespace analysis {
     // main wall, xwall and gveto calorimeters. For such task we use
     // sngeometry locators
 
-    std::ofstream fout ("/tmp/efficiency.dat");
+    std::ofstream fout (_output_filename_.c_str());
     {
       efficiency_dict::const_iterator found =
         std::max_element(_calo_efficiencies_.begin (), _calo_efficiencies_.end (),

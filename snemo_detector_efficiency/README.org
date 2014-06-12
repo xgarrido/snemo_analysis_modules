@@ -53,6 +53,14 @@ Set the same geometry service label.
   #@description The Geometry Service label
   Geo_label : string = "Geo"
 #+END_SRC
+*** Output file
+The result of the module is streamed to an ASCII file which path is defined
+below
+#+BEGIN_SRC sh
+  #@description Output file name
+  output_filename : string as path = "/tmp/efficiency.dat"
+#+END_SRC
+
 * Special execution of this module
 Since this module will actively use geometry manager and its locators (/i.e./
 =calo_locator=, =xcalo_locator=,...), the module need to initialize and load the

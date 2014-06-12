@@ -105,6 +105,9 @@ namespace analysis {
     // The calorimeter block efficiency dictionnary
     efficiency_dict _gg_efficiencies_;
 
+    // The output filename
+    std::string _output_filename_;
+
     // Macro to automate the registration of the module :
     DPP_MODULE_REGISTRATION_INTERFACE (snemo_detector_efficiency_module);
 
