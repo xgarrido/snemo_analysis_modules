@@ -28,37 +28,38 @@ The next item holds the configuration for this module. The module name is
 =detector_efficiency_module= which is needed when using =bxdpp_processing= as
 explained in the top [[file:../README.org::*Use and execute a module][README]] file.
 
-*** File preamble
+** File preamble
 #+BEGIN_SRC sh
   #@description A sample list of setups
   #@key_label   "name"
   #@meta_label  "type"
 #+END_SRC
-*** Declaration & description
+** Declaration & description
 #+BEGIN_SRC sh
   [name="detector_efficiency_module" type="analysis::snemo_detector_efficiency_module"]
 
   #@description A SuperNEMO module to calculate the detector sensitivity
 #+END_SRC
 
-*** Logging priority
+** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
   logging.priority : string = "trace"
 #+END_SRC
 
-*** Geometry service label
-Set the same geometry service label.
+** Geometry service label
 #+BEGIN_SRC sh
   #@description The Geometry Service label
   Geo_label : string = "Geo"
 #+END_SRC
-*** Bank label
+
+** Bank label
 #+BEGIN_SRC sh
   #@description The data bank label
   bank_label : string = "CD"
 #+END_SRC
-*** Output file
+
+** Output file
 The result of the module is streamed to an ASCII file which path is defined
 below
 #+BEGIN_SRC sh
