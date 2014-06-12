@@ -591,6 +591,12 @@ namespace analysis {
             if (vbkg_counts.empty()) vbkg_counts.assign(a_histogram.bins(), 0.0);
             vbkg_counts.at(i) += value;
           }
+
+        const bool rescale = true;
+        if (rescale)
+          {
+            a_pool.grab_1d(a_name) *= norm_factor;
+          }
       }// end of background loop
 
     // Get names of 'signal' histograms
