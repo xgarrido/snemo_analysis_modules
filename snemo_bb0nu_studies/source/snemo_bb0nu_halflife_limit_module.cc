@@ -284,12 +284,7 @@ namespace analysis {
         ptd.tree_dump();
       }
 
-    // Particle Counters
-    size_t nelectron  = 0;
-    size_t npositron  = 0;
-    size_t nundefined = 0;
-
-    // Calibrated energies
+    // Total calibrated energy carried by electrons
     double total_energy = 0.0;
 
     // Store geom_id to avoid double inclusion of energy deposited
@@ -330,10 +325,6 @@ namespace analysis {
             gids.insert(gid);
             total_energy += the_calorimeters.at(i).get().get_energy();
           }
-
-        if      (a_particle.get_charge() == snemo::datamodel::particle_track::negative) nelectron++;
-        else if (a_particle.get_charge() == snemo::datamodel::particle_track::positive) npositron++;
-        else nundefined++;
       }
 
     // Build unique key for histogram map:
@@ -368,21 +359,8 @@ namespace analysis {
         // Add a underscore separator between fields
         key << KEY_FIELD_SEPARATOR;
       }
-    // Add charge multiplicity
-    key << nelectron << "e-" << npositron << "e+" << nundefined << "u";
-
     DT_LOG_TRACE(get_logging_priority(), "Total energy = " << total_energy / CLHEP::keV << " keV");
-    DT_LOG_TRACE(get_logging_priority(), "Number of electrons = " << nelectron);
-    DT_LOG_TRACE(get_logging_priority(), "Number of positrons = " << npositron);
-    DT_LOG_TRACE(get_logging_priority(), "Number of undefined = " << nundefined);
     DT_LOG_TRACE(get_logging_priority(), "Key = " << key.str());
-
-    // Arbitrary selection of "two-particles" channel
-    if (nelectron != 2)
-      {
-        DT_LOG_WARNING(get_logging_priority(), "Selecting only two-electrons events!");
-        return dpp::base_module::PROCESS_CONTINUE;
-      }
 
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
