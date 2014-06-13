@@ -134,7 +134,6 @@ namespace analysis {
   void snemo_bb0nu_halflife_limit_module::_set_defaults()
   {
     _key_fields_.clear ();
-
     _histogram_pool_ = 0;
     return;
   }
@@ -355,9 +354,6 @@ namespace analysis {
         else if (eh_properties.is_integer(a_field)) key << eh_properties.fetch_integer(a_field);
         else if (eh_properties.is_real(a_field))    key << eh_properties.fetch_real(a_field);
         else if (eh_properties.is_string(a_field))  key << eh_properties.fetch_string(a_field);
-
-        // Add a underscore separator between fields
-        key << KEY_FIELD_SEPARATOR;
       }
     DT_LOG_TRACE(get_logging_priority(), "Total energy = " << total_energy / CLHEP::keV << " keV");
     DT_LOG_TRACE(get_logging_priority(), "Key = " << key.str());
@@ -568,12 +564,6 @@ namespace analysis {
             const double value = a_histogram.get(i) * norm_factor;
             if (vbkg_counts.empty()) vbkg_counts.assign(a_histogram.bins(), 0.0);
             vbkg_counts.at(i) += value;
-          }
-
-        const bool rescale = true;
-        if (rescale)
-          {
-            a_pool.grab_1d(a_name) *= norm_factor;
           }
       }// end of background loop
 
