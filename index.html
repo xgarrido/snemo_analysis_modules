@@ -145,6 +145,10 @@ mass&#x2026;).
 sensitive detector volumes of SuperNEMO experiment <i>i.e.</i> main wall
 calorimeter, X-wall calorimeter, &gamma;-vetos and Geiger cells.
 </dd>
+<dt><a href="./snemo_vertex_resolution/README.html">snemo_vertex_resolution</a></dt><dd>This module shows the efficiency of vertex
+reconstruction by plotting the vertex position resolution on the source
+foil as well as on the calorimeter walls.
+</dd>
 </dl>
 
 <p>
@@ -254,7 +258,8 @@ service_manager.configuration : string[1] as <span class="org-variable-name">pat
 <div class="org-src-container">
 
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration files for modules</span>
-modules.configuration_files : string[3] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+modules.configuration_files : string[4] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_vertex_resolution_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_detector_efficiency_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_bb0nu_studies_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_control_plot_module.conf"</span>
@@ -341,6 +346,9 @@ table sets the libraries:
 <span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "filename"</span>
 [<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_detector_efficiency"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_detector_efficiency/install/lib/libsnemo_detector_efficiency.so"</span>]
 <span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_detector_efficiency library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+[<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_vertex_resolution"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_vertex_resolution/install/lib/libsnemo_vertex_resolution.so"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_vertex_resolution library</span>
 <span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
 [<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_bb0nu_studies"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_bb0nu_studies/install/lib/libsnemo_bb0nu_studies.so"</span>]
 <span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_bb0nu_studies library</span>
@@ -559,7 +567,7 @@ directory and output file name in <a href="snemo_bb0nu_studies/README.html#*Hist
 </div>
 </div></div>
 <div id="postamble" class="status">
-File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/671b3b90c19761a99d999dc0d8265f460b7238ca">671b3b9</a> - 2014-06-12
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/7a2c472f70e1fcf9ae235f8f0f7f9770ef93ff0c">7a2c472</a> - 2014-06-14
 </div>
 </body>
 </html>

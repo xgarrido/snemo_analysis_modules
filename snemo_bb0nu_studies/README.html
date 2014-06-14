@@ -87,8 +87,8 @@ for the JavaScript code in this tag.
 This repository holds a SN@ilWare configuration + source code to calculate &beta;&beta;0&nu;
 sensitivity for SuperNEMO experiment. Given 2&beta; simulations (maybe data one day)
 from 0&nu; double decay and background simulations (2&nu;,&nbsp;<sup>208</sup>Tl,&nbsp;<sup>214</sup>Bi&#x2026;), the
-module <code>snemo_bb0nu_halflife_limit</code> calculates signal/background efficiencies
-and then determines the best sensitivity.
+module <code>snemo_bb0nu_halflife_limit_module</code> calculates signal/background
+efficiencies and then determines the best sensitivity.
 </p>
 
 <p>
@@ -190,7 +190,7 @@ Histo_output_files : string[2] as <span class="org-variable-name">path</span> = 
 
 <p>
 Histograms done from a previous run of the module can be load at startup. This
-is useful when processing of a huge collection of files has been done and energy
+is useful when processing a huge collection of files has been done and energy
 distribution as well as efficiency have been computed : then the output
 histograms can be set as new input for the <code>histogram_service</code> in such way, the
 processing does not to be redo for these peculiar files.
@@ -451,7 +451,7 @@ max : real as <span class="org-variable-name">energy</span> = 3200.0 keV
 </div>
 </div>
 <div id="postamble" class="status">
-File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/671b3b90c19761a99d999dc0d8265f460b7238ca">671b3b9</a> - 2014-06-12
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/7a2c472f70e1fcf9ae235f8f0f7f9770ef93ff0c">7a2c472</a> - 2014-06-14
 </div>
 </body>
 </html>
