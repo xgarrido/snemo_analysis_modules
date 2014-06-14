@@ -70,7 +70,7 @@ ROOT files or XML archives.
 #+END_SRC
 
 Histograms done from a previous run of the module can be load at startup. This
-is useful when processing of a huge collection of files has been done and energy
+is useful when processing a huge collection of files has been done and energy
 distribution as well as efficiency have been computed : then the output
 histograms can be set as new input for the =histogram_service= in such way, the
 processing does not to be redo for these peculiar files.
