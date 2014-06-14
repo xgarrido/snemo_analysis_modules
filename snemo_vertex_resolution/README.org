@@ -68,37 +68,24 @@ archives.
       "/tmp/${USER}/snemo.d/snemo_vertex_resolution_histos.xml"
 #+END_SRC
 
-# Histograms done from a previous run of the module can be load at startup. This
-# is useful when processing of a huge collection of files has been done and energy
-# distribution as well as efficiency have been computed : then the output
-# histograms can be set as new input for the =histogram_service= in such way, the
-# processing does not to be redo for these peculiar files.
-# #+BEGIN_SRC sh
-#   # #@description The input file from where to load the histograms
-#   # Histo_input_file : string as path = \
-#   #     "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.saved.xml"
-# #+END_SRC
-
-*** COMMENT Histogram templates
+*** Histogram templates
 Templates for histogram may be provided to reduce the amount of configuration of
-individual histogram. For instance, plotting the energy distributions of several
-channels may only need one general histogram definition which gives the x-axis
-boundaries and x-binning (see [[Histogram declarations][below]]).
+individual histogram. For instance, plotting the vertex position distributions
+only implies 3 histogram templates for each of the 3 cartesian coordinates
+$x,y,z$ (see [[Histogram declarations][below]]).
 #+BEGIN_SRC sh
   #@description The ouput file where to store the histograms
   Histo_template_files : string[1] as path = \
-      "@SNEMO_SIMULATION_MODULES_DIR@/snemo_bb0nu_histogram_templates.conf"
+      "@SNEMO_SIMULATION_MODULES_DIR@/snemo_vertex_resolution_histogram_templates.conf"
 #+END_SRC
-** COMMENT Histogram declarations
+** Histogram declarations
 :PROPERTIES:
 :TANGLE: ../config/snemo_vertex_resolution_histogram_templates.conf
 :END:
 
 The histogram declarations /i.e./ name, boundaries, binning... are set in this
 section. There are mostly /template/ histogram in such way, their declarations
-may be used as templates for several histograms. For instance, the [[Energy
-template]] defines an histogram that can be mimic by different analysis channels
-/i.e./ 0\nu energy distribution to background energy distribution.
+may be used as templates for several histograms.
 
 *** Mandatory preamble
 #+BEGIN_SRC sh
@@ -107,10 +94,10 @@ template]] defines an histogram that can be mimic by different analysis channels
   #@meta_label  "type"
 #+END_SRC
 
-*** Energy template
+*** $x$-position distribution
 #+BEGIN_SRC sh
-  [name="energy_template" type="mygsl::histogram_1d"]
-  #@config The histogram template of the energy distribution
+  [name="delta_x" type="mygsl::histogram_1d"]
+  #@config The histogram template of the x-position of vertex reconstruction
 
   #@description The group of the histogram (optional)
   group : string = "__template"
@@ -122,27 +109,27 @@ template]] defines an histogram that can be mimic by different analysis channels
   linear : boolean = 1
 
   #@description The X axis label
-  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}$E$_\text{calibrated}"
+  display.xaxis.label : string = "\Updelta x"
 
   #@description The Y axis label
-  display.yaxis.label : string = "dN/dE [A.U.]"
+  display.yaxis.label : string = "dN/dx"
 
   #@description The number of bins
   number_of_bins : integer = 25
 
   #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
+  unit : string = "mm"
 
   #@description The lower bound of the histogram
-  min : real as energy = 2000.0 keV
+  min : real as length = -100.0 mm
 
   #@description The upper bound of the histogram
-  max : real as energy = 3200.0 keV
+  max : real as length = +100.0 mm
 #+END_SRC
-*** Efficiency template
+*** $y$-position distribution
 #+BEGIN_SRC sh
-  [name="efficiency_template" type="mygsl::histogram_1d"]
-  #@config The histogram template of the energy selection efficiency
+  [name="delta_y" type="mygsl::histogram_1d"]
+  #@config The histogram template of the y-position of vertex reconstruction
 
   #@description The group of the histogram (optional)
   group : string = "__template"
@@ -154,28 +141,27 @@ template]] defines an histogram that can be mimic by different analysis channels
   linear : boolean = 1
 
   #@description The X axis label
-  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}"
-
-  #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
-  display.xaxis.unit : string = "keV"
+  display.xaxis.label : string = "\Updelta y"
 
   #@description The Y axis label
-  display.yaxis.label : string = "efficiency"
+  display.yaxis.label : string = "dN/dx"
 
   #@description The number of bins
   number_of_bins : integer = 25
 
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "mm"
+
   #@description The lower bound of the histogram
-  min : real as energy = 2000.0 keV
+  min : real as length = -50.0 mm
 
   #@description The upper bound of the histogram
-  max : real as energy = 3200.0 keV
+  max : real as length = +50.0 mm
 #+END_SRC
-
-*** Halflife limit template
+*** $z$-position distribution
 #+BEGIN_SRC sh
-  [name="halflife_template" type="mygsl::histogram_1d"]
-  #@config The histogram template of the halflife limit values
+  [name="delta_z" type="mygsl::histogram_1d"]
+  #@config The histogram template of the x-position of vertex reconstruction
 
   #@description The group of the histogram (optional)
   group : string = "__template"
@@ -187,20 +173,20 @@ template]] defines an histogram that can be mimic by different analysis channels
   linear : boolean = 1
 
   #@description The X axis label
-  display.xaxis.label : string = "\Upsigma_\text{\tiny 1,2}\text{E}_\text{calibrated}\geq\text{E}_\text{cut}"
-
-  #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
-  display.xaxis.unit : string = "keV"
+  display.xaxis.label : string = "\Updelta z"
 
   #@description The Y axis label
-  display.yaxis.label : string = "halflife limit"
+  display.yaxis.label : string = "dN/dx"
 
   #@description The number of bins
   number_of_bins : integer = 25
 
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "mm"
+
   #@description The lower bound of the histogram
-  min : real as energy = 2000.0 keV
+  min : real as length = -100.0 mm
 
   #@description The upper bound of the histogram
-  max : real as energy = 3200.0 keV
+  max : real as length = +100.0 mm
 #+END_SRC

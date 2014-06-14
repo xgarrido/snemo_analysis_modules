@@ -35,12 +35,9 @@
 // Data processing module abstract base class
 #include <dpp/base_module.h>
 
-#include <map>
-#include <string>
-#include <vector>
-
-#include <mygsl/datapoint.h>
-#include <mygsl/histogram.h>
+namespace mygsl {
+  class histogram_pool;
+}
 
 namespace analysis {
 
@@ -48,13 +45,11 @@ namespace analysis {
   {
   public:
 
-    typedef std::vector<mygsl::datapoint>     datapoints;
-    typedef std::map<std::string, datapoints> graph_collection_type;
-    typedef std::map<std::string, mygsl::histogram> histogram_collection_type;
+    /// Setting histogram pool
+    void set_histogram_pool(mygsl::histogram_pool & pool_);
 
-    void set_parameter_label (const std::string & parameter_);
-
-    const std::string & get_parameter_label () const;
+    /// Grabbing histogram pool
+    mygsl::histogram_pool & grab_histogram_pool();
 
     /// Constructor
     snemo_vertex_resolution_module(datatools::logger::priority = datatools::logger::PRIO_FATAL);
@@ -84,27 +79,13 @@ namespace analysis {
     /// Give default values to specific class members.
     void _set_defaults();
 
-    // // Generate ROOT plots.
-    // void _generate_plots_ ();
-
-    // // Generate scatter plot chi2/ndof value vs. simulated energy
-    // void _generate_scatter_plot_ ();
-
-    // // Generate chi2/ndof distribution value
-    // void _generate_histogram_plot_ ();
-
   private:
 
-    // The parameter name for vertex (either 'foil' or 'calorimeter')
-    std::string _parameter_;
-
-    // Distribution of the event charge:
-    graph_collection_type _vertex_graphs_;
-    histogram_collection_type _vertex_histograms_;
+    // The histogram pool :
+    mygsl::histogram_pool * _histogram_pool_;
 
     // Macro to automate the registration of the module :
     DPP_MODULE_REGISTRATION_INTERFACE(snemo_vertex_resolution_module);
-
   };
 
 } // namespace analysis
