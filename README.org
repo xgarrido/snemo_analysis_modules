@@ -25,6 +25,9 @@ The following analysis modules are currently available :
 - [[./snemo_detector_efficiency/README.org][snemo_detector_efficiency]] :: This module computes the efficiency of each
      sensitive detector volumes of SuperNEMO experiment /i.e./ main wall
      calorimeter, X-wall calorimeter, \gamma-vetos and Geiger cells.
+- [[./snemo_vertex_resolution/README.org][snemo_vertex_resolution]] :: This module shows the efficiency of vertex
+     reconstruction by plotting the vertex position resolution on the source
+     foil as well as on the calorimeter walls.
 
 The following package also provides :
 
