@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>SuperNEMO - Vertex reconstruction</title>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Xavier Garrido" />
+<link rel="stylesheet" href="../css/styles.css" />
+               <link rel="stylesheet" href="../css/org-pygments.css" />
+               <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script><script type="text/javascript">
+  function randomLinkColor() {
+      var colors = ['#f1c40f','#e74c3c','#3399cc','#e67e22','#67ad00','#8e44ad','#1abc9c','#003399'];
+      var random_color = colors[Math.floor(Math.random() * colors.length)];
+      var elements = document.querySelectorAll('a');
+      [].slice.call(elements).forEach(function(elem) {
+          //elem.style.color = random_color;
+      });
+  }
+  function displayTOC() {
+      var ttoc = document.getElementById("text-table-of-contents");
+      if (ttoc) {
+          var maincontent = '<a class="button"><i class="fa fa-list"></i></a>'
+          maincontent += "<div>" + ttoc.innerHTML + "</div>";
+          document.getElementById("toc").innerHTML = maincontent;
+      } else {
+          document.getElementById("toc").style.display = "none";
+          document.getElementById("preamble").style.top = "10px";
+      }
+     }
+  </script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      messageStyle: "none",
+      TeX: {
+          extensions: ["cancel.js"],
+          Macros: {
+              vv: ["{\\vec{#1}}",1],
+              Upsigma: "{\\Sigma}",
+              Updelta: "{\\Delta}",
+              varoiint: "{\\iint}",
+              varoint: "{\\int}",
+              grad: "{\\vec{\\nabla}}",
+              div: "{\\vec{\\nabla}.}",
+              rot: "{\\vec{\\nabla}\\times\\,}",
+              ket: ["{|#1 \\rangle}",1],
+              bra: ["{\\langle#1|}",1],
+              psh: ["{\\langle#1|#2 \\rangle}",2],
+              bm: ["{\\boldsymbol #1}",1]
+          }
+      }
+  });
+  MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      var TEX = MathJax.InputJax.TeX;
+      TEX.Definitions.macros.unit = "jaxunit";
+      TEX.Parse.Augment({
+          jaxunit: function (name) {
+              var n = this.GetBrackets(name),
+              unit = this.GetArgument(name)
+              if (n == null) {n = ""}
+              var tex = n + '\\,\\text{'+unit+'}';
+              this.string = tex + this.string.slice(this.i); this.i = 0;
+          }
+      });
+  });
+  MathJax.Hub.Queue(function () {
+      document.getElementById("spinner").style.display = "none";
+  });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <div id="spinner">
+    <div id="bounce1"></div>
+    <div id="bounce2"></div>
+    <div id="bounce3"></div>
+    <small>Loading MathJax...</small>
+  </div>
+</head>
+<body onload="randomLinkColor();displayTOC();"><div id="toc"></div>
+<div id="preamble" class="status">
+<a href="../index.html"><i class="fa fa-home"></i></a><br/> <a href="https://github.com/xgarrido/snemo_simulation_modules"><i class="fa fa-github"></i></a><br/> 
+</div>
+<div id="content">
+<h1 class="title">SuperNEMO - Vertex reconstruction</h1>
+<p>
+This repository holds a SN@ilWare configuration + source code to study the
+vertex reconstruction of particle track in SuperNEMO. It especially produces
+plots of vertex position resolution on the source foil as well as on calorimeter
+wall surface.
+</p>
+
+<p>
+The current version is hosted at
+<a href="https://github.com/xgarrido/snemo_simulation_modules/snemo_vertex_resolution">https://github.com/xgarrido/snemo_simulation_modules/snemo_vertex_resolution</a>
+under <code>git</code> version control.
+</p>
+
+<p>
+The code itself is implemented in the <code>source</code> directory which holds the
+<code>snemo_vertex_resolution_module.*</code> source code as well as a <code>CMakeLists.txt</code>
+file in order to compile, build and install the module following <code>cmake</code> rules.
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1">Module configuration</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The next item holds the configuration for the module itself. The second item is
+related to histogram declarations.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1">Module declaration</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The module name is <code>vertex_resolution_module</code> which is needed when using
+<code>bxdpp_processing</code> as explained in the top <a href="../README.html">README</a> file.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1">File preamble</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2">Declaration &amp; description</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"vertex_resolution_module"</span> <span class="org-variable-name">type</span>=<span class="org-string">"analysis::snemo_vertex_resolution_module"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description A SuperNEMO module to show the vertex position resolution</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3">Logging priority</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"notice"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-4" class="outline-4">
+<h4 id="sec-1-1-4">Histogram service label</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<p>
+Set the same histogram service label as defined <i>here</i>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The Histogram Service label</span>
+Histo_label : <span class="org-variable-name">string</span> = <span class="org-string">"Histo"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-1-5" class="outline-4">
+<h4 id="sec-1-1-5">Histogram storage</h4>
+<div class="outline-text-4" id="text-1-1-5">
+<p>
+All histograms generated by this module can be stored inside ROOT files or XML
+archives.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The ouput file where to store the histograms</span>
+Histo_output_files : string[2] as <span class="org-variable-name">path</span> =                       <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/snemo_vertex_resolution_histos.root"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/snemo_vertex_resolution_histos.xml"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-6" class="outline-4">
+<h4 id="sec-1-1-6">Histogram templates</h4>
+<div class="outline-text-4" id="text-1-1-6">
+<p>
+Templates for histogram may be provided to reduce the amount of configuration of
+individual histogram. For instance, plotting the vertex position distributions
+only implies 3 histogram templates for each of the 3 cartesian coordinates
+\(x,y,z\) (see <a href="#sec-1-2">below</a>).
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The ouput file where to store the histograms</span>
+Histo_template_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_vertex_resolution_histogram_templates.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2">Histogram declarations</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+The histogram declarations <i>i.e.</i> name, boundaries, binning&#x2026; are set in this
+section. There are mostly <i>template</i> histogram in such way, their declarations
+may be used as templates for several histograms.
+</p>
+</div>
+
+<div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1">Mandatory preamble</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2">\(x\)-position distribution</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"delta_x"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram template of the x-position of vertex reconstruction</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Updelta x"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"dN/dx"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
+number_of_bins : <span class="org-variable-name">integer</span> = 25
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
+unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+min : real as <span class="org-variable-name">length</span> = -100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+max : real as <span class="org-variable-name">length</span> = +100.0 mm
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3">\(y\)-position distribution</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"delta_y"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram template of the y-position of vertex reconstruction</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Updelta y"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"dN/dx"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
+number_of_bins : <span class="org-variable-name">integer</span> = 25
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
+unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+min : real as <span class="org-variable-name">length</span> = -50.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+max : real as <span class="org-variable-name">length</span> = +50.0 mm
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4">\(z\)-position distribution</h4>
+<div class="outline-text-4" id="text-1-2-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"delta_z"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_1d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@config The histogram template of the x-position of vertex reconstruction</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"\Updelta z"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"dN/dx"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The number of bins</span>
+number_of_bins : <span class="org-variable-name">integer</span> = 25
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)</span>
+unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+min : real as <span class="org-variable-name">length</span> = -100.0 mm
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+max : real as <span class="org-variable-name">length</span> = +100.0 mm
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/7a2c472f70e1fcf9ae235f8f0f7f9770ef93ff0c">7a2c472</a> - 2014-06-14
+</div>
+</body>
+</html>
