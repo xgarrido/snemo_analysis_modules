@@ -160,16 +160,16 @@ namespace analysis {
     DT_THROW_IF (! is_initialized(), std::logic_error,
                  "Module '" << get_name() << "' is not initialized !");
 
+    // Check if the record bank is available :
+    if (!data_record_.has(_bank_label_))
+      {
+        DT_LOG_ERROR(get_logging_priority(),
+                     "Could not find any bank with label '" << _bank_label_ << "' !");
+        return dpp::base_module::PROCESS_STOP;
+      }
     namespace sdm = snemo::datamodel;
     if (_bank_label_ == sdm::data_info::default_calibrated_data_label())
       {
-        // Check if the 'calibrated data' record bank is available :
-        if (!data_record_.has(_bank_label_))
-          {
-            DT_LOG_ERROR(get_logging_priority(),
-                         "Could not find any bank with label '" << _bank_label_ << "' !");
-            return dpp::base_module::PROCESS_STOP;
-          }
         const sdm::calibrated_data & cd
           = data_record_.get<sdm::calibrated_data>(_bank_label_);
 
@@ -195,13 +195,6 @@ namespace analysis {
       }
     else if (_bank_label_ == sdm::data_info::default_particle_track_data_label())
       {
-        // Check if the 'particle track' record bank is available :
-        if (!data_record_.has(_bank_label_))
-          {
-            DT_LOG_ERROR(get_logging_priority(),
-                         "Could not find any bank with label '" << _bank_label_ << "' !");
-            return dpp::base_module::PROCESS_STOP;
-          }
         const sdm::particle_track_data & ptd
           = data_record_.get<sdm::particle_track_data>(_bank_label_);
 
