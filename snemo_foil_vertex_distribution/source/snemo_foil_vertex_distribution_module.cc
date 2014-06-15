@@ -8,7 +8,7 @@
 
 // Third party:
 // - Bayeux/datatools:
-#include <datatools/services/service_manager.h>
+#include <datatools/service_manager.h>
 // - Bayeux/mygsl
 #include <mygsl/histogram_pool.h>
 // - Bayeux/mtools
@@ -124,7 +124,7 @@ namespace analysis {
   }
 
     // Reset :
-  void snemo_detector_efficiency_module::reset()
+  void snemo_foil_vertex_distribution_module::reset()
   {
     DT_THROW_IF (! is_initialized (),
                  std::logic_error,
@@ -144,152 +144,108 @@ namespace analysis {
   }
 
   // Processing :
-
-  SNEMO_MODULE_PROCESS_IMPLEMENT_HEAD (snemo_vertex_distribution_module,
-                                       event_record_)
+  dpp::base_module::process_status
+  snemo_foil_vertex_distribution_module::process(datatools::things & data_record_)
   {
-    if (! is_initialized ())
+    DT_THROW_IF (! is_initialized(), std::logic_error,
+                 "Module '" << get_name() << "' is not initialized !");
+
+    if (!data_record_.has(_bank_label_))
       {
-        ostringstream message;
-        message << "snemo::analysis::processing::"
-                << "snemo_vertex_distribution_module::process: "
-                << "Module '" << get_name () << "' is not initialized !";
-        throw logic_error (message.str ());
+        DT_LOG_ERROR(get_logging_priority(),
+                     "Could not find any bank with label '" << _bank_label_ << "' !");
+        return dpp::base_module::PROCESS_STOP;
       }
 
-    if (_bank_label_ == snemo::core::model::data_info::SIMULATED_DATA_LABEL)
+    const geomtools::vector_3d * vertex = 0;
+    namespace sdm = snemo::datamodel;
+    if (_bank_label_ == sdm::data_info::default_simulated_data_label())
       {
         // Check if the 'calibrated data' record bank is available :
-        namespace scm = snemo::core::model;
-        if (! DATATOOLS_UTILS_THINGS_CHECK_BANK (event_record_, _bank_label_, scm::simulated_data))
-          {
-            std::clog << datatools::utils::io::error
-                      << "snemo::analysis::processing::"
-                      << "snemo_detector_efficiency_module::process: "
-                      << "Could not find any bank with label '"
-                      << _bank_label_ << "' !"
-                      << std::endl;
-            return STOP;
-          }
-        DATATOOLS_UTILS_THINGS_CONST_BANK (event_record_, _bank_label_, scm::simulated_data, sd);
+        const mctools::simulated_data & sd
+          = data_record_.get<mctools::simulated_data>(_bank_label_);
 
-        if (sd.has_vertex ())
-          {
-            const geomtools::vector_3d & a_vertex = sd.get_vertex ();
-            // Getting histogram pool
-            mygsl::histogram_pool & a_pool = grab_histogram_pool ();
-
-            const std::string & key_str = "vertex_distribution";
-            if (!a_pool.has (key_str))
-              {
-                mygsl::histogram_2d & h = a_pool.add_2d (key_str, "", "distribution");
-                datatools::utils::properties hconfig;
-                hconfig.store_string ("mode", "mimic");
-                hconfig.store_string ("mimic.histogram_2d", "vertex_distribution_template");
-                mygsl::histogram_pool::init_histo_2d (h, hconfig, &a_pool);
-              }
-
-            // Getting the current histogram
-            mygsl::histogram_2d & a_histo = a_pool.grab_2d (key_str);
-            a_histo.fill (a_vertex.y (), a_vertex.z ());
-          }
+        if (sd.has_vertex()) vertex = &(sd.get_vertex());
       }
-    else if (_bank_label_ == snemo::analysis::model::data_info::PARTICLE_TRACK_DATA_LABEL)
+    else if (_bank_label_ == sdm::data_info::default_particle_track_data_label())
       {
-        namespace sam = snemo::analysis::model;
-        // Check if the 'particle track' event record bank is available :
-        if (! DATATOOLS_UTILS_THINGS_CHECK_BANK (event_record_, _bank_label_, sam::particle_track_data))
-          {
-            clog << datatools::utils::io::error
-                 << "snemo::analysis::processing::"
-                 << "snemo_vertex_distribution_module::process: "
-                 << "Could not find any bank with label '"
-                 << _bank_label_ << "' !"
-                 << endl;
-            return STOP;
-          }
-        // Get a const reference to this event record bank of interest :
-        DATATOOLS_UTILS_THINGS_CONST_BANK (event_record_, _bank_label_, sam::particle_track_data, ptd);
-
-        if (is_debug ())
-          {
-            clog << datatools::utils::io::debug
-                 << "snemo::analysis::processing::"
-                 << "snemo_vertex_distribution_module::process: "
-                 << "Particle track data : " << endl;
-            ptd.tree_dump (clog, "", "DEBUG: ");
-          }
-
+        const sdm::particle_track_data & ptd
+          = data_record_.get<sdm::particle_track_data>(_bank_label_);
         // Loop over all saved particles
-        const sam::particle_track_data::particle_collection_type & the_particles
+        const sdm::particle_track_data::particle_collection_type & the_particles
           = ptd.get_particles ();
-
-        for (sam::particle_track_data::particle_collection_type::const_iterator
-               iparticle = the_particles.begin ();
-             iparticle != the_particles.end ();
+        for (sdm::particle_track_data::particle_collection_type::const_iterator
+               iparticle = the_particles.begin();
+             iparticle != the_particles.end();
              ++iparticle)
           {
-            const sam::particle_track & a_particle = iparticle->get ();
+            const sdm::particle_track & a_particle = iparticle->get();
+            if (!a_particle.has_vertices()) continue;
 
-            if (!a_particle.has_negative_charge ()) continue;
-
-            if (!a_particle.has_vertices ()) continue;
-
-            const sam::particle_track::vertex_collection_type & the_vertices
+            const sdm::particle_track::vertex_collection_type & the_vertices
               = a_particle.get_vertices ();
-
-            for (sam::particle_track::vertex_collection_type::const_iterator
-                   ivertex = the_vertices.begin ();
-                 ivertex != the_vertices.end (); ++ivertex)
+            for (sdm::particle_track::vertex_collection_type::const_iterator
+                   ivertex = the_vertices.begin();
+                 ivertex != the_vertices.end(); ++ivertex)
               {
                 const geomtools::blur_spot & a_vertex = ivertex->get ();
-                const datatools::utils::properties & a_prop = a_vertex.get_auxiliaries ();
+                const datatools::properties & a_prop = a_vertex.get_auxiliaries ();
 
-                if (!a_prop.has_flag ("foil_vertex")) continue;
+                if (!a_prop.has_flag("foil_vertex")) continue;
 
-                // Getting histogram pool
-                mygsl::histogram_pool & a_pool = grab_histogram_pool ();
-
-                const std::string & key_str = "vertex_distribution";
-                if (!a_pool.has (key_str))
-                  {
-                    mygsl::histogram_2d & h = a_pool.add_2d (key_str, "", "distribution");
-                    datatools::utils::properties hconfig;
-                    hconfig.store_string ("mode", "mimic");
-                    hconfig.store_string ("mimic.histogram_2d", "vertex_distribution_template");
-                    mygsl::histogram_pool::init_histo_2d (h, hconfig, &a_pool);
-                  }
-
-                // Getting the current histogram
-                mygsl::histogram_2d & a_histo = a_pool.grab_2d (key_str);
-                a_histo.fill (a_vertex.get_position ().y (), a_vertex.get_position ().z ());
-
+                vertex = &(a_vertex.get_position());
               }
           }
       }
+    else
+      {
+        DT_THROW_IF(true, std::logic_error,
+                    "Bank label '" << _bank_label_ << "' is not supported !");
+      }
 
-    return SUCCESS;
+    if (vertex == 0)
+      {
+        DT_LOG_WARNING(get_logging_priority(), "No vertex has been set !");
+        return dpp::base_module::PROCESS_STOP;
+      }
+    // Getting histogram pool
+    mygsl::histogram_pool & a_pool = grab_histogram_pool();
+
+    const std::string & key_str = "vertex_distribution";
+    if (!a_pool.has(key_str))
+      {
+        mygsl::histogram_2d & h = a_pool.add_2d(key_str, "", "distribution");
+        datatools::properties hconfig;
+        hconfig.store_string("mode", "mimic");
+        hconfig.store_string("mimic.histogram_2d", "vertex_distribution_template");
+        mygsl::histogram_pool::init_histo_2d(h, hconfig, &a_pool);
+      }
+
+    // Getting the current histogram
+    mygsl::histogram_2d & a_histo = a_pool.grab_2d(key_str);
+    a_histo.fill(vertex->y(), vertex->z());
+
+    return dpp::base_module::PROCESS_SUCCESS;
   }
 
-  void snemo_vertex_distribution_module::_dump_result_ (ostream      & out_,
-                                                        const string & title_,
-                                                        const string & indent_,
-                                                        bool inherit_) const
+  void snemo_foil_vertex_distribution_module::dump_result(std::ostream      & out_,
+                                                          const std::string & title_,
+                                                          const std::string & indent_,
+                                                          bool inherit_) const
   {
-    string indent;
+    std::string indent;
     if (! indent_.empty ())
       {
         indent = indent_;
       }
     if ( !title_.empty () )
       {
-        out_ << indent << title_ << endl;
+        out_ << indent << title_ << std::endl;
       }
-    namespace du = datatools::utils;
 
     {
       // Histogram :
-      out_ << indent << du::i_tree_dumpable::tag
+      out_ << indent << datatools::i_tree_dumpable::tag
            << "Vertex histograms : ";
       if (_histogram_pool_->empty ())
         out_ << "<empty>";
@@ -310,13 +266,13 @@ namespace analysis {
           std::ostringstream indent_oss;
           if (++j == hnames.end ())
             {
-              out_  << du::i_tree_dumpable::last_tag;
-              indent_oss << indent << du::i_tree_dumpable::last_skip_tag;
+              out_  << datatools::i_tree_dumpable::last_tag;
+              indent_oss << indent << datatools::i_tree_dumpable::last_skip_tag;
             }
           else
             {
-              out_ << du::i_tree_dumpable::tag;
-              indent_oss << indent << du::i_tree_dumpable::skip_tag;
+              out_ << datatools::i_tree_dumpable::tag;
+              indent_oss << indent << datatools::i_tree_dumpable::skip_tag;
             }
 
           out_ << "Label " << a_name << std::endl;
@@ -333,13 +289,9 @@ namespace analysis {
     return;
   }
 
-} // namespace processing
-
 } // namespace analysis
 
-} // namespace snemo
-
-// end of snemo_vertex_distribution_module.cc
+// end of snemo_foil_vertex_distribution_module.cc
 /*
 ** Local Variables: --
 ** mode: c++ --
