@@ -96,10 +96,10 @@ namespace analysis {
     virtual process_status process(datatools::things & data_);
 
     /// Dump
-    void dump_result (std::ostream      & out_    = std::clog,
-                      const std::string & title_  = "",
-                      const std::string & indent_ = "",
-                      bool inherit_               = false) const;
+    void dump_result(std::ostream      & out_    = std::clog,
+                     const std::string & title_  = "",
+                     const std::string & indent_ = "",
+                     bool inherit_               = false) const;
 
   protected:
 
@@ -124,7 +124,7 @@ namespace analysis {
     experiment_entry_type _experiment_conditions_;
 
     // Macro to automate the registration of the module :
-    DPP_MODULE_REGISTRATION_INTERFACE (snemo_bb0nu_halflife_limit_module);
+    DPP_MODULE_REGISTRATION_INTERFACE(snemo_bb0nu_halflife_limit_module);
 
   };
 

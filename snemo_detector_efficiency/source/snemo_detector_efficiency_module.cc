@@ -1,23 +1,4 @@
-/* snemo_detector_efficiency_module.cc
- *
- * Copyright (C) 2013 Xavier Garrido <garrido@lal.in2p3.fr>
-
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or (at
- * your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301, USA.
- *
- */
+// snemo_detector_efficiency_module.cc
 
 #include <stdexcept>
 #include <sstream>
@@ -58,7 +39,6 @@ namespace analysis {
   void snemo_detector_efficiency_module::_set_defaults()
   {
     _bank_label_        = "";
-    _Geo_service_label_ = "";
     _output_filename_   = "";
 
     _calo_efficiencies_.clear();
@@ -299,8 +279,7 @@ namespace analysis {
         {
           const geomtools::geom_id & a_gid = i->first;
 
-          const snemo::geometry::calo_locator & calo_locator
-            = dynamic_cast<const snemo::geometry::calo_locator&>(_locator_plugin_->get_calo_locator());
+          const snemo::geometry::calo_locator & calo_locator = _locator_plugin_->get_calo_locator();
           if (calo_locator.is_calo_block_in_current_module(a_gid))
             {
               fout << "calo ";
@@ -310,8 +289,7 @@ namespace analysis {
                    << position.y () << " "
                    << position.z () << " ";
             }
-          const snemo::geometry::xcalo_locator & xcalo_locator
-            = dynamic_cast<const snemo::geometry::xcalo_locator&>(_locator_plugin_->get_xcalo_locator());
+          const snemo::geometry::xcalo_locator & xcalo_locator = _locator_plugin_->get_xcalo_locator();
           if (xcalo_locator.is_calo_block_in_current_module(a_gid))
             {
               fout << "xcalo ";
@@ -321,8 +299,7 @@ namespace analysis {
                    << position.y () << " "
                    << position.z () << " ";
             }
-          const snemo::geometry::gveto_locator & gveto_locator
-            = dynamic_cast<const snemo::geometry::gveto_locator&>(_locator_plugin_->get_gveto_locator());
+          const snemo::geometry::gveto_locator & gveto_locator = _locator_plugin_->get_gveto_locator();
           if (gveto_locator.is_calo_block_in_current_module(a_gid))
             {
               fout << "gveto ";

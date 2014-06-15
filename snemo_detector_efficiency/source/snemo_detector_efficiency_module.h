@@ -90,9 +90,6 @@ namespace analysis {
 
   private:
 
-    // The label/name of the 'Geo' service accessible from the service manager :
-    std::string _Geo_service_label_;
-
     // The label/name of the bank accessible from the event record :
     std::string _bank_label_;
 
