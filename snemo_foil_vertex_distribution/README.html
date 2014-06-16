@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>SuperNEMO - Foil vertex distribution</title>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Xavier Garrido" />
+<link rel="stylesheet" href="../css/styles.css" />
+               <link rel="stylesheet" href="../css/org-pygments.css" />
+               <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script><script type="text/javascript">
+  function randomLinkColor() {
+      var colors = ['#f1c40f','#e74c3c','#3399cc','#e67e22','#67ad00','#8e44ad','#1abc9c','#003399'];
+      var random_color = colors[Math.floor(Math.random() * colors.length)];
+      var elements = document.querySelectorAll('a');
+      [].slice.call(elements).forEach(function(elem) {
+          //elem.style.color = random_color;
+      });
+  }
+  function displayTOC() {
+      var ttoc = document.getElementById("text-table-of-contents");
+      if (ttoc) {
+          var maincontent = '<a class="button"><i class="fa fa-list"></i></a>'
+          maincontent += "<div>" + ttoc.innerHTML + "</div>";
+          document.getElementById("toc").innerHTML = maincontent;
+      } else {
+          document.getElementById("toc").style.display = "none";
+          document.getElementById("preamble").style.top = "10px";
+      }
+     }
+  </script>
+</head>
+<body onload="randomLinkColor();displayTOC();"><div id="toc"></div>
+<div id="preamble" class="status">
+<a href="../index.html"><i class="fa fa-home"></i></a><br/> <a href="https://github.com/xgarrido/snemo_simulation_modules"><i class="fa fa-github"></i></a><br/> 
+</div>
+<div id="content">
+<h1 class="title">SuperNEMO - Foil vertex distribution</h1>
+<p>
+This repository holds a SN@ilWare configuration + source code to show the vertex
+distribution on the source foil. It builds a 2D visualization histogram by
+looking into simulated data <i>i.e.</i> within true vertex position or reconstructed
+data. Thus, it can be used to compare the two distributions, simulated vs. real
+to exhibit detector reconstruction efficiency. An example of
+the use of this module is provided in this <a href="http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=2732">presentation</a>.
+</p>
+
+<p>
+The current version is hosted at
+<a href="https://github.com/xgarrido/snemo_simulation_modules/snemo_foil_vertex_distribution">https://github.com/xgarrido/snemo_simulation_modules/snemo_foil_vertex_distribution</a> under
+<code>git</code> version control.
+</p>
+
+<p>
+The code itself is implemented in the <code>source</code> directory which holds the
+<code>snemo_foil_vertex_distribution_module.*</code> source code as well as a
+<code>CMakeLists.txt</code> file in order to compile, build and install the module
+following <code>cmake</code> rules.
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1">Module declaration</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The next item holds the configuration for this module. The module name is
+<code>foil_vertex_distribution_module</code> which is needed when using <code>bxdpp_processing</code>
+as explained in the top <a href="../README.html#*Use and execute a module">README</a> file.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1">File preamble</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2">Declaration &amp; description</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"foil_vertex_distribution_module"</span> <span class="org-variable-name">type</span>=<span class="org-string">"analysis::snemo_foil_vertex_distribution_module"</span>]
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description A SuperNEMO module to plot the vertex distribution on the source foil</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3">Logging priority</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description Logging priority</span>
+logging.priority : <span class="org-variable-name">string</span> = <span class="org-string">"trace"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4">Bank label</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+The bank record label where to look in.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The data bank label</span>
+bank_label : <span class="org-variable-name">string</span> = <span class="org-string">"SD"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5">Histogram service label</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+Set the same histogram service label as defined <a href="../README.html#*Histogram service">here</a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The Histogram Service label</span>
+Histo_label : <span class="org-variable-name">string</span> = <span class="org-string">"Histo"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-6" class="outline-3">
+<h3 id="sec-1-6">Histogram storage</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+All histograms generated by <code>snemo_bb0nu_studies</code> module can be stored inside
+ROOT files or XML archives.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The ouput file where to store the histograms</span>
+Histo_output_files : string[2] as <span class="org-variable-name">path</span> =                              <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/snemo_foil_vertex_distribution_histos.root"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"/tmp/${USER}/snemo.d/snemo_foil_vertex_distribution_histos.xml"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-7" class="outline-3">
+<h3 id="sec-1-7">Histogram template location</h3>
+<div class="outline-text-3" id="text-1-7">
+<p>
+Templates for histogram may be provided to reduce the amount of configuration of
+individual histogram. For instance, plotting the energy distributions of several
+channels may only need one general histogram definition which gives the x-axis
+boundaries and x-binning (see <i>below</i>).
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The ouput file where to store the histograms</span>
+Histo_template_files : string[1] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_foil_vertex_distribution_templates.conf"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2">Histogram declaration</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The histogram declaration <i>i.e.</i> name, boundaries, binning&#x2026; are set in this
+section. There are mostly <i>template</i> histogram in such way, their declarations
+may be used as templates for several histograms. For
+<code>snemo_foil_vertex_distribution_module</code> only one 2D histogram needs to be
+declared which boundaries represent foil design boundaries <i>i.e.</i> &plusmn; 2500 mm &times;
+&plusmn;1500 mm.
+</p>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1">Mandatory preamble</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description A sample list of setups</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@key_label   "name"</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">@meta_label  "type"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2">2D vertex distribution template</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">[<span class="org-variable-name">name</span>=<span class="org-string">"foil_vertex_distribution_template"</span> <span class="org-variable-name">type</span>=<span class="org-string">"mygsl::histogram_2d"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The group of the histogram (optional)</span>
+group : <span class="org-variable-name">string</span> = <span class="org-string">"__template"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The build mode (default : "regular", "table", "mimic");</span>
+mode : <span class="org-variable-name">string</span> = <span class="org-string">"regular"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+x.linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X bin unit</span>
+x.unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+x.min : <span class="org-variable-name">real</span> = -2500.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+x.max : <span class="org-variable-name">real</span> = +2500.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+x.number_of_bins : <span class="org-variable-name">integer</span> = 100
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The linear mode (default)</span>
+y.linear : <span class="org-variable-name">boolean</span> = 1
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X bin unit</span>
+y.unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The lower bound of the histogram</span>
+y.min : <span class="org-variable-name">real</span> = -1500.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+y.max : <span class="org-variable-name">real</span> = +1500.0
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The upper bound of the histogram</span>
+y.number_of_bins : <span class="org-variable-name">integer</span> = 100
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis label</span>
+display.xaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"y"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The X axis unit for display (a standard unit, typically SI or CLHEP)</span>
+display.xaxis.unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis label</span>
+display.yaxis.label : <span class="org-variable-name">string</span> = <span class="org-string">"z"</span>
+
+<span class="org-comment-delimiter">#</span><span class="org-comment">@description The Y axis unit for display (a standard unit, typically SI or CLHEP)</span>
+display.yaxis.unit : <span class="org-variable-name">string</span> = <span class="org-string">"mm"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/fb7130f218a2ab4f0867e15ae51e0ddb885238f0">fb7130f</a> - 2014-06-16
+</div>
+</body>
+</html>
