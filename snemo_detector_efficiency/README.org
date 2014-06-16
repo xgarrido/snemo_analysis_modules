@@ -1,4 +1,4 @@
-#+TITLE:  SuperNEMO Detector Efficiency
+#+TITLE:  SuperNEMO - Detector Efficiency
 #+AUTHOR: Xavier Garrido
 #+DATE:   2014-05-23
 #+OPTIONS: ^:{} num:nil toc:nil
