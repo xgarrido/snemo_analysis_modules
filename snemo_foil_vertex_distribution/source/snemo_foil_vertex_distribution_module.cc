@@ -211,13 +211,13 @@ namespace analysis {
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
 
-    const std::string & key_str = "vertex_distribution";
+    const std::string & key_str = "foil_vertex_distribution";
     if (!a_pool.has(key_str))
       {
-        mygsl::histogram_2d & h = a_pool.add_2d(key_str, "", "distribution");
+        mygsl::histogram_2d & h = a_pool.add_2d(key_str);
         datatools::properties hconfig;
         hconfig.store_string("mode", "mimic");
-        hconfig.store_string("mimic.histogram_2d", "vertex_distribution_template");
+        hconfig.store_string("mimic.histogram_2d", "foil_vertex_distribution_template");
         mygsl::histogram_pool::init_histo_2d(h, hconfig, &a_pool);
       }
 
