@@ -28,6 +28,10 @@ The following analysis modules are currently available :
 - [[./snemo_vertex_resolution/README.org][snemo_vertex_resolution]] :: This module shows the efficiency of vertex
      reconstruction by plotting the vertex position resolution on the source
      foil as well as on the calorimeter walls.
+- [[./snemo_foil_vertex_distribution/README.org][snemo_foil_vertex_distribution]] :: This module produces a 2D distribution of
+     the vertices on the source foil. It can be used either for simulated data
+     to get the true vertices distribution or for reconstructed particle tracks
+     to get vertices distribution from detector acceptance.
 
 The following package also provides :
 
