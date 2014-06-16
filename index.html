@@ -149,6 +149,11 @@ calorimeter, X-wall calorimeter, &gamma;-vetos and Geiger cells.
 reconstruction by plotting the vertex position resolution on the source
 foil as well as on the calorimeter walls.
 </dd>
+<dt><a href="./snemo_foil_vertex_distribution/README.html">snemo_foil_vertex_distribution</a></dt><dd>This module produces a 2D distribution of
+the vertices on the source foil. It can be used either for simulated data
+to get the true vertices distribution or for reconstructed particle tracks
+to get vertices distribution from detector acceptance.
+</dd>
 </dl>
 
 <p>
@@ -258,7 +263,8 @@ service_manager.configuration : string[1] as <span class="org-variable-name">pat
 <div class="org-src-container">
 
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration files for modules</span>
-modules.configuration_files : string[4] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+modules.configuration_files : string[5] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_foil_vertex_distribution_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_vertex_resolution_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_detector_efficiency_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_bb0nu_studies_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
@@ -352,6 +358,9 @@ table sets the libraries:
 <span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
 [<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_bb0nu_studies"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_bb0nu_studies/install/lib/libsnemo_bb0nu_studies.so"</span>]
 <span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_bb0nu_studies library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+[<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_foil_vertex_distribution"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_foil_vertex_distribution/install/lib/libsnemo_foil_vertex_distribution.so"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_foil_vertex_distribution library</span>
 <span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
 [<span class="org-variable-name">name</span>=<span class="org-string">"Falaise"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"$SNAILWARE_PRO_DIR/falaise/install/lib64/libFalaise.so"</span>]
 <span class="org-comment-delimiter">#</span><span class="org-comment">config The Falaise library</span>
@@ -567,7 +576,7 @@ directory and output file name in <a href="snemo_bb0nu_studies/README.html#*Hist
 </div>
 </div></div>
 <div id="postamble" class="status">
-File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/7a2c472f70e1fcf9ae235f8f0f7f9770ef93ff0c">7a2c472</a> - 2014-06-14
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/fb7130f218a2ab4f0867e15ae51e0ddb885238f0">fb7130f</a> - 2014-06-16
 </div>
 </body>
 </html>

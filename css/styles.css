@@ -106,6 +106,9 @@ pre {
     overflow-x: auto;
 }
 
+cite {
+    font-style: normal;
+}
 .tag {
      display:inline-block;
      white-space:no-wrap;
