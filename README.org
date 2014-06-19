@@ -76,6 +76,7 @@ occurs. This is done /via/ the =Makefile= which parse and replace this variable.
 :PROPERTIES:
 :TANGLE: config/module_manager.conf
 :END:
+
 This file is the main and central piece of code for loading all modules/services
 needed by =dpp_processing= binary. It provides links to module files and
 service files.

@@ -565,6 +565,20 @@ namespace analysis {
             if (vbkg_counts.empty()) vbkg_counts.assign(a_histogram.bins(), 0.0);
             vbkg_counts.at(i) += value;
           }
+
+        {
+          // Adding histogram efficiency in terms of number of events
+          const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "event_number";
+          if (a_pool.has(key_str))
+            {
+              DT_LOG_WARNING(get_logging_priority(), "Histogram '" << key_str << "' already exists ! Remove it !");
+              a_pool.remove(key_str);
+            }
+          mygsl::histogram_1d & h = a_pool.add_1d(key_str);
+          std::vector<std::string> dummy;
+          h.initialize(a_histogram*norm_factor, dummy);
+          h.grab_auxiliaries().update("display.yaxis.label", "dN/dE");
+        }
       }// end of background loop
 
     // Get names of 'signal' histograms
