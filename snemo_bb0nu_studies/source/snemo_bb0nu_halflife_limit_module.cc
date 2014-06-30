@@ -574,7 +574,7 @@ namespace analysis {
               DT_LOG_WARNING(get_logging_priority(), "Histogram '" << key_str << "' already exists ! Remove it !");
               a_pool.remove(key_str);
             }
-          mygsl::histogram_1d & h = a_pool.add_1d(key_str);
+          mygsl::histogram_1d & h = a_pool.add_1d(key_str, "", "efficiency_event_number");
           std::vector<std::string> dummy;
           h.initialize(a_histogram*norm_factor, dummy);
           h.grab_auxiliaries().update("display.yaxis.label", "dN/dE");
