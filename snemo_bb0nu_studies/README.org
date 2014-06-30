@@ -149,8 +149,30 @@ The histogram declarations /i.e./ name, boundaries, binning... are set in this
 section. There are mostly /template/ histogram in such way, their declarations
 may be used as templates for several histograms. For instance, the [[Energy
 template]] defines an histogram that can be mimic by different analysis channels
-/i.e./ 0\nu energy distribution to background energy distribution.
+/i.e./ 0\nu energy distribution to background energy distribution. Table [[hbin]]
+defines the number of bins, the minimal energy and the maximal energy to compute
+neutrinoless double bet decay sensitivity.
 
+#+CAPTION: *Histogram binning values.*
+#+NAME: hbin
+|----------------+------------|
+| Number of bins | 25         |
+| Minimal energy | 2000.0 keV |
+| Maximal energy | 3200.0 keV |
+|----------------+------------|
+
+*** Retrieving binning information                               :noexport:
+#+NAME: get_binning_info
+#+HEADERS: :var bin=hbin[1,1] :var min=hbin[2,1] :var max=hbin[3,1] :var info="bin"
+#+BEGIN_SRC sh :tangle no :results output
+    if [ ${info} == "bin" ]; then
+        echo -ne "${bin}"
+    elif [ ${info} == "min" ]; then
+        echo -ne "${min}"
+    elif [ ${info} == "max" ]; then
+        echo -ne "${max}"
+    fi
+#+END_SRC
 *** Mandatory preamble
 #+BEGIN_SRC sh
   #@description A sample list of setups
@@ -159,7 +181,7 @@ template]] defines an histogram that can be mimic by different analysis channels
 #+END_SRC
 
 *** Energy template
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :noweb yes
   [name="energy_template" type="mygsl::histogram_1d"]
   #@config The histogram template of the energy distribution
 
@@ -179,19 +201,19 @@ template]] defines an histogram that can be mimic by different analysis channels
   display.yaxis.label : string = "dN/dE [A.U.]"
 
   #@description The number of bins
-  number_of_bins : integer = 25
+  number_of_bins : integer = <<get_binning_info(info="bin")>>
 
   #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
   unit : string = "keV"
 
   #@description The lower bound of the histogram
-  min : real as energy = 2000.0 keV
+  min : real as energy = <<get_binning_info(info="min")>>
 
   #@description The upper bound of the histogram
-  max : real as energy = 3200.0 keV
+  max : real as energy = <<get_binning_info(info="max")>>
 #+END_SRC
 *** Efficiency template
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :noweb yes
   [name="efficiency_template" type="mygsl::histogram_1d"]
   #@config The histogram template of the energy selection efficiency
 
@@ -214,13 +236,13 @@ template]] defines an histogram that can be mimic by different analysis channels
   display.yaxis.label : string = "efficiency"
 
   #@description The number of bins
-  number_of_bins : integer = 25
+  number_of_bins : integer = <<get_binning_info(info="bin")>>
 
   #@description The lower bound of the histogram
-  min : real as energy = 2000.0 keV
+  min : real as energy = <<get_binning_info(info="min")>>
 
   #@description The upper bound of the histogram
-  max : real as energy = 3200.0 keV
+  max : real as energy = <<get_binning_info(info="max")>>
 #+END_SRC
 
 *** Halflife limit template
@@ -247,11 +269,11 @@ template]] defines an histogram that can be mimic by different analysis channels
   display.yaxis.label : string = "halflife limit"
 
   #@description The number of bins
-  number_of_bins : integer = 25
+  number_of_bins : integer = <<get_binning_info(info="bin")>>
 
   #@description The lower bound of the histogram
-  min : real as energy = 2000.0 keV
+  min : real as energy = <<get_binning_info(info="min")>>
 
   #@description The upper bound of the histogram
-  max : real as energy = 3200.0 keV
+  max : real as energy = <<get_binning_info(info="max")>>
 #+END_SRC
