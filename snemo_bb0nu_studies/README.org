@@ -50,7 +50,7 @@ The module name is =bb0nu_halflife_limit_module= which is needed when using
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "notice"
+  logging.priority : string = "warning"
 #+END_SRC
 
 *** Histogram service label
@@ -161,7 +161,7 @@ neutrinoless double bet decay sensitivity.
 | Maximal energy | 3200.0 keV |
 |----------------+------------|
 
-*** Retrieving binning information                               :noexport:
+*** Retrieve binning information                                   :noexport:
 #+NAME: get_binning_info
 #+HEADERS: :var bin=hbin[1,1] :var min=hbin[2,1] :var max=hbin[3,1] :var info="bin"
 #+BEGIN_SRC sh :tangle no :results output
