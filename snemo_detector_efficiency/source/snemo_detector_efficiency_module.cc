@@ -67,9 +67,9 @@ namespace analysis {
   // Reset :
   void snemo_detector_efficiency_module::reset()
   {
-    DT_THROW_IF (! is_initialized (),
-                 std::logic_error,
-                 "Module '" << get_name() << "' is not initialized !");
+    DT_THROW_IF(! is_initialized(),
+                std::logic_error,
+                "Module '" << get_name() << "' is not initialized !");
 
     // Compute efficiency
     _compute_efficiency();
@@ -110,46 +110,46 @@ namespace analysis {
     if (config_.has_key("Geo_label")) {
       geo_label = config_.fetch_string("Geo_label");
     }
-    DT_THROW_IF (geo_label.empty(), std::logic_error,
-                 "Module '" << get_name() << "' has no valid '" << "Geo_label" << "' property !");
-    DT_THROW_IF (! service_manager_.has(geo_label) ||
-                 ! service_manager_.is_a<geomtools::geometry_service>(geo_label),
-                 std::logic_error,
-                 "Module '" << get_name() << "' has no '" << geo_label << "' service !");
+    DT_THROW_IF(geo_label.empty(), std::logic_error,
+                "Module '" << get_name() << "' has no valid '" << "Geo_label" << "' property !");
+    DT_THROW_IF(! service_manager_.has(geo_label) ||
+                ! service_manager_.is_a<geomtools::geometry_service>(geo_label),
+                std::logic_error,
+                "Module '" << get_name() << "' has no '" << geo_label << "' service !");
     geomtools::geometry_service & Geo
       = service_manager_.get<geomtools::geometry_service>(geo_label);
 
     // Get geometry locator plugin
     const geomtools::manager & geo_mgr = Geo.get_geom_manager();
     std::string locator_plugin_name;
-    if (config_.has_key ("locator_plugin_name"))
+    if (config_.has_key("locator_plugin_name"))
       {
-        locator_plugin_name = config_.fetch_string ("locator_plugin_name");
+        locator_plugin_name = config_.fetch_string("locator_plugin_name");
       }
     else
       {
         // If no locator plugin name is set, then search for the first one
-        const geomtools::manager::plugins_dict_type & plugins = geo_mgr.get_plugins ();
-        for (geomtools::manager::plugins_dict_type::const_iterator ip = plugins.begin ();
-             ip != plugins.end ();
+        const geomtools::manager::plugins_dict_type & plugins = geo_mgr.get_plugins();
+        for (geomtools::manager::plugins_dict_type::const_iterator ip = plugins.begin();
+             ip != plugins.end();
              ip++) {
           const std::string & plugin_name = ip->first;
-          if (geo_mgr.is_plugin_a<snemo::geometry::locator_plugin> (plugin_name)) {
-            DT_LOG_DEBUG (get_logging_priority (), "Find locator plugin with name = " << plugin_name);
+          if (geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(plugin_name)) {
+            DT_LOG_DEBUG(get_logging_priority(), "Find locator plugin with name = " << plugin_name);
             locator_plugin_name = plugin_name;
             break;
           }
         }
       }
     // Access to a given plugin by name and type :
-    DT_THROW_IF (! geo_mgr.has_plugin (locator_plugin_name) ||
-                 ! geo_mgr.is_plugin_a<snemo::geometry::locator_plugin> (locator_plugin_name),
-                 std::logic_error,
-                 "Found no locator plugin named '" << locator_plugin_name << "'");
-    _locator_plugin_ = &geo_mgr.get_plugin<snemo::geometry::locator_plugin> (locator_plugin_name);
+    DT_THROW_IF(! geo_mgr.has_plugin(locator_plugin_name) ||
+                ! geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(locator_plugin_name),
+                std::logic_error,
+                "Found no locator plugin named '" << locator_plugin_name << "'");
+    _locator_plugin_ = &geo_mgr.get_plugin<snemo::geometry::locator_plugin>(locator_plugin_name);
 
     // Tag the module as initialized :
-    _set_initialized (true);
+    _set_initialized(true);
     return;
   }
 
@@ -157,8 +157,8 @@ namespace analysis {
   dpp::base_module::process_status
   snemo_detector_efficiency_module::process(datatools::things & data_record_)
   {
-    DT_THROW_IF (! is_initialized(), std::logic_error,
-                 "Module '" << get_name() << "' is not initialized !");
+    DT_THROW_IF(! is_initialized(), std::logic_error,
+                "Module '" << get_name() << "' is not initialized !");
 
     // Check if the record bank is available :
     if (!data_record_.has(_bank_label_))
@@ -174,23 +174,23 @@ namespace analysis {
           = data_record_.get<sdm::calibrated_data>(_bank_label_);
 
         const sdm::calibrated_data::calorimeter_hit_collection_type & the_calo_hits
-          = cd.calibrated_calorimeter_hits ();
+          = cd.calibrated_calorimeter_hits();
         const sdm::calibrated_data::tracker_hit_collection_type & the_tracker_hits
-          = cd.calibrated_tracker_hits ();
+          = cd.calibrated_tracker_hits();
 
         for (sdm::calibrated_data::calorimeter_hit_collection_type::const_iterator
-               i = the_calo_hits.begin ();
-             i != the_calo_hits.end (); ++i)
+               i = the_calo_hits.begin();
+             i != the_calo_hits.end(); ++i)
           {
-            const sdm::calibrated_calorimeter_hit & a_hit = i->get ();
-            _calo_efficiencies_[a_hit.get_geom_id ()]++;
+            const sdm::calibrated_calorimeter_hit & a_hit = i->get();
+            _calo_efficiencies_[a_hit.get_geom_id()]++;
           }
         for (sdm::calibrated_data::tracker_hit_collection_type::const_iterator
-               i = the_tracker_hits.begin ();
-             i != the_tracker_hits.end (); ++i)
+               i = the_tracker_hits.begin();
+             i != the_tracker_hits.end(); ++i)
           {
-            const sdm::calibrated_tracker_hit & a_hit = i->get ();
-            _gg_efficiencies_[a_hit.get_geom_id ()]++;
+            const sdm::calibrated_tracker_hit & a_hit = i->get();
+            _gg_efficiencies_[a_hit.get_geom_id()]++;
           }
       }
     else if (_bank_label_ == sdm::data_info::default_particle_track_data_label())
@@ -203,44 +203,44 @@ namespace analysis {
 
         // Loop over all saved particles
         const sdm::particle_track_data::particle_collection_type & the_particles
-          = ptd.get_particles ();
+          = ptd.get_particles();
 
         for (sdm::particle_track_data::particle_collection_type::const_iterator
-               iparticle = the_particles.begin ();
-             iparticle != the_particles.end ();
+               iparticle = the_particles.begin();
+             iparticle != the_particles.end();
              ++iparticle)
           {
-            const sdm::particle_track & a_particle = iparticle->get ();
+            const sdm::particle_track & a_particle = iparticle->get();
 
-            if (!a_particle.has_associated_calorimeters ()) continue;
+            if (!a_particle.has_associated_calorimeter_hits()) continue;
 
             const sdm::calibrated_calorimeter_hit::collection_type & the_calorimeters
-              = a_particle.get_associated_calorimeters ();
+              = a_particle.get_associated_calorimeter_hits();
 
-            if (the_calorimeters.size () > 2)
+            if (the_calorimeters.size() > 2)
               {
                 DT_LOG_DEBUG(get_logging_priority(),
                              "The particle is associated to more than 2 calorimeters !");
                 continue;
               }
 
-            for (size_t i = 0; i < the_calorimeters.size (); ++i)
+            for (size_t i = 0; i < the_calorimeters.size(); ++i)
               {
-                const geomtools::geom_id & a_gid = the_calorimeters.at (i).get ().get_geom_id ();
-                if (gids.find (a_gid) != gids.end ()) continue;
-                gids.insert (a_gid);
+                const geomtools::geom_id & a_gid = the_calorimeters.at(i).get().get_geom_id();
+                if (gids.find(a_gid) != gids.end()) continue;
+                gids.insert(a_gid);
                 _calo_efficiencies_[a_gid]++;
               }
 
             // Get trajectory and attached geiger cells
-            const sdm::tracker_trajectory & a_trajectory = a_particle.get_trajectory ();
-            const sdm::tracker_cluster & a_cluster = a_trajectory.get_cluster ();
-            const sdm::calibrated_tracker_hit::collection_type & the_hits = a_cluster.get_hits ();
-            for (size_t i = 0; i < the_hits.size (); ++i)
+            const sdm::tracker_trajectory & a_trajectory = a_particle.get_trajectory();
+            const sdm::tracker_cluster & a_cluster = a_trajectory.get_cluster();
+            const sdm::calibrated_tracker_hit::collection_type & the_hits = a_cluster.get_hits();
+            for (size_t i = 0; i < the_hits.size(); ++i)
               {
-                const geomtools::geom_id & a_gid = the_hits.at (i).get ().get_geom_id ();
-                if (gids.find (a_gid) != gids.end ()) continue;
-                gids.insert (a_gid);
+                const geomtools::geom_id & a_gid = the_hits.at(i).get().get_geom_id();
+                if (gids.find(a_gid) != gids.end()) continue;
+                gids.insert(a_gid);
                 _gg_efficiencies_[a_gid]++;
               }
           }
@@ -259,16 +259,16 @@ namespace analysis {
     // main wall, xwall and gveto calorimeters. For such task we use
     // sngeometry locators
 
-    std::ofstream fout (_output_filename_.c_str());
+    std::ofstream fout(_output_filename_.c_str());
     {
       efficiency_dict::const_iterator found =
-        std::max_element(_calo_efficiencies_.begin (), _calo_efficiencies_.end (),
+        std::max_element(_calo_efficiencies_.begin(), _calo_efficiencies_.end(),
                          (boost::bind(&efficiency_dict::value_type::second, _1) <
                           boost::bind(&efficiency_dict::value_type::second, _2)));
       const int calo_total = found->second;
 
-      for (efficiency_dict::const_iterator i = _calo_efficiencies_.begin ();
-           i != _calo_efficiencies_.end (); ++i)
+      for (efficiency_dict::const_iterator i = _calo_efficiencies_.begin();
+           i != _calo_efficiencies_.end(); ++i)
         {
           const geomtools::geom_id & a_gid = i->first;
 
@@ -278,19 +278,19 @@ namespace analysis {
               fout << "calo ";
               geomtools::vector_3d position;
               calo_locator.get_block_position(a_gid, position);
-              fout << position.x () << " "
-                   << position.y () << " "
-                   << position.z () << " ";
+              fout << position.x() << " "
+                   << position.y() << " "
+                   << position.z() << " ";
             }
           const snemo::geometry::xcalo_locator & xcalo_locator = _locator_plugin_->get_xcalo_locator();
           if (xcalo_locator.is_calo_block_in_current_module(a_gid))
             {
               fout << "xcalo ";
               geomtools::vector_3d position;
-              xcalo_locator.get_block_position (a_gid, position);
-              fout << position.x () << " "
-                   << position.y () << " "
-                   << position.z () << " ";
+              xcalo_locator.get_block_position(a_gid, position);
+              fout << position.x() << " "
+                   << position.y() << " "
+                   << position.z() << " ";
             }
           const snemo::geometry::gveto_locator & gveto_locator = _locator_plugin_->get_gveto_locator();
           if (gveto_locator.is_calo_block_in_current_module(a_gid))
@@ -298,23 +298,23 @@ namespace analysis {
               fout << "gveto ";
               geomtools::vector_3d position;
               gveto_locator.get_block_position(a_gid, position);
-              fout << position.x () << " "
-                   << position.y () << " "
-                   << position.z () << " ";
+              fout << position.x() << " "
+                   << position.y() << " "
+                   << position.z() << " ";
             }
-          fout << i->second/double (calo_total) << std::endl;
+          fout << i->second/double(calo_total) << std::endl;
         }
     }
 
     {
       efficiency_dict::const_iterator found =
-        std::max_element(_gg_efficiencies_.begin (), _gg_efficiencies_.end (),
+        std::max_element(_gg_efficiencies_.begin(), _gg_efficiencies_.end(),
                          (boost::bind(&efficiency_dict::value_type::second, _1) <
                           boost::bind(&efficiency_dict::value_type::second, _2)));
       const int gg_total = found->second;
 
-      for (efficiency_dict::const_iterator i = _gg_efficiencies_.begin ();
-           i != _gg_efficiencies_.end (); ++i)
+      for (efficiency_dict::const_iterator i = _gg_efficiencies_.begin();
+           i != _gg_efficiencies_.end(); ++i)
         {
           const geomtools::geom_id & a_gid = i->first;
 
@@ -325,9 +325,9 @@ namespace analysis {
               fout << "gg ";
               geomtools::vector_3d position;
               gg_locator.get_cell_position(a_gid, position);
-              fout << position.x () << " " << position.y () << " ";
+              fout << position.x() << " " << position.y() << " ";
             }
-          fout << i->second/double (gg_total) << std::endl;
+          fout << i->second/double(gg_total) << std::endl;
         }
     }
 
@@ -340,11 +340,11 @@ namespace analysis {
                                                      bool inherit_) const
   {
     std::string indent;
-    if (! indent_.empty ())
+    if (! indent_.empty())
       {
         indent = indent_;
       }
-    if ( !title_.empty () )
+    if ( !title_.empty() )
       {
         out_ << indent << title_ << std::endl;
       }
@@ -353,8 +353,8 @@ namespace analysis {
       out_ << indent << datatools::i_tree_dumpable::tag
            << "Calorimeters efficiency [" << _calo_efficiencies_.size() << "]"
            << std::endl;
-      for (efficiency_dict::const_iterator i = _calo_efficiencies_.begin ();
-           i != _calo_efficiencies_.end (); ++i)
+      for (efficiency_dict::const_iterator i = _calo_efficiencies_.begin();
+           i != _calo_efficiencies_.end(); ++i)
         {
           out_ << indent << datatools::i_tree_dumpable::skip_tag;
           efficiency_dict::const_iterator j = i;
