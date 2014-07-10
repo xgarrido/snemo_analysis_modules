@@ -126,8 +126,12 @@ namespace analysis {
                 std::logic_error,
                 "Module '" << get_name() << "' is not initialized !");
 
-    // // Generate ROOT plots
-    // _generate_plots_ ();
+    // Dump result
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG)
+      {
+        DT_LOG_NOTICE(get_logging_priority (), "Vertex resolution module dump: ");
+        dump_result();
+      }
 
     _set_defaults();
 
@@ -194,33 +198,14 @@ namespace analysis {
             const geomtools::blur_spot & a_vertex = ivertex->get();
             const datatools::properties & aux = a_vertex.get_auxiliaries();
 
-            std::string vname;
-            if (aux.has_flag("foil_vertex"))
-              {
-                vname = "foil_vertex";
-              }
-            else if (aux.has_flag("calo"))
-              {
-                vname = "calo";
-              }
-            else if (aux.has_flag("xcalo"))
-              {
-                vname = "xcalo";
-              }
-            else if (aux.has_flag("gveto"))
-              {
-                vname = "gveto";
-              }
-            else
-              {
-                DT_LOG_WARNING(get_logging_priority(),
-                               "Vertex " << a_vertex.get_position()
-                               << " is not associated to any special part of the detector ! Skip !");
-                continue;
-              }
+            if (!aux.has_key(snemo::datamodel::particle_track::vertex_type_key())) {
+              DT_LOG_WARNING(get_logging_priority(), "Current vertex has no vertex type !");
+              continue;
+            }
+            const std::string vname = aux.fetch_string(snemo::datamodel::particle_track::vertex_type_key());
 
             // Calculate delta vertex
-            if (vname == "foil_vertex")
+            if (snemo::datamodel::particle_track::vertex_is_on_source_foil(a_vertex))
               {
                 delta = a_vertex.get_position() - sd.get_vertex();
               }
@@ -250,13 +235,13 @@ namespace analysis {
 
                 // Get the associated calorimeter list
                 const snemo::datamodel::calibrated_calorimeter_hit::collection_type calos
-                  = a_particle.get_associated_calorimeters();
+                  = a_particle.get_associated_calorimeter_hits();
                 if (calos.size() != 1)
                   {
                     DT_LOG_WARNING(get_logging_priority(), "More than one calorimeter associated to the particle track ! Skip !");
                     continue;
                   }
-                const geomtools::geom_id & the_calo_gid = calos.front().get ().get_geom_id ();
+                const geomtools::geom_id & the_calo_gid = calos.front().get().get_geom_id();
                 if (! geomtools::geom_id::match (the_calo_gid, the_step_hit_gid))
                   {
                     DT_LOG_WARNING(get_logging_priority(),
@@ -264,11 +249,11 @@ namespace analysis {
                     continue;
                   }
 
-                delta = a_vertex.get_position () - the_step_hit.get_position_start();
+                delta = a_vertex.get_position() - the_step_hit.get_position_start();
               }
             DT_LOG_DEBUG(get_logging_priority(), "Delta value = " << delta/CLHEP::mm << " mm");
 
-            DT_THROW_IF(!geomtools::is_valid (delta), std::logic_error,
+            DT_THROW_IF(!geomtools::is_valid(delta), std::logic_error,
                         "Something gets wrong when vertex difference has been calculated");
 
             // Getting histogram pool
@@ -313,47 +298,50 @@ namespace analysis {
         out_ << indent << title_ << std::endl;
       }
 
-    // {
-    //   // Histogram :
-    //   out_ << indent << datatools::i_tree_dumpable::tag
-    //        << "Vertex histograms : ";
-    //   if (_vertex_histograms_.empty ())
-    //     out_ << "<empty>";
-    //   else
-    //     out_ << _vertex_histograms_.size ();
-    //   out_ << std::endl;
+    {
+      // Histogram :
+      out_ << indent << datatools::i_tree_dumpable::tag
+           << "Vertex resolution histograms : ";
+      if (_histogram_pool_->empty())
+        out_ << "<empty>";
+      else
+        out_ << _histogram_pool_->size();
+      out_ << std::endl;;
 
-    //   for (histogram_collection_type::const_iterator
-    //          i = _vertex_histograms_.begin ();
-    //        i != _vertex_histograms_.end ();
-    //        ++i)
-    //     {
-    //       const std::string & a_label = i->first;
-    //       histogram_collection_type::const_iterator j = i;
-    //       out_ << indent;
-    //       if (++j == _vertex_histograms_.end ())
-    //         {
-    //           out_  << datatools::i_tree_dumpable::last_tag;
-    //         }
-    //       else
-    //         {
-    //           out_ << datatools::i_tree_dumpable::tag;
-    //         }
-    //       out_ << "Label " << a_label << std::endl;
+      std::vector<std::string> hnames;
+      _histogram_pool_->names(hnames);
+      for (std::vector<std::string>::const_iterator i = hnames.begin();
+           i != hnames.end(); ++i)
+        {
+          const std::string & a_name = *i;
+          const std::string & a_group = _histogram_pool_->get_group(a_name);
+          if (a_group.find("template") != std::string::npos) continue;
 
-    //       out_ << indent << datatools::i_tree_dumpable::skip_tag <<  datatools::i_tree_dumpable::tag
-    //            << "Number of events " << i->second.sum ()  << std::endl;
-    //       out_ << indent << datatools::i_tree_dumpable::skip_tag <<  datatools::i_tree_dumpable::tag
-    //            << "Mean  = " << i->second.mean () / CLHEP::mm << " mm" << std::endl;
-    //       out_ << indent << datatools::i_tree_dumpable::skip_tag << datatools::i_tree_dumpable::last_tag
-    //            << "Sigma = " << i->second.sigma () / CLHEP::mm << " mm" << std::endl;
+          std::vector<std::string>::const_iterator j = i;
+          out_ << indent;
+          std::ostringstream indent_oss;
+          if (++j == hnames.end())
+            {
+              out_  << datatools::i_tree_dumpable::last_tag;
+              indent_oss << indent << datatools::i_tree_dumpable::last_skip_tag;
+            }
+          else
+            {
+              out_ << datatools::i_tree_dumpable::tag;
+              indent_oss << indent << datatools::i_tree_dumpable::skip_tag;
+            }
 
-    //       // if (is_debug ())
-    //       //   {
-    //       //     i->second.print (clog);
-    //       //   }
-    //     }
-    // }
+          out_ << "Label " << a_name << std::endl;
+          const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d(a_name);
+          a_histogram.tree_dump(out_, "", indent_oss.str(), inherit_);
+
+          if (get_logging_priority() >= datatools::logger::PRIO_DEBUG)
+            {
+              DT_LOG_DEBUG(get_logging_priority(), "Histogram '" << a_name << "' dump :");
+              a_histogram.print(std::clog);
+            }
+        }
+    }
 
     return;
   }
