@@ -189,10 +189,7 @@ namespace analysis {
                  ivertex != the_vertices.end(); ++ivertex)
               {
                 const geomtools::blur_spot & a_vertex = ivertex->get ();
-                const datatools::properties & a_prop = a_vertex.get_auxiliaries ();
-
-                if (!a_prop.has_flag("foil_vertex")) continue;
-
+                if (!sdm::particle_track::vertex_is_on_source_foil(a_vertex)) continue;
                 vertex = &(a_vertex.get_position());
               }
           }
@@ -276,13 +273,6 @@ namespace analysis {
             }
 
           out_ << "Label " << a_name << std::endl;
-          // const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d (a_name);
-          // a_histogram.tree_dump (out_, "", indent_oss.str (), inherit_);
-
-          if (is_debug ())
-            {
-              //                  a_histogram.print (std::clog);
-            }
         }
     }
 
