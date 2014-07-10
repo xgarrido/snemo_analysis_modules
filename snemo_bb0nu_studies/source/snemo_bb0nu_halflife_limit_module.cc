@@ -300,7 +300,7 @@ namespace analysis {
       {
         const snemo::datamodel::particle_track & a_particle = iparticle->get();
 
-        if (! a_particle.has_associated_calorimeters())
+        if (! a_particle.has_associated_calorimeter_hits())
           {
             DT_LOG_DEBUG(get_logging_priority(),
                          "Particle track is not associated to any calorimeter block !");
@@ -308,7 +308,7 @@ namespace analysis {
           }
 
         const snemo::datamodel::calibrated_calorimeter_hit::collection_type &
-          the_calorimeters = a_particle.get_associated_calorimeters ();
+          the_calorimeters = a_particle.get_associated_calorimeter_hits();
 
         if (the_calorimeters.size() > 2)
           {
