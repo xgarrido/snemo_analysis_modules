@@ -242,7 +242,7 @@ namespace analysis {
         const std::string label[3] = { "x", "y", "z"};
         for (size_t i = 0; i < 3; i++) {
           std::ostringstream key;
-          key << sd.get_primary_event().get_total_kinetic_energy()/CLHEP::keV << "keV_";
+          key << std::setw(4) << sd.get_primary_event().get_total_kinetic_energy()/CLHEP::keV << "keV_";
           std::ostringstream group;
           group << vname << "_" << label[i] << "_position";
           key << group.str();
