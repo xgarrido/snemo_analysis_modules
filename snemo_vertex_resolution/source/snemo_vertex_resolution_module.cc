@@ -192,7 +192,7 @@ namespace analysis {
           DT_LOG_WARNING(get_logging_priority(), "Current vertex has no vertex type !");
           continue;
         }
-        const std::string vname = aux.fetch_string(snemo::datamodel::particle_track::vertex_type_key());
+        std::string vname = aux.fetch_string(snemo::datamodel::particle_track::vertex_type_key());
 
         // Calculate delta vertex
         if (snemo::datamodel::particle_track::vertex_is_on_source_foil(a_vertex)) {
@@ -242,9 +242,12 @@ namespace analysis {
         const std::string label[3] = { "x", "y", "z"};
         for (size_t i = 0; i < 3; i++) {
           std::ostringstream key;
-          key << vname << " - " << label[i] << " position";
+          key << sd.get_primary_event().get_total_kinetic_energy()/CLHEP::keV << "keV_";
+          std::ostringstream group;
+          group << vname << "_" << label[i] << "_position";
+          key << group.str();
           if (! a_pool.has(key.str())) {
-            mygsl::histogram_1d & h = a_pool.add_1d(key.str());
+            mygsl::histogram_1d & h = a_pool.add_1d(key.str(), "", group.str());
             datatools::properties hconfig;
             hconfig.store_string("mode", "mimic");
             hconfig.store_string("mimic.histogram_1d", "delta_" + label[i]);

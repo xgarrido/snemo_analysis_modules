@@ -49,7 +49,7 @@ The module name is =vertex_resolution_module= which is needed when using
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "warning"
+  logging.priority : string = "error"
 #+END_SRC
 
 *** Histogram service label
