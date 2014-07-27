@@ -15,13 +15,13 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # - Third party
-find_package(sncore 3.0.0 REQUIRED)
+find_package(Falaise 1.0.0 REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR} ${sncore_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR} ${Falaise_INCLUDE_DIRS})
 
 add_library(snemo_control_plot SHARED snemo_control_plot_module.h snemo_control_plot_module.cc)
 
-target_link_libraries(snemo_control_plot ${sncore_LIBRARIES})
+target_link_libraries(snemo_control_plot ${Falaise_LIBRARIES})
 
 install(FILES
   ${PROJECT_BINARY_DIR}/libsnemo_control_plot${CMAKE_SHARED_LIBRARY_SUFFIX}
