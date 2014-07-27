@@ -68,7 +68,7 @@ archives.
       "/tmp/${USER}/snemo.d/snemo_vertex_resolution_histos.xml"
 #+END_SRC
 
-*** Histogram templates
+*** Histogram template location
 Templates for histogram may be provided to reduce the amount of configuration of
 individual histogram. For instance, plotting the vertex position distributions
 only implies 3 histogram templates for each of the 3 cartesian coordinates
@@ -115,7 +115,7 @@ may be used as templates for several histograms.
   display.yaxis.label : string = "dN/dx"
 
   #@description The number of bins
-  number_of_bins : integer = 25
+  number_of_bins : integer = 100
 
   #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
   unit : string = "mm"
@@ -150,7 +150,7 @@ may be used as templates for several histograms.
   display.yaxis.label : string = "dN/dx"
 
   #@description The number of bins
-  number_of_bins : integer = 25
+  number_of_bins : integer = 100
 
   #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
   unit : string = "mm"
@@ -182,7 +182,7 @@ may be used as templates for several histograms.
   display.yaxis.label : string = "dN/dx"
 
   #@description The number of bins
-  number_of_bins : integer = 25
+  number_of_bins : integer = 100
 
   #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
   unit : string = "mm"
