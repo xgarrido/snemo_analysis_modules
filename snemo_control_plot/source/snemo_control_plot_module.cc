@@ -9,6 +9,8 @@
 #include <numeric>
 
 // Third party:
+// - Boost :
+#include <boost/foreach.hpp>
 // - Bayeux/datatools:
 #include <datatools/service_manager.h>
 // - Bayeux/mygsl
@@ -79,6 +81,20 @@ namespace analysis {
       dpp::histogram_service & Histo
         = service_manager_.get<dpp::histogram_service>(histogram_label);
       set_histogram_pool(Histo.grab_pool());
+      if (config_.has_key("Histo_output_files")) {
+        std::vector<std::string> output_files;
+        config_.fetch("Histo_output_files", output_files);
+        for (size_t i = 0; i < output_files.size(); i++) {
+          Histo.add_output_file(output_files[i]);
+        }
+      }
+      if (config_.has_key("Histo_template_files")) {
+        std::vector<std::string> template_files;
+        config_.fetch("Histo_template_files", template_files);
+        for (size_t i = 0; i < template_files.size(); i++) {
+          Histo.grab_pool().load(template_files[i]);
+        }
+      }
     }
 
     // Tag the module as initialized :
@@ -190,6 +206,30 @@ namespace analysis {
       h1d.fill(ncalos);
     }
 
+    if (! cd.has_calibrated_tracker_hits()) return;
+    const snemo::datamodel::calibrated_data::tracker_hit_collection_type gg_hits
+      = cd.calibrated_tracker_hits();
+
+    BOOST_FOREACH(const snemo::datamodel::calibrated_data::tracker_hit_handle_type & gg_handle, gg_hits) {
+      if (! gg_handle.has_data()) continue;
+      const snemo::datamodel::calibrated_tracker_hit & gg_hit = gg_handle.get();
+      if (_histogram_pool_->has_1d("CD::drift_radius")) {
+        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius");
+        h1d.fill(gg_hit.get_r());
+      }
+      if (_histogram_pool_->has_1d("CD::drift_radius_error")) {
+        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius_error");
+        h1d.fill(gg_hit.get_sigma_r());
+      }
+      if (_histogram_pool_->has_1d("CD::long_position")) {
+        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position");
+        h1d.fill(gg_hit.get_z());
+      }
+      if (_histogram_pool_->has_1d("CD::long_position_error")) {
+        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position_error");
+        h1d.fill(gg_hit.get_sigma_z());
+      }
+    }
     return;
   }
 
