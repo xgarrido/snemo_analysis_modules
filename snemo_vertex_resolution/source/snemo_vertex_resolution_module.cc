@@ -199,14 +199,11 @@ namespace analysis {
           delta = a_vertex.get_position() - sd.get_vertex();
         } else {
           // Getting the simulated hit inside the calorimeter
-          const mctools::simulated_data::hit_handle_collection_type * ptr_collection = 0;
-          if (sd.has_step_hits(vname)) {
-            ptr_collection = &sd.get_step_hits(vname);
-          } else {
+          if (! sd.has_step_hits(vname)) {
             DT_LOG_WARNING(get_logging_priority(), "Simulated data has not step hit associated to '" << vname << "' category ! Skip !");
             continue;
           }
-          const mctools::simulated_data::hit_handle_collection_type & hits = *ptr_collection;
+          const mctools::simulated_data::hit_handle_collection_type & hits = sd.get_step_hits(vname);
           if (hits.size() != 1) {
             DT_LOG_WARNING(get_logging_priority(), "More than one energy deposit ! Skip !");
             continue;
