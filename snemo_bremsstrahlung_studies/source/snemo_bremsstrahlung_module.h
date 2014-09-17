@@ -40,6 +40,9 @@ namespace mygsl {
 }
 
 namespace snemo {
+  namespace datamodel {
+    class particle_track_data;
+  }
   namespace geometry {
     class locator_plugin;
   }
@@ -84,6 +87,12 @@ namespace analysis {
 
     /// Give default values to specific class members.
     void _set_defaults();
+
+    /// Compute energy distributions.
+    void _compute_energy_distribution(const snemo::datamodel::particle_track_data & ptd_) const;
+
+    /// Compute angular distribution.
+    void _compute_angular_distribution(const snemo::datamodel::particle_track_data & ptd_) const;
 
   private:
 

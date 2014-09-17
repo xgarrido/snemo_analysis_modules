@@ -29,12 +29,9 @@
 #include <falaise/snemo/geometry/xcalo_locator.h>
 #include <falaise/snemo/geometry/gveto_locator.h>
 
-// // SuperNEMO event model
-// #include <sncore/models/data_model.h>
-// #include <sncore/models/line_trajectory_pattern.h>
-// #include <sncore/models/helix_trajectory_pattern.h>
-// #include <snanalysis/models/particle_track_data.h>
-
+// SuperNEMO event model
+#include <snemo/datamodels/data_model.h>
+#include <snemo/datamodels/particle_track_data.h>
 
 namespace analysis {
 
@@ -192,98 +189,73 @@ namespace analysis {
     DT_THROW_IF(! is_initialized(), std::logic_error,
                 "Module '" << get_name() << "' is not initialized !");
 
-    // namespace sam = snemo::analysis::model;
+    // Check if the 'particle track data' record bank is available :
+    const std::string ptd_label = snemo::datamodel::data_info::default_particle_track_data_label();
+    if (! data_record_.has(ptd_label)) {
+      DT_LOG_ERROR(get_logging_priority (), "Could not find any bank with label '"
+                   << ptd_label << "' !");
+      return dpp::base_module::PROCESS_STOP;
+    }
+    const snemo::datamodel::particle_track_data & ptd
+      = data_record_.get<snemo::datamodel::particle_track_data>(ptd_label);
 
-    // // Check if the 'particle track' event record bank is available :
-    // if (! DATATOOLS_UTILS_THINGS_CHECK_BANK (event_record_, _PTD_bank_label_, sam::particle_track_data))
-    //   {
-    //     std::clog << datatools::utils::io::error
-    //               << "snemo::analysis::processing::"
-    //               << "snemo_bremsstrahlung_module::process: "
-    //               << "Could not find any bank with label '"
-    //               << _PTD_bank_label_ << "' !"
-    //               << std::endl;
-    //     // Cannot find the event record bank :
-    //     return STOP;
-    //   }
-    // // Get a const reference to this event record bank of interest :
-    // DATATOOLS_UTILS_THINGS_CONST_BANK (event_record_, _PTD_bank_label_, sam::particle_track_data, ptd);
-    // if (is_debug ())
-    //   {
-    //     std::clog << datatools::utils::io::debug
-    //               << "snemo::analysis::processing::"
-    //               << "snemo_bremsstrahlung_module::process: "
-    //               << "Found the bank '" << _PTD_bank_label_ << "' !"
-    //               << std::endl;
-    //   }
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) {
+      DT_LOG_DEBUG(get_logging_priority(), "Particle track data : ");
+      ptd.tree_dump();
+    }
 
-    // if (is_debug ())
-    //   {
-    //     std::clog << datatools::utils::io::debug
-    //               << "snemo::analysis::processing::"
-    //               << "snemo_bremsstrahlung_module::process: "
-    //               << "Particle track data : " << std::endl;
-    //     ptd.tree_dump (std::clog, "", "DEBUG: ");
-    //   }
-
-    // _compute_energy_distribution_  (ptd);
-    // _compute_angular_distribution_ (ptd);
+    this->_compute_energy_distribution(ptd);
+    this->_compute_angular_distribution(ptd);
 
     DT_LOG_TRACE(get_logging_priority(), "Exiting.");
     return dpp::base_module::PROCESS_SUCCESS;
   }
 
-  // void snemo_bremsstrahlung_module::_compute_energy_distribution_ (const model::particle_track_data & ptd_) const
-  // {
-  //   namespace sam = snemo::analysis::model;
+  void snemo_bremsstrahlung_module::_compute_energy_distribution(const snemo::datamodel::particle_track_data & ptd_) const
+  {
+    // Loop over all saved particles
+    const snemo::datamodel::particle_track_data::particle_collection_type & the_particles
+      = ptd_.get_particles();
+    for (snemo::datamodel::particle_track_data::particle_collection_type::const_iterator
+           iparticle = the_particles.begin();
+         iparticle != the_particles.end();
+         ++iparticle) {
+      const snemo::datamodel::particle_track & a_particle = iparticle->get();
 
-  //   // Loop over all saved particles
-  //   const sam::particle_track_data::particle_collection_type & the_particles
-  //     = ptd_.get_particles ();
-  //   for (sam::particle_track_data::particle_collection_type::const_iterator
-  //          iparticle = the_particles.begin ();
-  //        iparticle != the_particles.end ();
-  //        ++iparticle)
-  //     {
-  //       const sam::particle_track & a_particle = iparticle->get ();
+        if (!a_particle.has_associated_calorimeter_hits()) continue;
 
-  //       if (!a_particle.has_associated_calorimeters ()) continue;
+        const snemo::datamodel::calibrated_calorimeter_hit::collection_type & the_calorimeters
+          = a_particle.get_associated_calorimeter_hits();
 
-  //       const sam::particle_track::calorimeter_collection_type & the_calorimeters
-  //         = a_particle.get_associated_calorimeters ();
+        if (the_calorimeters.size() > 1) continue;
 
-  //       if (the_calorimeters.size () > 1) continue;
+        // Filling the histograms :
+        if (_histogram_pool_->has_1d("electron_energy")) {
+          mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("electron_energy");
+          h1d.fill(the_calorimeters.front().get().get_energy());
+        }
+    }
 
-  //       // Filling the histograms :
-  //       if (_histogram_pool_->has_1d ("electron_energy"))
-  //         {
-  //           mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("electron_energy");
-  //           h1d.fill (the_calorimeters.front ().get ().get_energy ());
-  //         }
-  //     }
+    // Loop over all non associated calorimeters
+    const snemo::datamodel::calibrated_calorimeter_hit::collection_type & the_non_asso_calos
+      = ptd_.get_non_associated_calorimeters();
+    double total_gamma_energy = 0.0;
+    for (snemo::datamodel::calibrated_calorimeter_hit::collection_type::const_iterator
+           icalo = the_non_asso_calos.begin();
+         icalo != the_non_asso_calos.end(); ++icalo) {
+      total_gamma_energy += icalo->get().get_energy();
+    }
+    // Filling the histograms :
+    if (_histogram_pool_->has_1d("gamma_energy")) {
+      mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("gamma_energy");
+      h1d.fill(total_gamma_energy);
+    }
 
-  //   // Loop over all non associated calorimeters
-  //   const sam::particle_track_data::calorimeter_collection_type & the_non_asso_calos
-  //     = ptd_.get_non_associated_calorimeters ();
-  //   double total_gamma_energy = 0.0;
-  //   for (sam::particle_track_data::calorimeter_collection_type::const_iterator
-  //          icalo = the_non_asso_calos.begin ();
-  //        icalo != the_non_asso_calos.end (); ++icalo)
-  //     {
-  //       total_gamma_energy += icalo->get ().get_energy ();
-  //     }
-  //   // Filling the histograms :
-  //   if (_histogram_pool_->has_1d ("gamma_energy"))
-  //     {
-  //       mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("gamma_energy");
-  //       h1d.fill (total_gamma_energy);
-  //     }
+    return;
+  }
 
-  //   return;
-  // }
-
-  // void snemo_bremsstrahlung_module::_compute_angular_distribution_ (const model::particle_track_data & ptd_) const
-  // {
+  void snemo_bremsstrahlung_module::_compute_angular_distribution(const snemo::datamodel::particle_track_data & ptd_) const
+  {
   //   namespace scm = snemo::core::model;
   //   namespace sam = snemo::analysis::model;
   //   namespace sgs = snemo::geometry::snemo;
@@ -404,8 +376,8 @@ namespace analysis {
   //         }
   //     }
 
-  //   return;
-  // }
+    return;
+  }
 
 
 } // namespace analysis
