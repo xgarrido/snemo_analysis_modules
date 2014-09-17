@@ -32,6 +32,10 @@ The following analysis modules are currently available :
      the vertices on the source foil. It can be used either for simulated data
      to get the true vertices distribution or for reconstructed particle tracks
      to get vertices distribution from detector acceptance.
+- [[./snemo_bremsstrahlung_studies/README.org][snemo_bremsstrahlung_studies]] :: This module studies bremsstrahlung production
+     within the source foil. It plots, for instance, the energy distributions of
+     the primary electron and the emitted \gamma and the angular distribution of
+     particles.
 
 The following package also provides :
 
