@@ -50,7 +50,13 @@ The module name is =bremsstrahlung_studies_module= which is needed when using
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "error"
+  logging.priority : string = "trace"
+#+END_SRC
+
+*** Geometry service label
+#+BEGIN_SRC sh
+  #@description The Geometry Service label
+  Geo_label : string = "Geo"
 #+END_SRC
 
 *** Histogram service label
@@ -166,3 +172,23 @@ may be used as templates for several histograms.
   #@description The upper bound of the histogram
   max : real as energy = 3200.0 keV
 #+END_SRC
+* Special execution of this module
+Since this module will actively use geometry manager and its locators (/i.e./
+=calo_locator=, =xcalo_locator=,...), the module need to initialize and load the
+geometry service. The geometry service is actually called in this [[Geometry service label][section]] by
+using the =Geo= service label as defined in [[file:../README.org::*Geometry service]["Geometry service"]] section. To
+properly load the =Falaise= configuration files for the geometry, we have to
+specify the path to these resource files by executing
+
+#+BEGIN_SRC sh
+  bxdpp_processing                                                                              \
+      --module-manager-config $PWD/config/module_manager.conf                                   \
+      --module detector_efficiency_module_module                                                \
+      --dll-config $PWD/config/dlls.conf                                                        \
+      --datatools::resource_path=falaise@<path to Falaise instal>/share/Falaise-1.0.0/resources \
+      --input-file <path to a data record>
+#+END_SRC
+
+The =--datatools::resource_path= option will automatically register this path
+and it will replace any of the =@falaise:= declaration into =Falaise= resource
+path.
