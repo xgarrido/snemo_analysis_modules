@@ -32,6 +32,7 @@
 // SuperNEMO event model
 #include <snemo/datamodels/data_model.h>
 #include <snemo/datamodels/particle_track_data.h>
+#include <snemo/datamodels/helix_trajectory_pattern.h>
 
 namespace analysis {
 
@@ -256,125 +257,81 @@ namespace analysis {
 
   void snemo_bremsstrahlung_module::_compute_angular_distribution(const snemo::datamodel::particle_track_data & ptd_) const
   {
-  //   namespace scm = snemo::core::model;
-  //   namespace sam = snemo::analysis::model;
-  //   namespace sgs = snemo::geometry::snemo;
+    // Loop over all saved particles
+    const snemo::datamodel::particle_track_data::particle_collection_type & the_particles
+      = ptd_.get_particles();
+    for (snemo::datamodel::particle_track_data::particle_collection_type::const_iterator
+           iparticle = the_particles.begin();
+         iparticle != the_particles.end();
+         ++iparticle) {
+      const snemo::datamodel::particle_track & a_particle = iparticle->get();
 
-  //   // Prepare locators
-  //   const int module_number = 0;
-  //   sgs::calo_locator  the_calo_locator  = sgs::calo_locator (get_geom_manager (), module_number);
-  //   sgs::xcalo_locator the_xcalo_locator = sgs::xcalo_locator (get_geom_manager (), module_number);
-  //   sgs::gveto_locator the_gveto_locator = sgs::gveto_locator (get_geom_manager (), module_number);
+      if (! a_particle.has_trajectory()) {
+        DT_LOG_DEBUG(get_logging_priority(), "Current particle has no trajectory !");
+        continue;
+      }
 
-  //   // Loop over all saved particles
-  //   const sam::particle_track_data::particle_collection_type & the_particles
-  //     = ptd_.get_particles ();
-  //   for (sam::particle_track_data::particle_collection_type::const_iterator
-  //          iparticle = the_particles.begin ();
-  //        iparticle != the_particles.end ();
-  //        ++iparticle)
-  //     {
-  //       const sam::particle_track & a_particle = iparticle->get ();
+      // Retrieve a subset of vertices
+      snemo::datamodel::particle_track::vertex_collection_type vertices;
+      const size_t nvtx = a_particle.compute_vertices(vertices, snemo::datamodel::particle_track::VERTEX_ON_SOURCE_FOIL);
+      if (nvtx != 1) {
+        DT_LOG_DEBUG(get_logging_priority(), "Current particle has more than one vertex on source foil !");
+        continue;
+      }
 
-  //       if (! a_particle.has_trajectory ()) continue;
+      // Get helix parameters
+      const snemo::datamodel::tracker_trajectory & a_trajectory = a_particle.get_trajectory();
+      const snemo::datamodel::base_trajectory_pattern & a_track_pattern = a_trajectory.get_pattern();
+      DT_THROW_IF(a_track_pattern.get_pattern_id() != snemo::datamodel::helix_trajectory_pattern::pattern_id(),
+                  std::logic_error, "Trajectory must be an helix !");
 
-  //       const scm::tracker_trajectory & a_trajectory = a_particle.get_trajectory ();
-  //       const scm::base_trajectory_pattern & a_track_pattern = a_trajectory.get_pattern ();
+      const snemo::datamodel::helix_trajectory_pattern * ptr_helix
+        = dynamic_cast<const snemo::datamodel::helix_trajectory_pattern *>(&a_track_pattern);
+      const geomtools::helix_3d & a_helix = ptr_helix->get_helix();
+      const geomtools::vector_3d & vcenter = a_helix.get_center();
+      const geomtools::vector_3d & vfoil = vertices.front().get().get_position();
+      // Compute orthogonal vector
+      const geomtools::vector_3d vorth = (vfoil - vcenter).orthogonal();
 
-  //       if (a_track_pattern.get_pattern_id () == scm::line_trajectory_pattern::PATTERN_ID)
-  //         {
-  //           if (is_debug ())
-  //             {
-  //               std::clog << datatools::utils::io::debug
-  //                         << "snemo::analysis::processing::"
-  //                         << "snemo_bremsstrahlung_module::_compute_angular_distribution_: "
-  //                         << "Particle trajectory is a line" << std::endl;
-  //             }
-  //           continue;
-  //         }
+      DT_LOG_DEBUG(get_logging_priority(), "Particle direction = " << vorth);
 
-  //       // Retrieve helix trajectory
-  //       const scm::helix_trajectory_pattern * ptr_helix = 0;
-  //       if (a_track_pattern.get_pattern_id () == scm::helix_trajectory_pattern::PATTERN_ID)
-  //         {
-  //           ptr_helix = dynamic_cast<const scm::helix_trajectory_pattern *>(&a_track_pattern);
-  //         }
+      // Loop over all non associated calorimeters to compute angle difference
+      const snemo::datamodel::calibrated_calorimeter_hit::collection_type & the_non_asso_calos
+        = ptd_.get_non_associated_calorimeters();
+      for (snemo::datamodel::calibrated_calorimeter_hit::collection_type::const_iterator
+             icalo = the_non_asso_calos.begin();
+           icalo != the_non_asso_calos.end(); ++icalo)
+        {
+          // Get block geom_id
+          const geomtools::geom_id & a_gid = icalo->get().get_geom_id();
 
-  //       if (!ptr_helix)
-  //         {
-  //           std::cerr << datatools::utils::io::error
-  //                     << "snemo::analysis::processing::"
-  //                     << "snemo_bremsstrahlung_module::_compute_angular_distribution_: "
-  //                     << "Tracker trajectory is not an 'helix' !"
-  //                     << std::endl;
-  //           return;
-  //         }
+          // Get block position given
+          geomtools::vector_3d vblock;
+          geomtools::invalidate(vblock);
 
-  //       // Get helix parameters
-  //       const geomtools::helix_3d & a_helix = ptr_helix->get_helix ();
-  //       const geomtools::vector_3d & center = a_helix.get_center ();
-  //       const double radius = a_helix.get_radius ();
-  //       const geomtools::vector_3d foil = a_particle.has_negative_charge () ?
-  //         a_helix.get_last () : a_helix.get_first ();
-  //       // Compute orthogonal vector
-  //       const geomtools::vector_3d vorth = (foil - center).orthogonal ();
+          const snemo::geometry::calo_locator & calo_locator = _locator_plugin_->get_calo_locator();
+          const snemo::geometry::xcalo_locator & xcalo_locator = _locator_plugin_->get_xcalo_locator();
+          const snemo::geometry::gveto_locator & gveto_locator = _locator_plugin_->get_gveto_locator();
+          if (calo_locator.is_calo_block(a_gid)) {
+            calo_locator.get_block_position(a_gid, vblock);
+          } else if (xcalo_locator.is_calo_block(a_gid)) {
+            xcalo_locator.get_block_position(a_gid, vblock);
+          } else if (gveto_locator.is_calo_block(a_gid)) {
+            gveto_locator.get_block_position(a_gid, vblock);
+          }
+          DT_THROW_IF(! geomtools::is_valid(vblock), std::logic_error,
+                      "The calorimeter with geom_id '" << a_gid << "' has not be found !");
 
-  //       // Loop over all non associated calorimeters to compute angle difference
-  //       const sam::particle_track_data::calorimeter_collection_type & the_non_asso_calos
-  //         = ptd_.get_non_associated_calorimeters ();
-  //       for (sam::particle_track_data::calorimeter_collection_type::const_iterator
-  //              icalo = the_non_asso_calos.begin ();
-  //            icalo != the_non_asso_calos.end (); ++icalo)
-  //         {
-  //           // Get block geom_id
-  //           const geomtools::geom_id & a_gid = icalo->get ().get_geom_id ();
-
-  //           // Get block position given
-  //           geomtools::vector_3d vblock;
-  //           geomtools::invalidate (vblock);
-
-  //           if (the_calo_locator.is_calo_block (a_gid))
-  //             {
-  //               the_calo_locator.get_block_position (a_gid, vblock);
-  //             }
-  //           else if (the_xcalo_locator.is_calo_block (a_gid))
-  //             {
-  //               the_xcalo_locator.get_block_position (a_gid, vblock);
-  //             }
-  //           else if (the_gveto_locator.is_calo_block (a_gid))
-  //             {
-  //               the_gveto_locator.get_block_position (a_gid, vblock);
-  //             }
-  //           else
-  //             {
-  //               std::ostringstream message;
-  //               message << "snemo::analysis::processing::"
-  //                       << "snemo_bremsstrahlung_module::_compute_angular_distribution_: "
-  //                       << "The calorimeter with geom_id '" << a_gid << "' has not be found !";
-  //               throw std::logic_error (message.str ());
-  //             }
-
-  //           double angle;
-  //           if (geomtools::is_valid (vblock))
-  //             {
-  //               angle = vorth.angle (vblock - foil);
-  //               if (is_debug ())
-  //                 {
-  //                   std::clog << datatools::utils::io::debug
-  //                             << "snemo::analysis::processing::"
-  //                             << "snemo_bremsstrahlung_module::_compute_angular_distribution_: "
-  //                             << "The angle between electron and gamma is "
-  //                             << angle / CLHEP::degree << " degree" << std::endl;
-  //                 }
-  //             }
-  //           // Filling the histograms :
-  //           if (_histogram_pool_->has_1d ("gamma_angle"))
-  //             {
-  //               mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d ("gamma_angle");
-  //               h1d.fill (angle);
-  //             }
-  //         }
-  //     }
+          const double angle = vorth.angle(vblock - vfoil);
+          DT_LOG_DEBUG(get_logging_priority(), "The angle between electron and gamma is "
+                       << angle / CLHEP::degree << " degree");
+          // Filling the histograms :
+          if (_histogram_pool_->has_1d("gamma_angle")) {
+            mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("gamma_angle");
+            h1d.fill(angle);
+          }
+        }
+    }
 
     return;
   }
