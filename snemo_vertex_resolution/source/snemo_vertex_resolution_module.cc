@@ -262,6 +262,7 @@ namespace analysis {
       }// end of vertex list
     }// end of particle list
 
+    DT_LOG_TRACE(get_logging_priority(), "Exiting.");
     return dpp::base_module::PROCESS_SUCCESS;
   }
 
