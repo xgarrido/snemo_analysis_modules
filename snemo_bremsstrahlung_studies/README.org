@@ -172,6 +172,41 @@ may be used as templates for several histograms.
   #@description The upper bound of the histogram
   max : real as energy = 3200.0 keV
 #+END_SRC
+*** Angular distribution
+#+BEGIN_SRC sh
+  [name="gamma_angle" type="mygsl::histogram_1d"]
+  #@config The histogram of the angular distribution of the gamma bremsstrahlung
+
+  #@description The group of the histogram (optional)
+  group : string = "angular_distribution"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The X axis label
+  display.xaxis.label : string = "angle"
+
+  #@description The X axis unit for display (a standard unit, typically SI or CLHEP)
+  display.xaxis.unit : string = "degree"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "dN/d#theta"
+
+  #@description The number of bins
+  number_of_bins : integer = 25
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "degree"
+
+  #@description The lower bound of the histogram
+  min : real as angle = 0 degree
+
+  #@description The upper bound of the histogram
+  max : real as angle = 180 degree
+#+END_SRC
 * Special execution of this module
 Since this module will actively use geometry manager and its locators (/i.e./
 =calo_locator=, =xcalo_locator=,...), the module need to initialize and load the
