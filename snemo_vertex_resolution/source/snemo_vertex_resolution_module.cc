@@ -227,10 +227,10 @@ namespace analysis {
             continue;
           }
 
-          delta = a_vertex.get_position() - the_step_hit.get_position_start();
+          // delta = a_vertex.get_position() - the_step_hit.get_position_start();
           // TODO: Use mean position value of the calo box deposit
-          // delta = a_vertex.get_position() - 0.5*(the_step_hit.get_position_start() +
-          //                                        the_step_hit.get_position_stop());
+          delta = a_vertex.get_position() - 0.5*(the_step_hit.get_position_start() +
+                                                 the_step_hit.get_position_stop());
         }
         DT_LOG_DEBUG(get_logging_priority(), "Delta value = " << delta/CLHEP::mm << " mm");
 
