@@ -40,10 +40,6 @@
 #include <map>
 #include <string>
 
-namespace geomtools {
-  class manager;
-}
-
 namespace snemo {
   namespace geometry {
     class locator_plugin;
