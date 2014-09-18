@@ -119,7 +119,7 @@ framework. It also contains the basic configuration to run the processing of
 SuperNEMO data through the concept of modules as described in <a href="http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889">these talks</a>. Then,
 the content of this file is to provide a minimal working environment in order to
 run the <code>bxdpp_processing</code> binary<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>.
- <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara"> here, we assume that <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael">Cadfael</a>, <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux">Bayeux</a> &amp; <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Falaise">Falaise</a> libraries have been successfully installed </p><br/></div>
+ <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> here, we assume that <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Cadfael">Cadfael</a>, <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Bayeux">Bayeux</a> &amp; <a href="https://nemo.lpc-caen.in2p3.fr/wiki/Software/Falaise">Falaise</a> libraries have been successfully installed<br/></div>
 </p>
 
 <div id="outline-container-sec-1" class="outline-2">
@@ -154,6 +154,11 @@ the vertices on the source foil. It can be used either for simulated data
 to get the true vertices distribution or for reconstructed particle tracks
 to get vertices distribution from detector acceptance.
 </dd>
+<dt><a href="./snemo_bremsstrahlung_studies/README.html">snemo_bremsstrahlung_studies</a></dt><dd>This module studies bremsstrahlung production
+within the source foil. It plots, for instance, the energy distributions of
+the primary electron and the emitted &gamma; and the angular distribution of
+particles.
+</dd>
 </dl>
 
 <p>
@@ -177,7 +182,7 @@ the basic idea is to give a "literate" way to navigate through the different
 sections, each of them representing a part of the pipeline
 configuration. Moreover, using <code>org</code> folding/unfolding capability, item can be
 hide and the user can focus on relevant parts.
- <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara"> At the time of writing this document, emacs version is 24.3.1 </p><br/></div>
+ <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> At the time of writing this document, emacs version is 24.3.1<br/></div>
 </p>
 
 <p>
@@ -186,7 +191,7 @@ within <code>emacs</code> instance<sup><a id="fnr.3" class="footref" href="#fn.3
 file or use the associated <code>Makefile</code>. The author recommends to use the
 <code>Makefile</code> since the tangling process is asynchronous and thus, does not freeze
 your <code>emacs</code> (<code>org-babel-tangle</code> "occupies" emacs during its execution).
- <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara"> Emacs lisp function can be run using <code>ALT-x</code> command and typing the function name. </p><br/></div>
+ <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> Emacs lisp function can be run using <code>ALT-x</code> command and typing the function name.<br/></div>
 </p>
 </div>
 </div>
@@ -220,11 +225,9 @@ occurs. This is done <i>via</i> the <code>Makefile</code> which parse and replac
 <div id="outline-container-sec-2-1" class="outline-3">
 <h3 id="sec-2-1">Module manager</h3>
 <div class="outline-text-3" id="text-2-1">
-<p>
 This file is the main and central piece of code for loading all modules/services
 needed by <code>dpp_processing</code> binary. It provides links to module files and
 service files.
-</p>
 </div>
 <div id="outline-container-sec-2-1-1" class="outline-4">
 <h4 id="sec-2-1-1">Logging priority</h4>
@@ -263,11 +266,12 @@ service_manager.configuration : string[1] as <span class="org-variable-name">pat
 <div class="org-src-container">
 
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">@description The configuration files for modules</span>
-modules.configuration_files : string[5] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
+modules.configuration_files : string[6] as <span class="org-variable-name">path</span> = <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_foil_vertex_distribution_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_vertex_resolution_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_detector_efficiency_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_bb0nu_studies_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
+    <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_bremsstrahlung_studies_module.conf"</span> <span class="org-sh-escaped-newline">\</span>
     <span class="org-string">"@SNEMO_SIMULATION_MODULES_DIR@/snemo_control_plot_module.conf"</span>
 </pre>
 </div>
@@ -359,6 +363,12 @@ table sets the libraries:
 [<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_bb0nu_studies"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_bb0nu_studies/install/lib/libsnemo_bb0nu_studies.so"</span>]
 <span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_bb0nu_studies library</span>
 <span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+[<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_control_plot"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_control_plot/install/lib/libsnemo_control_plot.so"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_control_plot library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
+[<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_bremsstrahlung_studies"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_bremsstrahlung_studies/install/lib/libsnemo_bremsstrahlung_studies.so"</span>]
+<span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_bremsstrahlung_studies library</span>
+<span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
 [<span class="org-variable-name">name</span>=<span class="org-string">"libsnemo_foil_vertex_distribution"</span> <span class="org-variable-name">filename</span>=<span class="org-string">"/home/garrido/Workdir/NEMO/supernemo/simulations/snemo_simulation_modules/./snemo_foil_vertex_distribution/install/lib/libsnemo_foil_vertex_distribution.so"</span>]
 <span class="org-comment-delimiter">#</span><span class="org-comment">config The libsnemo_foil_vertex_distribution library</span>
 <span class="org-builtin">autoload</span> : <span class="org-variable-name">boolean</span> = 1
@@ -375,11 +385,9 @@ table sets the libraries:
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3">Services configuration</h2>
 <div class="outline-text-2" id="text-3">
-<p>
 A service generally hosts a specific resource that can be shared by many other
 software components, including other services or data processing modules (see
 <a href="https://nemo.lpc-caen.in2p3.fr/wiki/SNSW_SNailWare_FAQ#Whatisaservice">SN@ilWare FAQ</a>).
-</p>
 </div>
 
 <div id="outline-container-sec-3-1" class="outline-3">
@@ -452,11 +460,9 @@ manager.no_excluded_categories : <span class="org-variable-name">boolean</span> 
 <div id="outline-container-sec-3-4" class="outline-3">
 <h3 id="sec-3-4">Histogram service</h3>
 <div class="outline-text-3" id="text-3-4">
-<p>
 The histogram service provides an esay way to handle histogram plot from
 different modules (mainly plot modules). It provides a service where 1D or 2D
 histograms can be added to a histogram dictionnary.
-</p>
 </div>
 
 <div id="outline-container-sec-3-4-1" class="outline-4">
@@ -521,12 +527,9 @@ loaded at running time by the tangling process (see below).
 <div id="outline-container-sec-4-2" class="outline-3">
 <h3 id="sec-4-2">Tangling configuration</h3>
 <div class="outline-text-3" id="text-4-2">
-<p>
 Second, you have to tangle this file. As explained in the <i>Content</i> section, you
 may use the dedicated <code>Makefile</code> to generate the pipeline configuration. Just
 run <code>make</code> within this working directory<sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup>.
- <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> <p class="footpara"> on multicore machine you can also try to do <code>make -jX</code> where <code>X</code> is the number of processors. </p><br/></div>
-</p>
 </div>
 </div>
 
@@ -540,6 +543,7 @@ manager file and the name of the module to be run for instance,
 <code>bb0nu_halflife_limit_module</code>. Nevertheless, you need to dynamically load the
 library(ies) which holds the needed modules. Then, you can use the <code>dlls.conf</code>
 file built in section <a href="#sec-2-3">DLL loader</a> by writing
+ <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> on multicore machine you can also try to do <code>make -jX</code> where <code>X</code> is the number of processors.<br/></div>
 </p>
 
 <div class="org-src-container">
@@ -558,7 +562,7 @@ will generate a ROOT file containing several histograms. This file is located by
 default, in <code>/tmp/${USER}/snemo.d</code> directory under the
 <code>snemo_bb0nu_halflife_limit_histos.root</code> name. You can change the output
 directory and output file name in <a href="snemo_bb0nu_studies/README.html#*Histograms storage">this section</a>.
- <div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5">5</a></sup> <p class="footpara"> here, we assume that you already have generated a data record. </p><br/></div>
+ <div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5">5</a></sup> here, we assume that you already have generated a data record.<br/></div>
 </p>
 </div>
 </div>
@@ -570,13 +574,9 @@ directory and output file name in <a href="snemo_bb0nu_studies/README.html#*Hist
 
 
 
-
-
-
-</div>
 </div></div>
 <div id="postamble" class="status">
-File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/fb7130f218a2ab4f0867e15ae51e0ddb885238f0">fb7130f</a> - 2014-06-16
+File under <i class="fa fa-github-alt"></i> version control - commit <a href="https://github.com/xgarrido/snemo_simulation_modules/commit/90118388c13714106acef2a897e24cd567937e6b">9011838</a> - 2014-09-18
 </div>
 </body>
 </html>
