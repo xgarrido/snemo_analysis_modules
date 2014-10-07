@@ -49,38 +49,66 @@ namespace analysis {
   void snemo_bb0nu_halflife_limit_module::experiment_entry_type::initialize(const datatools::properties & config_)
   {
     // Get experimental conditions
-    if (config_.has_key("isotope_mass_number")) {
-      isotope_mass_number = config_.fetch_integer("isotope_mass_number");
+    DT_THROW_IF(!config_.has_key("isotope_mass_number"), std::logic_error,
+                "Missing 'isotope_mass_number' value !");
+    isotope_mass_number = config_.fetch_real("isotope_mass_number");
+    if (!config_.has_explicit_unit("isotope_mass_number")) {
       isotope_mass_number *= CLHEP::g/CLHEP::mole;
     }
-    if (config_.has_key("isotope_mass")) {
-      isotope_mass = config_.fetch_real("isotope_mass");
-      if (! config_.has_explicit_unit("isotope_mass")) {
-        isotope_mass *= CLHEP::kg;
-      }
+
+    DT_THROW_IF(!config_.has_key("isotope_mass"), std::logic_error, "Missing 'isotope_mass' value !");
+    isotope_mass = config_.fetch_real("isotope_mass");
+    if (! config_.has_explicit_unit("isotope_mass")) {
+      isotope_mass *= CLHEP::kg;
     }
-    if (config_.has_key("isotope_bb2nu_halflife")) {
-      isotope_bb2nu_halflife = config_.fetch_real("isotope_bb2nu_halflife");
+
+    DT_THROW_IF(!config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
+                "Missing 'isotope_bb2nu_halflife' value !");
+    isotope_bb2nu_halflife = config_.fetch_real("isotope_bb2nu_halflife");
+
+    DT_THROW_IF(!config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
+                "Missing 'exposure_time' value !");
+    exposure_time = config_.fetch_real("exposure_time");
+
+    DT_THROW_IF(!config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
+                "Missing 'tracker_volume' value !");
+    tracker_volume = config_.fetch_real("tracker_volume");
+    if (! config_.has_explicit_unit("tracker_volume")) {
+      tracker_volume *= CLHEP::m3;
     }
-    if (config_.has_key("exposure_time")) {
-      exposure_time = config_.fetch_real("exposure_time");
-    }
+
     if (config_.has_key("background_list")) {
       std::vector<std::string> bkgs;
       config_.fetch("background_list", bkgs);
       for (std::vector<std::string>::const_iterator ibkg = bkgs.begin();
            ibkg != bkgs.end(); ++ibkg) {
         const std::string & bkgname = *ibkg;
-        const std::string key = bkgname + ".activity";
-        DT_THROW_IF(! config_.has_key(key), std::logic_error,
-                    "No background activity for " << bkgname << " element");
-        background_activities[bkgname] = config_.fetch_real(key);
-        if (! config_.has_explicit_unit(key)) {
-          background_activities[bkgname] *= CLHEP::becquerel/CLHEP::kg;
+        std::string key;
+        if (config_.has_key(key = bkgname + ".mass_activity")) {
+          background_activities[bkgname] = config_.fetch_real(key);
+          if (! config_.has_explicit_unit(key)) {
+            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::kg;
+          }
+          background_activities[bkgname] *= isotope_mass;
+        } else if (config_.has_key(key = bkgname + ".volume_activity")) {
+          background_activities[bkgname] = config_.fetch_real(key);
+          if (! config_.has_explicit_unit(key)) {
+            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::m3;
+          }
+          background_activities[bkgname] *= tracker_volume;
+        } else if (config_.has_key(key = bkgname + ".surface_activity")) {
+          background_activities[bkgname] = config_.fetch_real(key);
+          if (! config_.has_explicit_unit(key)) {
+            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::m2;
+          }
+        } else {
+          DT_THROW_IF(true, std::logic_error,
+                      "No background activity for " << bkgname << " element");
         }
+
         DT_LOG_NOTICE(datatools::logger::PRIO_NOTICE,
-                      "Adding '" << bkgname << "' background with an activity of "
-                      << background_activities[bkgname]/CLHEP::becquerel*CLHEP::kg << " Bq/kg");
+                      "Adding '" << bkgname << "' background with an absolute activity of "
+                      << background_activities[bkgname]/CLHEP::becquerel << " Bq");
       }
     }
     return;
@@ -495,7 +523,7 @@ namespace analysis {
             DT_LOG_TRACE(get_logging_priority(),
                          "Found background element '" << ibkg->first << "'");
             const double year2sec = 3600 * 24 * 365;
-            norm_factor = ibkg->second/CLHEP::becquerel * exposure_time * year2sec * isotope_mass;
+            norm_factor = ibkg->second/CLHEP::becquerel * exposure_time * year2sec;
           }
         }
       }

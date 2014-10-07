@@ -50,7 +50,7 @@ The module name is =bb0nu_halflife_limit_module= which is needed when using
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "warning"
+  logging.priority : string = "notice"
 #+END_SRC
 
 *** Histogram service label
@@ -109,7 +109,7 @@ halflife, exposure are used.
 **** Isotope values
 #+BEGIN_SRC sh
   #@description The atomic mass number of the isotope
-  experiment.isotope_mass_number : integer = 82
+  experiment.isotope_mass_number : real = 82
 
   #@description The total mass of the isotope
   experiment.isotope_mass : real as mass = 7 kg
@@ -124,21 +124,32 @@ halflife, exposure are used.
   experiment.exposure_time : real = 2.5 #year
 #+END_SRC
 
+**** Tracking chamber volume
+#+BEGIN_SRC sh
+  #@description The total gas volume of the tracking chamber
+  experiment.tracker_volume : real as volume = 15.2 m3
+#+END_SRC
+
 **** Background activities
 #+BEGIN_SRC sh
   #@description The list of background element
-  experiment.background_list : string[2] = "Tl208" "Bi214"
+  experiment.background_list : string[3] = "Tl208" "Bi214" "Rn222"
 #+END_SRC
 
 ***** \nbsp^{208}Tl activity
 #+BEGIN_SRC sh
   #@description The mass activity for internal Thallium-208 contamination
-  experiment.Tl208.activity : real as mass_activity = 2 uBq/kg
+  experiment.Tl208.mass_activity : real as mass_activity = 2 uBq/kg
 #+END_SRC
 ***** \nbsp^{214}Bi activity
 #+BEGIN_SRC sh
   #@description The mass activity for internal Bismuth-214 contamination
-  experiment.Bi214.activity : real as mass_activity = 10 uBq/kg
+  experiment.Bi214.mass_activity : real as mass_activity = 10 uBq/kg
+#+END_SRC
+***** \nbsp^{222}Rn activity
+#+BEGIN_SRC sh
+  #@description The volume activity for Radon inside tracking chamber
+  experiment.Rn222.volume_activity : real as volume_activity = 100 uBq/m3
 #+END_SRC
 ** Histogram declarations
 :PROPERTIES:
@@ -246,7 +257,7 @@ neutrinoless double bet decay sensitivity.
 #+END_SRC
 
 *** Halflife limit template
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :noweb yes
   [name="halflife_template" type="mygsl::histogram_1d"]
   #@config The histogram template of the halflife limit values
 

@@ -59,6 +59,7 @@ namespace analysis {
       double isotope_mass;
       double isotope_bb2nu_halflife;
       double exposure_time;
+      double tracker_volume;
       background_dict_type background_activities;
 
       void initialize(const datatools::properties & config_);
