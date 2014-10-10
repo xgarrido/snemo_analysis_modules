@@ -377,7 +377,7 @@ namespace analysis {
     // and the weight of each event
     double weight = 1.0;
     if (eh_properties.has_key("analysis.total_number_of_event")) {
-      weight /= eh_properties.fetch_integer("analysis.total_number_of_event");
+      weight /= eh_properties.fetch_real("analysis.total_number_of_event");
     }
     if (eh_properties.has_key(mctools::event_utils::EVENT_GENBB_WEIGHT)) {
       weight *= eh_properties.fetch_real(mctools::event_utils::EVENT_GENBB_WEIGHT);
