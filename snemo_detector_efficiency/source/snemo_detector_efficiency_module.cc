@@ -122,25 +122,21 @@ namespace analysis {
     // Get geometry locator plugin
     const geomtools::manager & geo_mgr = Geo.get_geom_manager();
     std::string locator_plugin_name;
-    if (config_.has_key("locator_plugin_name"))
-      {
-        locator_plugin_name = config_.fetch_string("locator_plugin_name");
-      }
-    else
-      {
-        // If no locator plugin name is set, then search for the first one
-        const geomtools::manager::plugins_dict_type & plugins = geo_mgr.get_plugins();
-        for (geomtools::manager::plugins_dict_type::const_iterator ip = plugins.begin();
-             ip != plugins.end();
-             ip++) {
-          const std::string & plugin_name = ip->first;
-          if (geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(plugin_name)) {
-            DT_LOG_DEBUG(get_logging_priority(), "Find locator plugin with name = " << plugin_name);
-            locator_plugin_name = plugin_name;
-            break;
-          }
+    if (config_.has_key("locator_plugin_name")) {
+      locator_plugin_name = config_.fetch_string("locator_plugin_name");
+    } else {
+      // If no locator plugin name is set, then search for the first one
+      const geomtools::manager::plugins_dict_type & plugins = geo_mgr.get_plugins();
+      for (geomtools::manager::plugins_dict_type::const_iterator ip = plugins.begin();
+           ip != plugins.end(); ip++) {
+        const std::string & plugin_name = ip->first;
+        if (geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(plugin_name)) {
+          DT_LOG_DEBUG(get_logging_priority(), "Find locator plugin with name = " << plugin_name);
+          locator_plugin_name = plugin_name;
+          break;
         }
       }
+    }
     // Access to a given plugin by name and type :
     DT_THROW_IF(! geo_mgr.has_plugin(locator_plugin_name) ||
                 ! geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(locator_plugin_name),
