@@ -267,37 +267,28 @@ namespace analysis {
            i != _calo_efficiencies_.end(); ++i)
         {
           const geomtools::geom_id & a_gid = i->first;
-
+          geomtools::vector_3d position;
+          geomtools::invalidate(position);
           const snemo::geometry::calo_locator & calo_locator = _locator_plugin_->get_calo_locator();
-          if (calo_locator.is_calo_block_in_current_module(a_gid))
-            {
-              fout << "calo ";
-              geomtools::vector_3d position;
-              calo_locator.get_block_position(a_gid, position);
-              fout << position.x() << " "
-                   << position.y() << " "
-                   << position.z() << " ";
-            }
+          if (calo_locator.is_calo_block_in_current_module(a_gid)) {
+            fout << "calo ";
+            calo_locator.get_block_position(a_gid, position);
+          }
           const snemo::geometry::xcalo_locator & xcalo_locator = _locator_plugin_->get_xcalo_locator();
-          if (xcalo_locator.is_calo_block_in_current_module(a_gid))
-            {
-              fout << "xcalo ";
-              geomtools::vector_3d position;
-              xcalo_locator.get_block_position(a_gid, position);
-              fout << position.x() << " "
-                   << position.y() << " "
-                   << position.z() << " ";
-            }
+          if (xcalo_locator.is_calo_block_in_current_module(a_gid)) {
+            fout << "xcalo ";
+            xcalo_locator.get_block_position(a_gid, position);
+          }
           const snemo::geometry::gveto_locator & gveto_locator = _locator_plugin_->get_gveto_locator();
-          if (gveto_locator.is_calo_block_in_current_module(a_gid))
-            {
-              fout << "gveto ";
-              geomtools::vector_3d position;
-              gveto_locator.get_block_position(a_gid, position);
-              fout << position.x() << " "
-                   << position.y() << " "
-                   << position.z() << " ";
-            }
+          if (gveto_locator.is_calo_block_in_current_module(a_gid)) {
+            fout << "gveto ";
+            gveto_locator.get_block_position(a_gid, position);
+          }
+          if (geomtools::is_valid(position)) {
+            fout << position.x() << " "
+                 << position.y() << " "
+                 << position.z() << " ";
+          }
           fout << i->second/double(calo_total) << std::endl;
         }
     }
