@@ -137,18 +137,32 @@ namespace analysis {
     DT_THROW_IF(! is_initialized(), std::logic_error,
                 "Module '" << get_name() << "' is not initialized !");
 
-    // Check if some 'simulated_data' are available in the data model:
-    const std::string sd_label = snemo::datamodel::data_info::default_simulated_data_label();
-    if (! data_record_.has(sd_label)) {
-      DT_LOG_ERROR(get_logging_priority(), "Missing simulated data to be processed !");
-      return dpp::base_module::PROCESS_ERROR;
+    gamma_dict_type simulated_gammas;
+    {
+      const process_status status = _process_simulated_gammas(data_record_, simulated_gammas);
+      if (status != dpp::base_module::PROCESS_OK) {
+        DT_LOG_ERROR(get_logging_priority(), "Processing of simulated data fails !");
+        return status;
+      }
     }
-    // Get the 'simulated_data' entry from the data model :
-    const mctools::simulated_data & sd = data_record_.get<mctools::simulated_data>(sd_label);
+    gamma_dict_type reconstructed_gammas;
+    {
+      const process_status status = _process_reconstructed_gammas(data_record_, reconstructed_gammas);
+      if (status != dpp::base_module::PROCESS_OK) {
+        DT_LOG_ERROR(get_logging_priority(), "Processing of particle track data fails !");
+        return status;
+      }
+    }
 
-    DT_LOG_DEBUG(get_logging_priority(), "Simulated data : ");
-    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) sd.tree_dump(std::clog);
+    _compare_sequences(simulated_gammas, reconstructed_gammas);
 
+    DT_LOG_TRACE(get_logging_priority(), "Exiting.");
+    return dpp::base_module::PROCESS_SUCCESS;
+  }
+
+  dpp::base_module::process_status snemo_gamma_tracking_studies_module::_process_simulated_gammas(const datatools::things & data_record_,
+                                                                                                  gamma_dict_type & simulated_gammas_) const
+  {
     // Check if some 'calibrated_data' are available in the data model:
     const std::string cd_label = snemo::datamodel::data_info::default_calibrated_data_label();
     if (! data_record_.has(cd_label)) {
@@ -160,48 +174,33 @@ namespace analysis {
       = data_record_.get<snemo::datamodel::calibrated_data>(cd_label);
 
     DT_LOG_DEBUG(get_logging_priority(), "Calibrated data : ");
-    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) cd.tree_dump(std::clog);
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) cd.tree_dump();
 
-    // Check if some 'particle_track_data' are available in the data model:
-    const std::string ptd_label = snemo::datamodel::data_info::default_particle_track_data_label();
-    if (! data_record_.has(ptd_label)) {
-      DT_LOG_ERROR(get_logging_priority(), "Missing particle track data to be processed !");
+    if (! cd.has_calibrated_calorimeter_hits()) return dpp::base_module::PROCESS_CONTINUE;
+    const snemo::datamodel::calibrated_data::calorimeter_hit_collection_type & cch
+      = cd.calibrated_calorimeter_hits();
+
+    // Check if some 'simulated_data' are available in the data model:
+    const std::string sd_label = snemo::datamodel::data_info::default_simulated_data_label();
+    if (! data_record_.has(sd_label)) {
+      DT_LOG_ERROR(get_logging_priority(), "Missing simulated data to be processed !");
       return dpp::base_module::PROCESS_ERROR;
     }
-    // Get the 'particle_track_data' entry from the data model :
-    const snemo::datamodel::particle_track_data & ptd
-      = data_record_.get<snemo::datamodel::particle_track_data>(ptd_label);
+    // Get the 'simulated_data' entry from the data model :
+    const mctools::simulated_data & sd = data_record_.get<mctools::simulated_data>(sd_label);
 
-    DT_LOG_DEBUG(get_logging_priority(), "Particle track data : ");
-    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) ptd.tree_dump(std::clog);
-
-    // Filling the histograms :
-    _process_simulated_gammas(sd, cd);
-    // _process_calibrated_data(data_record_);
-    // _process_tracker_clustering_data(data_record_);
-
-    DT_LOG_TRACE(get_logging_priority(), "Exiting.");
-    return dpp::base_module::PROCESS_SUCCESS;
-  }
-
-  void snemo_gamma_tracking_studies_module::_process_simulated_gammas(const mctools::simulated_data & sd_,
-                                                                      const snemo::datamodel::calibrated_data & cd_)
-  {
-    if (! cd_.has_calibrated_calorimeter_hits()) return;
-    const snemo::datamodel::calibrated_data::calorimeter_hit_collection_type & cch
-      = cd_.calibrated_calorimeter_hits();
+    DT_LOG_DEBUG(get_logging_priority(), "Simulated data : ");
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) sd.tree_dump();
 
     const std::string hit_label = "__visu.tracks.calo";
-    if (! sd_.has_step_hits(hit_label)) return;
+    if (! sd.has_step_hits(hit_label)) return dpp::base_module::PROCESS_CONTINUE;
     const mctools::simulated_data::hit_handle_collection_type & hit_collection
-      = sd_.get_step_hits(hit_label);
+      = sd.get_step_hits(hit_label);
     if (hit_collection.empty()) {
       DT_LOG_DEBUG(get_logging_priority(), "No simulated calorimeter hits");
-      return;
+      return dpp::base_module::PROCESS_CONTINUE;
     }
 
-    typedef std::set<geomtools::geom_id> calo_list_type;
-    std::map<int, calo_list_type> calo_lists;
     for (auto ihit : hit_collection) {
       const mctools::base_step_hit & a_hit = ihit.get();
       const datatools::properties & a_aux = a_hit.get_auxiliaries();
@@ -222,15 +221,47 @@ namespace analysis {
       if (std::find_if(cch.begin(), cch.end(), [gid] (auto hit_) {
             return gid == hit_.get().get_geom_id();
           }) == cch.end()) continue;
-      calo_lists[track_id].insert(gid);
+      simulated_gammas_[track_id].insert(gid);
     }
 
-    for (auto i : calo_lists) {
-      const calo_list_type & a_list = i.second;
-      DT_LOG_WARNING(datatools::logger::PRIO_WARNING, i.first << " = " << a_list.size());
+    return dpp::base_module::PROCESS_OK;
+  }
+
+  dpp::base_module::process_status snemo_gamma_tracking_studies_module::_process_reconstructed_gammas(const datatools::things & data_record_,
+                                                                                                      gamma_dict_type & reconstructed_gammas_) const
+  {
+    // Check if some 'particle_track_data' are available in the data model:
+    const std::string ptd_label = snemo::datamodel::data_info::default_particle_track_data_label();
+    if (! data_record_.has(ptd_label)) {
+      DT_LOG_ERROR(get_logging_priority(), "Missing particle track data to be processed !");
+      return dpp::base_module::PROCESS_ERROR;
+    }
+    // Get the 'particle_track_data' entry from the data model :
+    const snemo::datamodel::particle_track_data & ptd
+      = data_record_.get<snemo::datamodel::particle_track_data>(ptd_label);
+
+    DT_LOG_DEBUG(get_logging_priority(), "Particle track data : ");
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) ptd.tree_dump();
+
+    snemo::datamodel::particle_track_data::particle_collection_type gammas;
+    const size_t ngammas = ptd.fetch_particles(gammas, snemo::datamodel::particle_track::NEUTRAL);
+    if (ngammas == 0) return dpp::base_module::PROCESS_CONTINUE;
+
+    for (auto igamma : gammas) {
+      for (auto icalo : igamma.get().get_associated_calorimeter_hits()) {
+        const geomtools::geom_id & gid = icalo.get().get_geom_id();
+        reconstructed_gammas_[igamma.get().get_track_id()].insert(gid);
+      }
     }
 
-    return;
+    return dpp::base_module::PROCESS_OK;
+  }
+
+  void snemo_gamma_tracking_studies_module::_compare_sequences(const gamma_dict_type & simulated_gammas_,
+                                                               const gamma_dict_type & reconstructed_gammas_)
+  {
+
+
   }
 
 } // namespace analysis

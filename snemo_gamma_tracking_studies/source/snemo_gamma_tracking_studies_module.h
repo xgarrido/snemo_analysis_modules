@@ -34,6 +34,13 @@
 #ifndef ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_
 #define ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_ 1
 
+// Standard libraires:
+#include <set>
+#include <map>
+// Third party:
+// - Bayeux/geomtools:
+#include <geomtools/geom_id.h>
+
 // Data processing module abstract base class
 #include <dpp/base_module.h>
 
@@ -42,20 +49,17 @@ namespace mygsl {
   class histogram_pool;
 }
 
-namespace mctools {
-  class simulated_data;
-}
-namespace snemo {
-  namespace datamodel {
-    class calibrated_data;
-  }
-}
-
 namespace analysis {
 
   class snemo_gamma_tracking_studies_module : public dpp::base_module
   {
   public:
+
+    /// Typedef for calorimeters collection
+    typedef std::set<geomtools::geom_id> calo_list_type;
+
+    /// Typedef for gamma dictionnaries
+    typedef std::map<int, calo_list_type> gamma_dict_type;
 
     /// Setting histogram pool
     void set_histogram_pool(mygsl::histogram_pool & pool_);
@@ -85,9 +89,17 @@ namespace analysis {
     /// Give default values to specific class members.
     void _set_defaults();
 
-    /// Generate plot for the 'simulated_data' bank
-    void _process_simulated_gammas(const mctools::simulated_data & sd_,
-                                   const snemo::datamodel::calibrated_data & cd_);
+    /// Get gammas sequence from 'simulated_data' bank
+    dpp::base_module::process_status _process_simulated_gammas(const datatools::things & data_,
+                                                               gamma_dict_type & gammas_) const;
+
+    /// Get gammas sequence from 'particle_track_data' bank
+    dpp::base_module::process_status _process_reconstructed_gammas(const datatools::things & data_,
+                                                                   gamma_dict_type & gammas_) const;
+
+    /// Compare 2 sequences of calorimeters
+    void _compare_sequences(const gamma_dict_type & simulated_gammas_,
+                            const gamma_dict_type & reconstructed_gammas_);
 
   private:
 
