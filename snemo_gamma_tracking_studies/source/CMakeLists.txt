@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(snemo_gamma_tracking_studies)
 
 # Use C++11
-set(CMAKE_CXX_FLAGS "-std=c++14")
+set(CMAKE_CXX_FLAGS "-W -Wall -std=c++14")
 
 # - Third party
 find_package(Falaise 1.0.0 REQUIRED)
