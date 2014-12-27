@@ -26,7 +26,7 @@ namespace analysis {
 
   void snemo_gamma_tracking_studies_module::_set_defaults()
   {
-    _efficiency_ = {0, 0, 0, 0, 0};
+    _efficiency_ = {0, 0, 0, 0};
     return;
   }
 
@@ -126,11 +126,10 @@ namespace analysis {
     DT_LOG_DEBUG(get_logging_priority(), "Simulated data : ");
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) sd.tree_dump();
 
-    // Get total number of gammas simulated
-    _efficiency_.ngamma = 0;
-    for (auto i : sd.get_primary_event().get_particles()) {
-      if (i.is_gamma()) _efficiency_.ngamma++;
-    }
+    // // Get total number of gammas simulated
+    // for (auto i : sd.get_primary_event().get_particles()) {
+    //   if (i.is_gamma()) _efficiency_.ngamma++;
+    // }
 
     // Check if some 'calibrated_data' are available in the data model:
     const std::string cd_label = snemo::datamodel::data_info::default_calibrated_data_label();
@@ -220,13 +219,12 @@ namespace analysis {
                                                                const gamma_dict_type & reconstructed_gammas_)
   {
     _efficiency_.nevent++;
-    _efficiency_.ntotal += _efficiency_.ngamma;
     if (reconstructed_gammas_.empty() && simulated_gammas_.empty()) {
       DT_LOG_DEBUG(get_logging_priority(), "No gammas have been catched and reconstructed !");
       _efficiency_.nmiss++;
-      _efficiency_.ngood += _efficiency_.ngamma;
       return;
     }
+    _efficiency_.ntotal += simulated_gammas_.size();
 
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) {
       DT_LOG_DEBUG(get_logging_priority(), "Simulated gammas :");

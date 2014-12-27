@@ -95,7 +95,6 @@ namespace analysis {
     struct efficiency_type {
       size_t nevent; //!< Total number of event processed
       size_t ntotal; //!< Total number of gammas simulated
-      size_t ngamma; //!< Current number of gammas in the event
       size_t ngood;  //!< Number of gammas well reconstructed
       size_t nmiss;  //!< Number of gammas that do not trigger detector
     };
