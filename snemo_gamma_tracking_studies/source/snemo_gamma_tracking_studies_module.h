@@ -1,9 +1,9 @@
 /* snemo_gamma_tracking_studies_module.h
  * Author(s)     : Xavier Garrido <garrido@lal.in2p3.fr>
- * Creation date : 2013-11-11
- * Last modified : 2013-11-11
+ * Creation date : 2014-12-27
+ * Last modified : 2014-12-27
  *
- * Copyright (C) 2012 Xavier Garrido <garrido@lal.in2p3.fr>
+ * Copyright (C) 2014 Xavier Garrido <garrido@lal.in2p3.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +23,15 @@
  *
  * Description:
  *
- * A module to plot several basic parameters from different banks (SD, CD,
- * ...). The purpose of this module is to generate automatically plots to do
- * comparisons between software version.
+ * A module that estimates the gamma tracking efficiency by comparing
+ * calorimeter reconstruction sequence to the true i.e. simulated seuqence.
  *
  * History:
  *
  */
 
-#ifndef ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_
-#define ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_ 1
+#ifndef ANALYSIS_SNEMO_GAMMA_TRACKING_STUDIES_MODULE_H_
+#define ANALYSIS_SNEMO_GAMMA_TRACKING_STUDIES_MODULE_H_ 1
 
 // Standard libraires:
 #include <set>
@@ -43,11 +42,6 @@
 
 // Data processing module abstract base class
 #include <dpp/base_module.h>
-
-// Forward declarations
-namespace mygsl {
-  class histogram_pool;
-}
 
 namespace analysis {
 
@@ -60,12 +54,6 @@ namespace analysis {
 
     /// Typedef for gamma dictionnaries
     typedef std::map<int, calo_list_type> gamma_dict_type;
-
-    /// Setting histogram pool
-    void set_histogram_pool(mygsl::histogram_pool & pool_);
-
-    /// Grabbing histogram pool
-    mygsl::histogram_pool & grab_histogram_pool();
 
     /// Constructor
     snemo_gamma_tracking_studies_module(datatools::logger::priority = datatools::logger::PRIO_FATAL);
@@ -91,11 +79,11 @@ namespace analysis {
 
     /// Get gammas sequence from 'simulated_data' bank
     dpp::base_module::process_status _process_simulated_gammas(const datatools::things & data_,
-                                                               gamma_dict_type & gammas_) const;
+                                                               gamma_dict_type & gammas_);
 
     /// Get gammas sequence from 'particle_track_data' bank
     dpp::base_module::process_status _process_reconstructed_gammas(const datatools::things & data_,
-                                                                   gamma_dict_type & gammas_) const;
+                                                                   gamma_dict_type & gammas_);
 
     /// Compare 2 sequences of calorimeters
     void _compare_sequences(const gamma_dict_type & simulated_gammas_,
@@ -103,16 +91,25 @@ namespace analysis {
 
   private:
 
-    // The histogram pool:
-    mygsl::histogram_pool * _histogram_pool_;
+    /// Internal structure to compute efficiency
+    struct efficiency_type {
+      size_t nevent; //!< Total number of event processed
+      size_t ntotal; //!< Total number of gammas simulated
+      size_t ngamma; //!< Current number of gammas in the event
+      size_t ngood;  //!< Number of gammas well reconstructed
+      size_t nmiss;  //!< Number of gammas that do not trigger detector
+    };
+
+    /// Efficiency structure
+    efficiency_type _efficiency_;
 
     // Macro to automate the registration of the module :
-    DPP_MODULE_REGISTRATION_INTERFACE (snemo_gamma_tracking_studies_module);
+    DPP_MODULE_REGISTRATION_INTERFACE(snemo_gamma_tracking_studies_module);
   };
 
 } // namespace analysis
 
-#endif // ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_
+#endif // ANALYSIS_SNEMO_GAMMA_TRACKING_STUDIES_MODULE_H_
 
 // end of snemo_gamma_tracking_studies_module.h
 /*
