@@ -49,7 +49,7 @@ The module name to be used when processing a file is =scp_module=.
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "warning"
+  logging.priority : string = "notice"
 #+END_SRC
 
 *** Histogram service label
