@@ -50,6 +50,3 @@ The module name to be used when processing a file is
   #@description Logging priority
   logging.priority : string = "notice"
 #+END_SRC
-
-
-* Installation
