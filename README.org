@@ -36,6 +36,9 @@ The following analysis modules are currently available :
      within the source foil. It plots, for instance, the energy distributions of
      the primary electron and the emitted \gamma and the angular distribution of
      particles.
+- [[./snemo_gamma_tracking_studies/README.org][snemo_gamma_tracking_studies]] :: This module studies the \gamma tracking
+     efficiency by comparing the true simulated sequence of calorimeters
+     associated to a gamma track to the one deduced from \gamma tracking algorithm.
 
 The following package also provides :
 
@@ -274,8 +277,8 @@ histograms can be added to a histogram dictionnary.
   pool.description : string = "SuperNEMO histograms"
 #+END_SRC
 * Running SN@ilWare processing chain
-
 ** Source code compilation
+
 First, you need to compile the module files within its directory. The build
 system used is =cmake= and a =CMakeLists.txt= file is provided to correctly
 setup the dependencies. Nevertheless, this implies that you have already and
@@ -296,11 +299,13 @@ library file. The library is automatically added to the list of libraries to be
 loaded at running time by the tangling process (see below).
 
 ** Tangling configuration
+
 Second, you have to tangle this file. As explained in the [[Content][Content]] section, you
 may use the dedicated =Makefile= to generate the pipeline configuration. Just
 run =make= within this working directory[fn:4].
 
 ** Use and execute a module
+
 Running processing pipeline is done by the =bxdpp_processing= program provided
 by =dpp= library. Its call is pretty simple and only implies to have a module
 manager file and the name of the module to be run for instance,
