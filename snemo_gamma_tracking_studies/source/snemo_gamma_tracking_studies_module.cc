@@ -145,18 +145,18 @@ namespace analysis {
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) cd.tree_dump();
 
     // Stop proccess if no calibrated calorimeters
-    if (! cd.has_calibrated_calorimeter_hits()) return dpp::base_module::PROCESS_CONTINUE;
+    if (! cd.has_calibrated_calorimeter_hits()) return dpp::base_module::PROCESS_STOP;
     const snemo::datamodel::calibrated_data::calorimeter_hit_collection_type & cch
       = cd.calibrated_calorimeter_hits();
 
     // Fetch simulated step hits from calorimeter blocks
     const std::string hit_label = "__visu.tracks.calo";
-    if (! sd.has_step_hits(hit_label)) return dpp::base_module::PROCESS_CONTINUE;
+    if (! sd.has_step_hits(hit_label)) return dpp::base_module::PROCESS_STOP;
     const mctools::simulated_data::hit_handle_collection_type & hit_collection
       = sd.get_step_hits(hit_label);
     if (hit_collection.empty()) {
       DT_LOG_DEBUG(get_logging_priority(), "No simulated calorimeter hits");
-      return dpp::base_module::PROCESS_CONTINUE;
+      return dpp::base_module::PROCESS_STOP;
     }
 
     for (auto ihit : hit_collection) {
@@ -173,12 +173,13 @@ namespace analysis {
       DT_THROW_IF(track_id == -1, std::logic_error, "Missing primary track id !");
       if (track_id == 0) continue; // Primary particles
 
-
       // Check if calorimeter has been calibrated
       const geomtools::geom_id & gid = a_hit.get_geom_id();
       if (std::find_if(cch.begin(), cch.end(), [gid] (auto hit_) {
             return gid == hit_.get().get_geom_id();
           }) == cch.end()) continue;
+
+
       simulated_gammas_[track_id].insert(gid);
     }
 
@@ -203,7 +204,7 @@ namespace analysis {
 
     snemo::datamodel::particle_track_data::particle_collection_type gammas;
     const size_t ngammas = ptd.fetch_particles(gammas, snemo::datamodel::particle_track::NEUTRAL);
-    if (ngammas == 0) return dpp::base_module::PROCESS_CONTINUE;
+    if (ngammas == 0) return dpp::base_module::PROCESS_STOP;
 
     for (auto igamma : gammas) {
       for (auto icalo : igamma.get().get_associated_calorimeter_hits()) {
