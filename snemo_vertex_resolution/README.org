@@ -69,7 +69,7 @@ archives.
 #+END_SRC
 
 *** Histogram template location
-Templates for histog ram may be provided to reduce the amount of configuration of
+Templates for histogram may be provided to reduce the amount of configuration of
 individual histogram. For instance, plotting the vertex position distributions
 only implies 3 histogram templates for each of the 3 cartesian coordinates
 $x,y,z$ (see [[Histogram declarations][below]]).
