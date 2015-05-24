@@ -1,4 +1,4 @@
-#+TITLE:  SN@ilWare Analysis Modules
+#+TITLE:  SN@ilWare Simulation Modules
 #+AUTHOR: Xavier Garrido
 #+DATE:   2014-05-23
 #+OPTIONS: ^:{} num:nil

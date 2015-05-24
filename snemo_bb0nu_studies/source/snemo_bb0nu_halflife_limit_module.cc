@@ -11,7 +11,6 @@
 // Third party:
 // - Bayeux/datatools:
 #include <datatools/clhep_units.h>
-#include <datatools/units.h>
 #include <datatools/service_manager.h>
 // - Bayeux/mygsl
 #include <mygsl/histogram_pool.h>
@@ -85,16 +84,31 @@ namespace analysis {
            ibkg != bkgs.end(); ++ibkg) {
         const std::string & bkgname = *ibkg;
         std::string key;
-        DT_THROW_IF(! config_.has_key(key = bkgname + ".activity"), std::logic_error,
-                    "Missing activity for '" << bkgname << "' background !");
-        background_activities[bkgname] = config_.fetch_real(key);
-        DT_THROW_IF(!config_.has_unit_symbol(key), std::logic_error, "Missing activity unit !");
-        const double unit = datatools::units::get_unit(config_.get_unit_symbol(key), true);
-        background_activities[bkgname] *= unit;
+        if (config_.has_key(key = bkgname + ".mass_activity")) {
+          background_activities[bkgname] = config_.fetch_real(key);
+          if (! config_.has_explicit_unit(key)) {
+            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::kg;
+          }
+          background_activities[bkgname] *= isotope_mass;
+        } else if (config_.has_key(key = bkgname + ".volume_activity")) {
+          background_activities[bkgname] = config_.fetch_real(key);
+          if (! config_.has_explicit_unit(key)) {
+            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::m3;
+          }
+          background_activities[bkgname] *= tracker_volume;
+        } else if (config_.has_key(key = bkgname + ".surface_activity")) {
+          background_activities[bkgname] = config_.fetch_real(key);
+          if (! config_.has_explicit_unit(key)) {
+            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::m2;
+          }
+        } else {
+          DT_THROW_IF(true, std::logic_error,
+                      "No background activity for " << bkgname << " element");
+        }
 
         DT_LOG_NOTICE(datatools::logger::PRIO_NOTICE,
                       "Adding '" << bkgname << "' background with an absolute activity of "
-                      << background_activities[bkgname]/unit << " " << config_.get_unit_symbol(key));
+                      << background_activities[bkgname]/CLHEP::becquerel << " Bq");
       }
     }
     return;
@@ -363,7 +377,7 @@ namespace analysis {
     // and the weight of each event
     double weight = 1.0;
     if (eh_properties.has_key("analysis.total_number_of_event")) {
-      weight /= eh_properties.fetch_integer("analysis.total_number_of_event");
+      weight /= eh_properties.fetch_real("analysis.total_number_of_event");
     }
     if (eh_properties.has_key(mctools::event_utils::EVENT_GENBB_WEIGHT)) {
       weight *= eh_properties.fetch_real(mctools::event_utils::EVENT_GENBB_WEIGHT);
