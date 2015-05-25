@@ -83,9 +83,6 @@ namespace analysis {
     /// Give default values to specific class members.
     void _set_defaults();
 
-    /// Generate plot for the 'tracker_clustering_data' bank
-    void _process_tracker_clustering_data(const datatools::things & data_record_);
-
   private:
 
     mygsl::histogram_pool * _histogram_pool_; //!< Histogram pool

@@ -1,4 +1,4 @@
-/// \file calibrated_data_plotter.h
+/// \file tracker_clustering_data_plotter.h
 /* Author(s)     : Xavier Garrido <garrido@lal.in2p3.fr>
  * Creation date : 2015-05-25
  * Last modified : 2013-12-13
@@ -28,8 +28,8 @@
  *
  */
 
-#ifndef SNEMO_ANALYSIS_CALIBRATED_DATA_PLOTTER_H
-#define SNEMO_ANALYSIS_CALIBRATED_DATA_PLOTTER_H 1
+#ifndef SNEMO_ANALYSIS_TRACKER_CLUSTERING_DATA_PLOTTER_H
+#define SNEMO_ANALYSIS_TRACKER_CLUSTERING_DATA_PLOTTER_H 1
 
 // This project:
 #include <base_plotter.h>
@@ -37,12 +37,12 @@
 namespace snemo {
 // Forward declaration:
 namespace datamodel {
-  class calibrated_data;
+  class tracker_clustering_data;
 }
 namespace analysis {
 
   /// \brief Simulated data plotter class
-  class calibrated_data_plotter : public ::snemo::analysis::base_plotter
+  class tracker_clustering_data_plotter : public ::snemo::analysis::base_plotter
   {
   public:
 
@@ -50,10 +50,10 @@ namespace analysis {
     static const std::string & get_id();
 
     /// Default constructor
-    calibrated_data_plotter(datatools::logger::priority p_ = datatools::logger::PRIO_FATAL);
+    tracker_clustering_data_plotter(datatools::logger::priority p_ = datatools::logger::PRIO_FATAL);
 
     /// Destructor
-    virtual ~calibrated_data_plotter();
+    virtual ~tracker_clustering_data_plotter();
 
     /// The main initialization method (post-construction):
     virtual void initialize(const datatools::properties & config_);
@@ -78,12 +78,12 @@ namespace analysis {
     /// Default class member value
     void _set_defaults();
 
-    /// Specialized method for plotting 'CD' bank
-    void _plot(const snemo::datamodel::calibrated_data & cd_);
+    /// Specialized method for plotting 'TCD' bank
+    void _plot(const snemo::datamodel::tracker_clustering_data & tcd_);
 
   private:
 
-    std::string _CD_label_; //!< Calibrated data bank label
+    std::string _TCD_label_; //!< Tracker clustering data bank label
   };
 
 } // end of namespace analysis
@@ -92,9 +92,9 @@ namespace analysis {
 #include <datatools/ocd_macros.h>
 
 // Declare the OCD interface of the module
-DOCD_CLASS_DECLARATION(snemo::analysis::calibrated_data_plotter)
+DOCD_CLASS_DECLARATION(snemo::analysis::tracker_clustering_data_plotter)
 
-#endif // SNEMO_ANALYSIS_CALIBRATED_DATA_PLOTTER_H
+#endif // SNEMO_ANALYSIS_TRACKER_CLUSTERING_DATA_PLOTTER_H
 
 /*
 ** Local Variables: --

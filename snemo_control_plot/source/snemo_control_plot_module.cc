@@ -23,6 +23,7 @@
 // This project:
 #include <simulated_data_plotter.h>
 #include <calibrated_data_plotter.h>
+#include <tracker_clustering_data_plotter.h>
 
 namespace snemo {
 namespace analysis {
@@ -107,6 +108,8 @@ namespace analysis {
         _plotters_.push_back(new snemo::analysis::simulated_data_plotter);
       } else if (a_plotter_name == snemo::analysis::calibrated_data_plotter::get_id()) {
         _plotters_.push_back(new snemo::analysis::calibrated_data_plotter);
+      } else if (a_plotter_name == snemo::analysis::tracker_clustering_data_plotter::get_id()) {
+        _plotters_.push_back(new snemo::analysis::tracker_clustering_data_plotter);
       } else {
         DT_THROW_IF(true, std::logic_error, "Unkown '" << a_plotter_name << "' plotter!");
       }
@@ -168,31 +171,6 @@ namespace analysis {
 
     DT_LOG_TRACE(get_logging_priority(), "Exiting.");
     return dpp::base_module::PROCESS_SUCCESS;
-  }
-
-  void snemo_control_plot_module::_process_tracker_clustering_data(const datatools::things & data_record_)
-  {
-    // // Check if some 'simulated_data' are available in the data model:
-    // const std::string tcd_label = snemo::datamodel::data_info::default_tracker_clustering_data_label();
-    // if (! data_record_.has(tcd_label)) {
-    //   DT_LOG_DEBUG(get_logging_priority(), "Missing tracker clustering data to be processed !");
-    //   return;
-    // }
-    // // Grab the 'simulated_data' entry from the data model :
-    // const snemo::datamodel::tracker_clustering_data & tcd
-    //   = data_record_.get<snemo::datamodel::tracker_clustering_data>(tcd_label);
-
-    // DT_LOG_DEBUG(get_logging_priority(), "Tracker clustering data : ");
-    // if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) tcd.tree_dump(std::clog);
-
-    // if (_histogram_pool_->has_1d("TCD::nclusters")) {
-    //   mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("TCD::nclusters");
-    //   size_t nclusters = 0;
-    //   if (tcd.has_default_solution()) nclusters += tcd.get_default_solution().get_clusters().size();
-    //   h1d.fill(nclusters);
-    // }
-
-    return;
   }
 
 } // end of namespace analysis

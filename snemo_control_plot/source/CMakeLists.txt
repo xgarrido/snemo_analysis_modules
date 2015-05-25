@@ -27,7 +27,9 @@ add_library(snemo_control_plot SHARED
   simulated_data_plotter.h
   simulated_data_plotter.cc
   calibrated_data_plotter.h
-  calibrated_data_plotter.cc)
+  calibrated_data_plotter.cc
+  tracker_clustering_data_plotter.h
+  tracker_clustering_data_plotter.cc)
 
 target_link_libraries(snemo_control_plot ${Falaise_LIBRARIES})
 
