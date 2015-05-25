@@ -20,13 +20,9 @@
 // - Bayeux/mctools
 #include <mctools/simulated_data.h>
 
-// - Falaise
-#include <snemo/datamodels/data_model.h>
-#include <snemo/datamodels/calibrated_data.h>
-#include <snemo/datamodels/tracker_clustering_data.h>
-
 // This project:
 #include <simulated_data_plotter.h>
+#include <calibrated_data_plotter.h>
 
 namespace snemo {
 namespace analysis {
@@ -109,6 +105,8 @@ namespace analysis {
 
       if (a_plotter_name == snemo::analysis::simulated_data_plotter::get_id()) {
         _plotters_.push_back(new snemo::analysis::simulated_data_plotter);
+      } else if (a_plotter_name == snemo::analysis::calibrated_data_plotter::get_id()) {
+        _plotters_.push_back(new snemo::analysis::calibrated_data_plotter);
       } else {
         DT_THROW_IF(true, std::logic_error, "Unkown '" << a_plotter_name << "' plotter!");
       }
@@ -170,62 +168,6 @@ namespace analysis {
 
     DT_LOG_TRACE(get_logging_priority(), "Exiting.");
     return dpp::base_module::PROCESS_SUCCESS;
-  }
-
-  void snemo_control_plot_module::_process_calibrated_data(const datatools::things & data_record_)
-  {
-    // // Check if some 'simulated_data' are available in the data model:
-    // const std::string cd_label = snemo::datamodel::data_info::default_calibrated_data_label();
-    // if (! data_record_.has(cd_label)) {
-    //   DT_LOG_DEBUG(get_logging_priority(), "Missing calibrated data to be processed !");
-    //   return;
-    // }
-    // // Grab the 'simulated_data' entry from the data model :
-    // const snemo::datamodel::calibrated_data & cd
-    //   = data_record_.get<snemo::datamodel::calibrated_data>(cd_label);
-
-    // DT_LOG_DEBUG(get_logging_priority(), "Calibrated data : ");
-    // if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) cd.tree_dump(std::clog);
-
-    // if (_histogram_pool_->has_1d("CD::ngghits")) {
-    //   mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::ngghits");
-    //   size_t nggs = 0;
-    //   if (cd.has_calibrated_tracker_hits()) nggs += cd.calibrated_tracker_hits().size();
-    //   h1d.fill(nggs);
-    // }
-
-    // if (_histogram_pool_->has_1d("CD::ncalohits")) {
-    //   mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::ncalohits");
-    //   size_t ncalos = 0;
-    //   if (cd.has_calibrated_calorimeter_hits()) ncalos += cd.calibrated_calorimeter_hits().size();
-    //   h1d.fill(ncalos);
-    // }
-
-    // if (! cd.has_calibrated_tracker_hits()) return;
-    // const snemo::datamodel::calibrated_data::tracker_hit_collection_type gg_hits
-    //   = cd.calibrated_tracker_hits();
-
-    // BOOST_FOREACH(const snemo::datamodel::calibrated_data::tracker_hit_handle_type & gg_handle, gg_hits) {
-    //   if (! gg_handle.has_data()) continue;
-    //   const snemo::datamodel::calibrated_tracker_hit & gg_hit = gg_handle.get();
-    //   if (_histogram_pool_->has_1d("CD::drift_radius")) {
-    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius");
-    //     h1d.fill(gg_hit.get_r());
-    //   }
-    //   if (_histogram_pool_->has_1d("CD::drift_radius_error")) {
-    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius_error");
-    //     h1d.fill(gg_hit.get_sigma_r());
-    //   }
-    //   if (_histogram_pool_->has_1d("CD::long_position")) {
-    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position");
-    //     h1d.fill(gg_hit.get_z());
-    //   }
-    //   if (_histogram_pool_->has_1d("CD::long_position_error")) {
-    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position_error");
-    //     h1d.fill(gg_hit.get_sigma_z());
-    //   }
-    // }
-    return;
   }
 
   void snemo_control_plot_module::_process_tracker_clustering_data(const datatools::things & data_record_)

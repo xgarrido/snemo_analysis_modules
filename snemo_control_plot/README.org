@@ -80,7 +80,7 @@ boundaries and x-binning.
 
 *** Plotter declarations
 #+BEGIN_SRC shell
-  plotters : string[1] = "SDP"
+  plotters : string[2] = "SDP" "CDP"
 #+END_SRC
 **** Simulated data plotter
 #+BEGIN_SRC shell
