@@ -47,8 +47,6 @@ namespace analysis {
   // Grab the histogram pool used by the module :
   mygsl::histogram_pool & snemo_control_plot_module::grab_histogram_pool()
   {
-    DT_THROW_IF (! is_initialized(), std::logic_error,
-                 "Module '" << get_name() << "' is not initialized !");
     return *_histogram_pool_;
   }
 
@@ -132,6 +130,11 @@ namespace analysis {
     DT_THROW_IF(! is_initialized(), std::logic_error,
                 "Module '" << get_name() << "' is not initialized !");
 
+    // Reset plotters
+    for (auto a_plotter : _plotters_) {
+      a_plotter->reset();
+    }
+
     // Tag the module as un-initialized :
     _set_initialized(false);
     _set_defaults();
@@ -161,8 +164,9 @@ namespace analysis {
                 "Module '" << get_name() << "' is not initialized !");
 
     // Filling the histograms :
-    _process_calibrated_data(data_record_);
-    _process_tracker_clustering_data(data_record_);
+    for (auto a_plotter : _plotters_) {
+      a_plotter->plot(data_record_);
+    }
 
     DT_LOG_TRACE(get_logging_priority(), "Exiting.");
     return dpp::base_module::PROCESS_SUCCESS;

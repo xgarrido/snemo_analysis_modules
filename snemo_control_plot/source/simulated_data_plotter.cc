@@ -26,7 +26,7 @@ namespace analysis {
 
   const std::string & simulated_data_plotter::get_id()
   {
-    static const std::string s("SPD");
+    static const std::string s("SDP");
     return s;
   }
 
@@ -51,6 +51,8 @@ namespace analysis {
     if (setup_.has_key("SD_label")) {
       _SD_label_ = setup_.fetch_string("SD_label");
     }
+
+    _set_initialized(true);
     return;
   }
 
