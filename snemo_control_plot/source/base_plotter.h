@@ -91,6 +91,15 @@ namespace analysis {
     /// Set the plotter description
     void set_description(const std::string & description_);
 
+    // Check the bank label
+    bool has_bank_label() const;
+
+    /// Return the bank label
+    const std::string & get_bank_label() const;
+
+    /// Set bank label
+    void set_bank_label(const std::string & label_);
+
     /// Check initialization flag
     bool is_initialized() const;
 
@@ -135,6 +144,7 @@ namespace analysis {
     datatools::logger::priority _logging; //!< The logging priority threshold
     std::string _name;                    //!< The name of the module
     std::string _description;             //!< The description of the module
+    std::string _bank_label;              //!< The bank label
 
   private:
 

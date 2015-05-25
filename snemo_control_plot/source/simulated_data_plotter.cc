@@ -48,10 +48,6 @@ namespace analysis {
   {
     ::snemo::analysis::base_plotter::_common_initialize(setup_);
 
-    if (setup_.has_key("SD_label")) {
-      _SD_label_ = setup_.fetch_string("SD_label");
-    }
-
     _set_initialized(true);
     return;
   }
@@ -68,29 +64,22 @@ namespace analysis {
 
   void simulated_data_plotter::plot(const datatools::things & data_record_)
   {
+    DT_THROW_IF(! has_bank_label(), std::logic_error, "Missing bank label !");
+
     // Check if some 'simulated_data' are available in the data model:
-    if (! data_record_.has(_SD_label_)) {
+    if (! data_record_.has(get_bank_label())) {
       DT_LOG_DEBUG(get_logging_priority(), "Missing simulated data to be processed !");
       return;
     }
     // Get the 'simulated_data' entry from the data model :
-    const mctools::simulated_data & sd = data_record_.get<mctools::simulated_data>(_SD_label_);
+    const mctools::simulated_data & sd = data_record_.get<mctools::simulated_data>(get_bank_label());
     ::snemo::analysis::simulated_data_plotter::_plot(sd);
-    return;
-  }
-
-  void simulated_data_plotter::tree_dump(std::ostream & out_,
-                                         const std::string & title_,
-                                         const std::string & indent_,
-                                         bool inherit_) const
-  {
-    ::snemo::analysis::base_plotter::tree_dump(out_, title_, indent_, inherit_);
     return;
   }
 
   void simulated_data_plotter::_set_defaults()
   {
-    _SD_label_ = snemo::datamodel::data_info::default_simulated_data_label();
+    set_bank_label(snemo::datamodel::data_info::default_simulated_data_label());
     return;
   }
 

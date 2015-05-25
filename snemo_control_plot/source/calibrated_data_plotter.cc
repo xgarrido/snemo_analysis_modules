@@ -47,10 +47,6 @@ namespace analysis {
   {
     ::snemo::analysis::base_plotter::_common_initialize(setup_);
 
-    if (setup_.has_key("CD_label")) {
-      _CD_label_ = setup_.fetch_string("CD_label");
-    }
-
     _set_initialized(true);
     return;
   }
@@ -58,8 +54,8 @@ namespace analysis {
   // Reset the clusterizer
   void calibrated_data_plotter::reset()
   {
-    DT_THROW_IF (! is_initialized(), std::logic_error,
-                 "Plotter '" << get_name() << "' is not initialized !");
+    DT_THROW_IF(! is_initialized(), std::logic_error,
+                "Plotter '" << get_name() << "' is not initialized !");
     _set_initialized(false);
     _set_defaults();
     return;
@@ -67,30 +63,23 @@ namespace analysis {
 
   void calibrated_data_plotter::plot(const datatools::things & data_record_)
   {
+    DT_THROW_IF(! has_bank_label(), std::logic_error, "Missing bank label !");
+
     // Check if some 'calibrated_data' are available in the data model:
-    if (! data_record_.has(_CD_label_)) {
+    if (! data_record_.has(get_bank_label())) {
       DT_LOG_DEBUG(get_logging_priority(), "Missing calibrated data to be processed !");
       return;
     }
     // Get the 'calibrated_data' entry from the data model :
     const snemo::datamodel::calibrated_data & cd
-      = data_record_.get<snemo::datamodel::calibrated_data>(_CD_label_);
+      = data_record_.get<snemo::datamodel::calibrated_data>(get_bank_label());
     ::snemo::analysis::calibrated_data_plotter::_plot(cd);
-    return;
-  }
-
-  void calibrated_data_plotter::tree_dump(std::ostream & out_,
-                                         const std::string & title_,
-                                         const std::string & indent_,
-                                         bool inherit_) const
-  {
-    ::snemo::analysis::base_plotter::tree_dump(out_, title_, indent_, inherit_);
     return;
   }
 
   void calibrated_data_plotter::_set_defaults()
   {
-    _CD_label_ = snemo::datamodel::data_info::default_calibrated_data_label();
+    set_bank_label(snemo::datamodel::data_info::default_calibrated_data_label());
     return;
   }
 

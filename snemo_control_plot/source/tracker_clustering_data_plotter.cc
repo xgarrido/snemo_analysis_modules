@@ -47,10 +47,6 @@ namespace analysis {
   {
     ::snemo::analysis::base_plotter::_common_initialize(setup_);
 
-    if (setup_.has_key("TCD_label")) {
-      _TCD_label_ = setup_.fetch_string("TCD_label");
-    }
-
     _set_initialized(true);
     return;
   }
@@ -67,30 +63,23 @@ namespace analysis {
 
   void tracker_clustering_data_plotter::plot(const datatools::things & data_record_)
   {
+    DT_THROW_IF(! has_bank_label(), std::logic_error, "Missing bank label !");
+
     // Check if some 'tracker_clustering_data' are available in the data model:
-    if (! data_record_.has(_TCD_label_)) {
+    if (! data_record_.has(get_bank_label())) {
       DT_LOG_DEBUG(get_logging_priority(), "Missing tracker clustering data to be processed !");
       return;
     }
     // Get the 'tracker_clustering_data' entry from the data model :
     const snemo::datamodel::tracker_clustering_data & tcd
-      = data_record_.get<snemo::datamodel::tracker_clustering_data>(_TCD_label_);
+      = data_record_.get<snemo::datamodel::tracker_clustering_data>(get_bank_label());
     ::snemo::analysis::tracker_clustering_data_plotter::_plot(tcd);
-    return;
-  }
-
-  void tracker_clustering_data_plotter::tree_dump(std::ostream & out_,
-                                                  const std::string & title_,
-                                                  const std::string & indent_,
-                                                  bool inherit_) const
-  {
-    ::snemo::analysis::base_plotter::tree_dump(out_, title_, indent_, inherit_);
     return;
   }
 
   void tracker_clustering_data_plotter::_set_defaults()
   {
-    _TCD_label_ = snemo::datamodel::data_info::default_tracker_clustering_data_label();
+    set_bank_label(snemo::datamodel::data_info::default_tracker_clustering_data_label());
     return;
   }
 
@@ -114,26 +103,6 @@ namespace analysis {
   {
     // Invoke OCD support from parent class :
     ::snemo::analysis::base_plotter::common_ocd(ocd_);
-
-    {
-      // Description of the 'TCD_label' configuration property :
-      datatools::configuration_property_description & cpd
-        = ocd_.add_property_info();
-      cpd.set_name_pattern("TCD_label")
-        .set_terse_description("The label/name of the 'tracker clustering data' bank")
-        .set_traits(datatools::TYPE_STRING)
-        .set_mandatory(false)
-        .set_long_description("This is the name of the bank to be used \n"
-                              "as the source of input.                 \n")
-        .set_default_value_string(snemo::datamodel::data_info::default_tracker_clustering_data_label())
-        .add_example("Use an alternative name for the  \n"
-                     "'tracker clustering data' bank:: \n"
-                     "                                 \n"
-                     "  TCD_label : string = \"TCD2\"  \n"
-                     "                                 \n"
-                     )
-        ;
-    }
 
     return;
   }

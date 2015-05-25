@@ -92,6 +92,22 @@ namespace analysis {
     return;
   }
 
+  bool base_plotter::has_bank_label() const
+  {
+    return ! _bank_label.empty();
+  }
+
+  const std::string & base_plotter::get_bank_label() const
+  {
+    return _bank_label;
+  }
+
+  void base_plotter::set_bank_label(const std::string & label_)
+  {
+    _bank_label = label_;
+    return;
+  }
+
   base_plotter::base_plotter(datatools::logger::priority p_)
   {
     _initialized = false;
@@ -129,7 +145,9 @@ namespace analysis {
          << "Plotter logging threshold : '"
          << datatools::logger::get_priority_label(_logging) << "'" << std::endl;
     out_ << indent << datatools::i_tree_dumpable::tag
-         << "Plotter initialized : " << is_initialized () << std::endl;
+         << "Plotter initialized : " << is_initialized() << std::endl;
+    out_ << indent << datatools::i_tree_dumpable::tag
+         << "Bank label name : " << get_bank_label() << std::endl;
     return;
   }
 
@@ -146,8 +164,8 @@ namespace analysis {
 
   void base_plotter::_common_initialize(const datatools::properties & config_)
   {
-    DT_THROW_IF (is_initialized(), std::logic_error,
-                 "Plotter '" << get_name() << "' is already initialized ! ");
+    DT_THROW_IF(is_initialized(), std::logic_error,
+                "Plotter '" << get_name() << "' is already initialized ! ");
 
     DT_THROW_IF(! has_histogram_pool(), std::logic_error, "Missing histogram pool !");
     DT_THROW_IF(! grab_histogram_pool().is_initialized(), std::logic_error,
@@ -174,7 +192,10 @@ namespace analysis {
       }
     }
 
-    DT_LOG_DEBUG(_logging, "Exiting.");
+    if (config_.has_key("bank_label")) {
+      set_bank_label(config_.fetch_string("bank_label"));
+    }
+
     return;
   }
 

@@ -65,12 +65,6 @@ namespace analysis {
     /// The main termination method
     virtual void reset();
 
-    /// Smart print
-    virtual void tree_dump(std::ostream &      out_ = std::clog,
-                           const std::string & title_  = "",
-                           const std::string & indent_ = "",
-                           bool                inherit_ = false) const;
-
     /// OCD support
     static void init_ocd(datatools::object_configuration_description & ocd_);
 
@@ -82,9 +76,6 @@ namespace analysis {
     /// Specialized method for plotting 'SD' bank
     void _plot(const mctools::simulated_data & sd_);
 
-  private:
-
-    std::string _SD_label_; //!< Simulated data bank label
   };
 
 }  // end of namespace analysis

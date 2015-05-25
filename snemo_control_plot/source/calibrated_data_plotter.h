@@ -64,12 +64,6 @@ namespace analysis {
     /// The main termination method
     virtual void reset();
 
-    /// Smart print
-    virtual void tree_dump(std::ostream &      out_ = std::clog,
-                           const std::string & title_  = "",
-                           const std::string & indent_ = "",
-                           bool                inherit_ = false) const;
-
     /// OCD support
     static void init_ocd(datatools::object_configuration_description & ocd_);
 
@@ -81,9 +75,6 @@ namespace analysis {
     /// Specialized method for plotting 'CD' bank
     void _plot(const snemo::datamodel::calibrated_data & cd_);
 
-  private:
-
-    std::string _CD_label_; //!< Calibrated data bank label
   };
 
 } // end of namespace analysis
