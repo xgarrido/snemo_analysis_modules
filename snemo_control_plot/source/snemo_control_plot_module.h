@@ -1,9 +1,9 @@
 /* snemo_control_plot_module.h
  * Author(s)     : Xavier Garrido <garrido@lal.in2p3.fr>
  * Creation date : 2013-11-11
- * Last modified : 2013-11-11
+ * Last modified : 2015-05-25
  *
- * Copyright (C) 2012 Xavier Garrido <garrido@lal.in2p3.fr>
+ * Copyright (C) 2013-2015 Xavier Garrido <garrido@lal.in2p3.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@
  *
  */
 
-#ifndef ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_
-#define ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_ 1
+#ifndef SNEMO_ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H
+#define SNEMO_ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H 1
 
 // Data processing module abstract base class
 #include <dpp/base_module.h>
@@ -42,11 +42,18 @@ namespace mygsl {
   class histogram_pool;
 }
 
+namespace snemo {
 namespace analysis {
+
+  // Forward declaration
+  class base_plotter;
 
   class snemo_control_plot_module : public dpp::base_module
   {
   public:
+
+    /// Typedef for the list of plotters type
+    typedef std::vector<snemo::analysis::base_plotter *> plotter_list_type;
 
     /// Setting histogram pool
     void set_histogram_pool(mygsl::histogram_pool & pool_);
@@ -74,29 +81,27 @@ namespace analysis {
   protected:
 
     /// Give default values to specific class members.
-    void _set_defaults ();
-
-    /// Generate plot for the 'simulated_data' bank
-    void _process_simulated_data (const datatools::things & data_record_);
+    void _set_defaults();
 
     /// Generate plot for the 'calibrated_data' bank
-    void _process_calibrated_data (const datatools::things & data_record_);
+    void _process_calibrated_data(const datatools::things & data_record_);
 
     /// Generate plot for the 'tracker_clustering_data' bank
-    void _process_tracker_clustering_data (const datatools::things & data_record_);
+    void _process_tracker_clustering_data(const datatools::things & data_record_);
 
   private:
 
-    // The histogram pool:
-    mygsl::histogram_pool * _histogram_pool_;
+    mygsl::histogram_pool * _histogram_pool_; //!< Histogram pool
+    plotter_list_type _plotters_;             //!< List of plotters
 
     // Macro to automate the registration of the module :
-    DPP_MODULE_REGISTRATION_INTERFACE (snemo_control_plot_module);
+    DPP_MODULE_REGISTRATION_INTERFACE(snemo_control_plot_module);
   };
 
-} // namespace analysis
+} // end of namespace analysis
+} // end of namespace snemo
 
-#endif // ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H_
+#endif // SNEMO_ANALYSIS_SNEMO_CONTROL_PLOT_MODULE_H
 
 // end of snemo_control_plot_module.h
 /*

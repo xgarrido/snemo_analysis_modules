@@ -10,18 +10,30 @@
 
 // Third party:
 // - Bayeux/datatools:
-#include <datatools/properties.h>
-#include <datatools/ioutils.h>
-#include <datatools/object_configuration_description.h>
+#include <bayeux/datatools/properties.h>
+#include <bayeux/datatools/ioutils.h>
+#include <bayeux/datatools/object_configuration_description.h>
+// - Bayeux/mygsl
+#include <bayeux/mygsl/histogram_pool.h>
 
-// #include <datatools/utils.h>
-// #include <datatools/service_manager.h>
-// #include <datatools/exception.h>
-
-// // This project:
-// #include <dpp/module_manager.h>
-
+namespace snemo {
 namespace analysis {
+
+  bool base_plotter::has_histogram_pool() const
+  {
+    return _histogram_pool_ != 0;
+  }
+
+  void base_plotter::set_histogram_pool(mygsl::histogram_pool & pool_)
+  {
+    _histogram_pool_ = &pool_;
+    return;
+  }
+
+  mygsl::histogram_pool & base_plotter::grab_histogram_pool()
+  {
+    return *_histogram_pool_;
+  }
 
   bool base_plotter::is_initialized() const
   {
@@ -97,12 +109,6 @@ namespace analysis {
     return;
   }
 
-  void base_plotter::print(std::ostream & out_) const
-  {
-    this->tree_dump(out_, "Base plotter :");
-    return;
-  }
-
   void base_plotter::tree_dump(std::ostream & out_,
                                const std::string & title_,
                                const std::string & indent_,
@@ -140,7 +146,14 @@ namespace analysis {
 
   void base_plotter::_common_initialize(const datatools::properties & config_)
   {
-    DT_LOG_DEBUG(_logging, "Entering...");
+    DT_THROW_IF (is_initialized(), std::logic_error,
+                 "Plotter '" << get_name() << "' is already initialized ! ");
+
+    DT_THROW_IF(! has_histogram_pool(), std::logic_error, "Missing histogram pool !");
+    DT_THROW_IF(! grab_histogram_pool().is_initialized(), std::logic_error,
+                "Histogram pool is not initialized !");
+
+    // Logging priority:
     datatools::logger::priority p =
       datatools::logger::extract_logging_configuration(config_,
                                                        datatools::logger::PRIO_UNDEFINED,
@@ -203,7 +216,8 @@ namespace analysis {
     return;
   }
 
-}  // end of namespace analysis
+} // end of namespace snemo
+} // end of namespace analysis
 
 // end of base_plotter.cc
 /*

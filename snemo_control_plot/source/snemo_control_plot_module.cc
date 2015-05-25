@@ -25,11 +25,15 @@
 #include <snemo/datamodels/calibrated_data.h>
 #include <snemo/datamodels/tracker_clustering_data.h>
 
+// This project:
+#include <simulated_data_plotter.h>
+
+namespace snemo {
 namespace analysis {
 
   // Registration instantiation macro :
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_control_plot_module,
-                                    "analysis::snemo_control_plot_module");
+                                    "snemo::analysis::snemo_control_plot_module");
 
   // Set the histogram pool used by the module :
   void snemo_control_plot_module::set_histogram_pool(mygsl::histogram_pool & pool_)
@@ -81,20 +85,40 @@ namespace analysis {
       dpp::histogram_service & Histo
         = service_manager_.get<dpp::histogram_service>(histogram_label);
       set_histogram_pool(Histo.grab_pool());
-      if (config_.has_key("Histo_output_files")) {
+      if (config_.has_key("Histo.output_files")) {
         std::vector<std::string> output_files;
-        config_.fetch("Histo_output_files", output_files);
+        config_.fetch("Histo.output_files", output_files);
         for (size_t i = 0; i < output_files.size(); i++) {
           Histo.add_output_file(output_files[i]);
         }
       }
-      if (config_.has_key("Histo_template_files")) {
+      if (config_.has_key("Histo.template_files")) {
         std::vector<std::string> template_files;
-        config_.fetch("Histo_template_files", template_files);
+        config_.fetch("Histo.template_files", template_files);
         for (size_t i = 0; i < template_files.size(); i++) {
           Histo.grab_pool().load(template_files[i]);
         }
       }
+    }
+
+    // Plotters
+    DT_THROW_IF(! config_.has_key("plotters"), std::logic_error, "Missing 'plotters' key !");
+    std::vector<std::string> plotter_names;
+    config_.fetch("plotters", plotter_names);
+    for (std::vector<std::string>::const_iterator iplotter = plotter_names.begin();
+         iplotter != plotter_names.end(); ++iplotter) {
+      const std::string & a_plotter_name = *iplotter;
+
+      if (a_plotter_name == snemo::analysis::simulated_data_plotter::get_id()) {
+        _plotters_.push_back(new snemo::analysis::simulated_data_plotter);
+      } else {
+        DT_THROW_IF(true, std::logic_error, "Unkown '" << a_plotter_name << "' plotter!");
+      }
+      snemo::analysis::base_plotter * a_plotter = _plotters_.back();
+      a_plotter->set_histogram_pool(grab_histogram_pool());
+      datatools::properties a_config;
+      config_.export_and_rename_starting_with(a_config, a_plotter_name + ".", "");
+      a_plotter->initialize(a_config);
     }
 
     // Tag the module as initialized :
@@ -137,7 +161,6 @@ namespace analysis {
                 "Module '" << get_name() << "' is not initialized !");
 
     // Filling the histograms :
-    _process_simulated_data(data_record_);
     _process_calibrated_data(data_record_);
     _process_tracker_clustering_data(data_record_);
 
@@ -145,120 +168,89 @@ namespace analysis {
     return dpp::base_module::PROCESS_SUCCESS;
   }
 
-  void snemo_control_plot_module::_process_simulated_data(const datatools::things & data_record_)
-  {
-    // Check if some 'simulated_data' are available in the data model:
-    const std::string sd_label = snemo::datamodel::data_info::default_simulated_data_label();
-    if (! data_record_.has(sd_label)) {
-      DT_LOG_DEBUG(get_logging_priority(), "Missing simulated data to be processed !");
-      return;
-    }
-    // Grab the 'simulated_data' entry from the data model :
-    const mctools::simulated_data & sd = data_record_.get<mctools::simulated_data>(sd_label);
-
-    DT_LOG_DEBUG (get_logging_priority(), "Simulated data : ");
-    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) sd.tree_dump(std::clog);
-
-    if (_histogram_pool_->has_1d("SD::ngghits")) {
-      mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("SD::ngghits");
-      size_t nggs = 0;
-      if (sd.has_step_hits("gg")) nggs += sd.get_number_of_step_hits("gg");
-      h1d.fill(nggs);
-    }
-
-    if (_histogram_pool_->has_1d("SD::ncalohits")) {
-      mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("SD::ncalohits");
-      size_t ncalos = 0;
-      if (sd.has_step_hits("calo"))  ncalos += sd.get_number_of_step_hits("calo");
-      if (sd.has_step_hits("xcalo")) ncalos += sd.get_number_of_step_hits("xcalo");
-      if (sd.has_step_hits("gveto")) ncalos += sd.get_number_of_step_hits("gveto");
-      h1d.fill(ncalos);
-    }
-    return;
-  }
-
   void snemo_control_plot_module::_process_calibrated_data(const datatools::things & data_record_)
   {
-    // Check if some 'simulated_data' are available in the data model:
-    const std::string cd_label = snemo::datamodel::data_info::default_calibrated_data_label();
-    if (! data_record_.has(cd_label)) {
-      DT_LOG_DEBUG(get_logging_priority(), "Missing calibrated data to be processed !");
-      return;
-    }
-    // Grab the 'simulated_data' entry from the data model :
-    const snemo::datamodel::calibrated_data & cd
-      = data_record_.get<snemo::datamodel::calibrated_data>(cd_label);
+    // // Check if some 'simulated_data' are available in the data model:
+    // const std::string cd_label = snemo::datamodel::data_info::default_calibrated_data_label();
+    // if (! data_record_.has(cd_label)) {
+    //   DT_LOG_DEBUG(get_logging_priority(), "Missing calibrated data to be processed !");
+    //   return;
+    // }
+    // // Grab the 'simulated_data' entry from the data model :
+    // const snemo::datamodel::calibrated_data & cd
+    //   = data_record_.get<snemo::datamodel::calibrated_data>(cd_label);
 
-    DT_LOG_DEBUG(get_logging_priority(), "Calibrated data : ");
-    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) cd.tree_dump(std::clog);
+    // DT_LOG_DEBUG(get_logging_priority(), "Calibrated data : ");
+    // if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) cd.tree_dump(std::clog);
 
-    if (_histogram_pool_->has_1d("CD::ngghits")) {
-      mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::ngghits");
-      size_t nggs = 0;
-      if (cd.has_calibrated_tracker_hits()) nggs += cd.calibrated_tracker_hits().size();
-      h1d.fill(nggs);
-    }
+    // if (_histogram_pool_->has_1d("CD::ngghits")) {
+    //   mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::ngghits");
+    //   size_t nggs = 0;
+    //   if (cd.has_calibrated_tracker_hits()) nggs += cd.calibrated_tracker_hits().size();
+    //   h1d.fill(nggs);
+    // }
 
-    if (_histogram_pool_->has_1d("CD::ncalohits")) {
-      mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::ncalohits");
-      size_t ncalos = 0;
-      if (cd.has_calibrated_calorimeter_hits()) ncalos += cd.calibrated_calorimeter_hits().size();
-      h1d.fill(ncalos);
-    }
+    // if (_histogram_pool_->has_1d("CD::ncalohits")) {
+    //   mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::ncalohits");
+    //   size_t ncalos = 0;
+    //   if (cd.has_calibrated_calorimeter_hits()) ncalos += cd.calibrated_calorimeter_hits().size();
+    //   h1d.fill(ncalos);
+    // }
 
-    if (! cd.has_calibrated_tracker_hits()) return;
-    const snemo::datamodel::calibrated_data::tracker_hit_collection_type gg_hits
-      = cd.calibrated_tracker_hits();
+    // if (! cd.has_calibrated_tracker_hits()) return;
+    // const snemo::datamodel::calibrated_data::tracker_hit_collection_type gg_hits
+    //   = cd.calibrated_tracker_hits();
 
-    BOOST_FOREACH(const snemo::datamodel::calibrated_data::tracker_hit_handle_type & gg_handle, gg_hits) {
-      if (! gg_handle.has_data()) continue;
-      const snemo::datamodel::calibrated_tracker_hit & gg_hit = gg_handle.get();
-      if (_histogram_pool_->has_1d("CD::drift_radius")) {
-        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius");
-        h1d.fill(gg_hit.get_r());
-      }
-      if (_histogram_pool_->has_1d("CD::drift_radius_error")) {
-        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius_error");
-        h1d.fill(gg_hit.get_sigma_r());
-      }
-      if (_histogram_pool_->has_1d("CD::long_position")) {
-        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position");
-        h1d.fill(gg_hit.get_z());
-      }
-      if (_histogram_pool_->has_1d("CD::long_position_error")) {
-        mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position_error");
-        h1d.fill(gg_hit.get_sigma_z());
-      }
-    }
+    // BOOST_FOREACH(const snemo::datamodel::calibrated_data::tracker_hit_handle_type & gg_handle, gg_hits) {
+    //   if (! gg_handle.has_data()) continue;
+    //   const snemo::datamodel::calibrated_tracker_hit & gg_hit = gg_handle.get();
+    //   if (_histogram_pool_->has_1d("CD::drift_radius")) {
+    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius");
+    //     h1d.fill(gg_hit.get_r());
+    //   }
+    //   if (_histogram_pool_->has_1d("CD::drift_radius_error")) {
+    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::drift_radius_error");
+    //     h1d.fill(gg_hit.get_sigma_r());
+    //   }
+    //   if (_histogram_pool_->has_1d("CD::long_position")) {
+    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position");
+    //     h1d.fill(gg_hit.get_z());
+    //   }
+    //   if (_histogram_pool_->has_1d("CD::long_position_error")) {
+    //     mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("CD::long_position_error");
+    //     h1d.fill(gg_hit.get_sigma_z());
+    //   }
+    // }
     return;
   }
 
   void snemo_control_plot_module::_process_tracker_clustering_data(const datatools::things & data_record_)
   {
-    // Check if some 'simulated_data' are available in the data model:
-    const std::string tcd_label = snemo::datamodel::data_info::default_tracker_clustering_data_label();
-    if (! data_record_.has(tcd_label)) {
-      DT_LOG_DEBUG(get_logging_priority(), "Missing tracker clustering data to be processed !");
-      return;
-    }
-    // Grab the 'simulated_data' entry from the data model :
-    const snemo::datamodel::tracker_clustering_data & tcd
-      = data_record_.get<snemo::datamodel::tracker_clustering_data>(tcd_label);
+    // // Check if some 'simulated_data' are available in the data model:
+    // const std::string tcd_label = snemo::datamodel::data_info::default_tracker_clustering_data_label();
+    // if (! data_record_.has(tcd_label)) {
+    //   DT_LOG_DEBUG(get_logging_priority(), "Missing tracker clustering data to be processed !");
+    //   return;
+    // }
+    // // Grab the 'simulated_data' entry from the data model :
+    // const snemo::datamodel::tracker_clustering_data & tcd
+    //   = data_record_.get<snemo::datamodel::tracker_clustering_data>(tcd_label);
 
-    DT_LOG_DEBUG(get_logging_priority(), "Tracker clustering data : ");
-    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) tcd.tree_dump(std::clog);
+    // DT_LOG_DEBUG(get_logging_priority(), "Tracker clustering data : ");
+    // if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) tcd.tree_dump(std::clog);
 
-    if (_histogram_pool_->has_1d("TCD::nclusters")) {
-      mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("TCD::nclusters");
-      size_t nclusters = 0;
-      if (tcd.has_default_solution()) nclusters += tcd.get_default_solution().get_clusters().size();
-      h1d.fill(nclusters);
-    }
+    // if (_histogram_pool_->has_1d("TCD::nclusters")) {
+    //   mygsl::histogram_1d & h1d = _histogram_pool_->grab_1d("TCD::nclusters");
+    //   size_t nclusters = 0;
+    //   if (tcd.has_default_solution()) nclusters += tcd.get_default_solution().get_clusters().size();
+    //   h1d.fill(nclusters);
+    // }
 
     return;
   }
 
-} // namespace analysis
+} // end of namespace analysis
+} // end of namespace snemo
 
 // end of snemo_control_plot_module.cc
 /*

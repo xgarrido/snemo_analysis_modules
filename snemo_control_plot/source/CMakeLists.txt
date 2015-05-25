@@ -19,7 +19,13 @@ find_package(Falaise 1.0.0 REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR} ${Falaise_INCLUDE_DIRS})
 
-add_library(snemo_control_plot SHARED snemo_control_plot_module.h snemo_control_plot_module.cc)
+add_library(snemo_control_plot SHARED
+  snemo_control_plot_module.h
+  snemo_control_plot_module.cc
+  base_plotter.h
+  base_plotter.cc
+  simulated_data_plotter.h
+  simulated_data_plotter.cc)
 
 target_link_libraries(snemo_control_plot ${Falaise_LIBRARIES})
 

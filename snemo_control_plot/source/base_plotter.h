@@ -1,9 +1,9 @@
 /// \file base_plotter.h
 /* Author(s)     : Xavier Garrido <garrido@lal.in2p3.fr>
  * Creation date : 2015-05-24
- * Last modified : 2013-12-13
+ * Last modified : 2015-05-24
  *
- * Copyright (C) 2015 Francois Mauger <mauger@lpccaen.in2p3.fr>
+ * Copyright (C) 2015 Xavier Garrido <garrido@lal.in2p3.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,23 +28,29 @@
  *
  */
 
-#ifndef ANALYSIS_BASE_PLOTTER_H
-#define ANALYSIS_BASE_PLOTTER_H 1
+#ifndef SNEMO_ANALYSIS_BASE_PLOTTER_H
+#define SNEMO_ANALYSIS_BASE_PLOTTER_H 1
 
 // Standard library:
 #include <string>
 
 // Third party:
 // - Bayeux/datatools:
-#include <datatools/i_tree_dump.h>
-#include <datatools/logger.h>
+#include <bayeux/datatools/i_tree_dump.h>
+#include <bayeux/datatools/logger.h>
 
+// Forward declarations
 namespace datatools {
   // Forward class declarations :
   class properties;
   class things;
 }
 
+namespace mygsl {
+  class histogram_pool;
+}
+
+namespace snemo {
 namespace analysis {
 
   /// \brief Base plotter class (abstract interface)
@@ -52,10 +58,19 @@ namespace analysis {
   {
   public:
 
-    /// Default constructor :
-    base_plotter(datatools::logger::priority p = datatools::logger::PRIO_FATAL);
+    /// Check histogram pool existence
+    bool has_histogram_pool() const;
 
-    /// Destructor :
+    /// Set histogram pool pointer
+    void set_histogram_pool(mygsl::histogram_pool & pool_);
+
+    /// Return a mutable reference to histogra pool
+    mygsl::histogram_pool & grab_histogram_pool();
+
+    /// Default constructor
+    base_plotter(datatools::logger::priority p_ = datatools::logger::PRIO_FATAL);
+
+    /// Destructor
     virtual ~base_plotter();
 
     /// Check the plotter name
@@ -74,31 +89,28 @@ namespace analysis {
     const std::string & get_description() const;
 
     /// Set the plotter description
-    void set_description(const std::string & a_description);
+    void set_description(const std::string & description_);
 
     /// Check initialization flag
     bool is_initialized() const;
 
     /// The main initialization method (post-construction):
-    virtual void initialize(const datatools::properties & a_config) = 0;
+    virtual void initialize(const datatools::properties & config_) = 0;
 
     /// The main data model plotting method
-    virtual void plot(datatools::things & a_data_model) = 0;
+    virtual void plot(const datatools::things & data_model_) = 0;
 
     /// The main termination method
     virtual void reset() = 0;
 
     /// Smart print
-    virtual void tree_dump(std::ostream &      a_out = std::clog,
-                           const std::string & a_title  = "",
-                           const std::string & a_indent = "",
-                           bool                a_inherit = false) const;
-
-    /// Default print
-    void print(std::ostream & a_out = std::clog) const;
+    virtual void tree_dump(std::ostream &      out_ = std::clog,
+                           const std::string & title_  = "",
+                           const std::string & indent_ = "",
+                           bool                inherit_ = false) const;
 
     /// Set logging priority
-    void set_logging_priority(datatools::logger::priority p);
+    void set_logging_priority(datatools::logger::priority p_);
 
     /// Returns logging priority
     datatools::logger::priority get_logging_priority() const;
@@ -109,27 +121,31 @@ namespace analysis {
   protected:
 
     /// Set the name of the module
-    void _set_name(const std::string & a_name);
+    void _set_name(const std::string & name_);
 
     /// Set the initialization flag of the module
-    void _set_initialized(bool a_initialized);
+    void _set_initialized(bool initialized_);
 
     /// Basic initialization shared by all inherited modules
-    void _common_initialize(const datatools::properties & a_config);
+    void _common_initialize(const datatools::properties & config_);
 
   protected:
 
-    std::string _name;           //!< The name of the module
-    std::string _description;    //!< The description of the module
+    bool _initialized;                    //!< The initialization flag
     datatools::logger::priority _logging; //!< The logging priority threshold
+    std::string _name;                    //!< The name of the module
+    std::string _description;             //!< The description of the module
 
-    bool        _initialized;    //!< The initialization flag
+  private:
+
+    mygsl::histogram_pool * _histogram_pool_;//!< Histogram pool
 
   };
 
-}  // end of namespace analysis
+} // end of namespace snemo
+} // end of namespace analysis
 
-#endif // ANALYSIS_BASE_PLOTTER_H
+#endif // SNEMO_ANALYSIS_BASE_PLOTTER_H
 
 /*
 ** Local Variables: --
