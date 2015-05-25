@@ -1,4 +1,4 @@
-#+TITLE:  SN@ilWare Simulation Modules
+#+TITLE:  SN@ilWare Analysis Modules
 #+AUTHOR: Xavier Garrido
 #+DATE:   2014-05-23
 #+OPTIONS: ^:{} num:nil
@@ -74,7 +74,7 @@ automatically build the list of module files. Services are declared in section
 the concept behind modules/services see [[http://nile.hep.utexas.edu/cgi-bin/DocDB/ut-nemo/private/ShowDocument?docid=1889][these mandatory presentations]] given by
 F. Mauger.
 
-The =@SNEMO_SIMULATION_MODULES_DIR@= corresponds to the directory where
+The =@SNEMO_ANALYSIS_MODULES_DIR@= corresponds to the directory where
 configuration files are going to be stored. This variable which varies from one
 installation to the other, is automatically change when the tangle process
 occurs. This is done /via/ the =Makefile= which parse and replace this variable.
@@ -103,7 +103,7 @@ service files.
 #+BEGIN_SRC sh
   #@description The configuration file of the embedded service manager
   service_manager.configuration : string[1] as path = \
-      "@SNEMO_SIMULATION_MODULES_DIR@/service_manager.conf"
+      "@SNEMO_ANALYSIS_MODULES_DIR@/service_manager.conf"
 #+END_SRC
 
 *** Configuration files for modules
@@ -134,7 +134,7 @@ service files.
 #+BEGIN_SRC sh
   #@description The list of files that describe services
   services.configuration_files : string[1] as path = \
-      "@SNEMO_SIMULATION_MODULES_DIR@/services.conf"
+      "@SNEMO_ANALYSIS_MODULES_DIR@/services.conf"
 #+END_SRC
 
 ** DLL loader
@@ -336,7 +336,7 @@ directory and output file name in [[file:snemo_bb0nu_studies/README.org::*Histog
   echo "${prefix} : string[${#files[@]}] as path = \\"
   for file in ${files[@]}
   do
-      echo -n "    \"@SNEMO_SIMULATION_MODULES_DIR@/${file/config\//}\""
+      echo -n "    \"@SNEMO_ANALYSIS_MODULES_DIR@/${file/config\//}\""
       if [ $file != ${files[${#files[@]}-1]} ]; then echo ' \'; fi
   done
 #+END_SRC
