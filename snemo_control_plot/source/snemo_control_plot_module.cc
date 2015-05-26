@@ -24,6 +24,7 @@
 #include <simulated_data_plotter.h>
 #include <calibrated_data_plotter.h>
 #include <tracker_clustering_data_plotter.h>
+#include <tracker_trajectory_data_plotter.h>
 
 namespace snemo {
 namespace analysis {
@@ -83,15 +84,15 @@ namespace analysis {
       if (config_.has_key("Histo.output_files")) {
         std::vector<std::string> output_files;
         config_.fetch("Histo.output_files", output_files);
-        for (size_t i = 0; i < output_files.size(); i++) {
-          Histo.add_output_file(output_files[i]);
+        for (auto a_file : output_files) {
+          Histo.add_output_file(a_file);
         }
       }
       if (config_.has_key("Histo.template_files")) {
         std::vector<std::string> template_files;
         config_.fetch("Histo.template_files", template_files);
-        for (size_t i = 0; i < template_files.size(); i++) {
-          Histo.grab_pool().load(template_files[i]);
+        for (auto a_file : template_files) {
+          Histo.grab_pool().load(a_file);
         }
       }
     }
@@ -100,16 +101,15 @@ namespace analysis {
     DT_THROW_IF(! config_.has_key("plotters"), std::logic_error, "Missing 'plotters' key !");
     std::vector<std::string> plotter_names;
     config_.fetch("plotters", plotter_names);
-    for (std::vector<std::string>::const_iterator iplotter = plotter_names.begin();
-         iplotter != plotter_names.end(); ++iplotter) {
-      const std::string & a_plotter_name = *iplotter;
-
+    for (auto a_plotter_name : plotter_names) {
       if (a_plotter_name == snemo::analysis::simulated_data_plotter::get_id()) {
         _plotters_.push_back(new snemo::analysis::simulated_data_plotter);
       } else if (a_plotter_name == snemo::analysis::calibrated_data_plotter::get_id()) {
         _plotters_.push_back(new snemo::analysis::calibrated_data_plotter);
       } else if (a_plotter_name == snemo::analysis::tracker_clustering_data_plotter::get_id()) {
         _plotters_.push_back(new snemo::analysis::tracker_clustering_data_plotter);
+      } else if (a_plotter_name == snemo::analysis::tracker_trajectory_data_plotter::get_id()) {
+        _plotters_.push_back(new snemo::analysis::tracker_trajectory_data_plotter);
       } else {
         DT_THROW_IF(true, std::logic_error, "Unkown '" << a_plotter_name << "' plotter!");
       }

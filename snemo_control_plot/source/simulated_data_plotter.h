@@ -1,7 +1,7 @@
 /// \file simulated_data_plotter.h
 /* Author(s)     : Xavier Garrido <garrido@lal.in2p3.fr>
  * Creation date : 2015-05-25
- * Last modified : 2013-12-13
+ * Last modified : 2015-05-25
  *
  * Copyright (C) 2015 Xavier Garrido <garrido@lal.in2p3.fr>
  *

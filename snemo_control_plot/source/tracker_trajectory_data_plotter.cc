@@ -19,6 +19,7 @@
 // - Falaise
 #include <falaise/snemo/datamodels/data_model.h>
 #include <falaise/snemo/datamodels/tracker_trajectory_data.h>
+#include <falaise/snemo/datamodels/helix_trajectory_pattern.h>
 
 namespace snemo {
 namespace analysis {
@@ -87,6 +88,28 @@ namespace analysis {
   {
     DT_LOG_DEBUG (get_logging_priority(), "Tracker trajectory data : ");
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) ttd_.tree_dump(std::clog);
+
+    if (! ttd_.has_default_solution()) return;
+    auto a_default_solution = ttd_.get_default_solution();
+    if (! a_default_solution.has_trajectories()) return;
+    auto trajectories = a_default_solution.get_trajectories();
+    for (auto itrajectory : trajectories) {
+      auto a_trajectory = itrajectory.get();
+      auto a_auxiliaries = a_trajectory.get_auxiliaries();
+      if (! a_auxiliaries.has_flag("default")) continue;
+      auto a_pattern_id = a_trajectory.get_pattern().get_pattern_id();
+      if (a_pattern_id != snemo::datamodel::helix_trajectory_pattern::pattern_id())
+        continue;
+      auto a_helix_pattern
+        = dynamic_cast<const snemo::datamodel::helix_trajectory_pattern&>(a_trajectory.get_pattern());
+      auto a_helix = a_helix_pattern.get_helix();
+      mygsl::histogram_pool & a_pool = grab_histogram_pool();
+      if (a_pool.has_1d("TTD::helix_radius")) {
+        mygsl::histogram_1d & h1d = a_pool.grab_1d("TTD::helix_radius");
+        h1d.fill(a_helix.get_radius());
+      }
+    }
+
 
     return;
   }
