@@ -14,6 +14,9 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "in-source build detected")
 endif()
 
+# Use C++11
+set(CMAKE_CXX_FLAGS "-std=c++11 -W -Wall")
+
 # - Third party
 find_package(Falaise 1.0.0 REQUIRED)
 
