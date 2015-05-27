@@ -34,9 +34,13 @@ add_library(snemo_control_plot SHARED
   tracker_clustering_data_plotter.h
   tracker_clustering_data_plotter.cc
   tracker_trajectory_data_plotter.h
-  tracker_trajectory_data_plotter.cc)
+  tracker_trajectory_data_plotter.cc
+  topology_data_plotter.h
+  topology_data_plotter.cc)
 
-target_link_libraries(snemo_control_plot ${Falaise_LIBRARIES})
+set(Falaise_PID_DIR "${Falaise_INCLUDE_DIR}/../lib64/Falaise/modules")
+set(Falaise_PID_LIBRARY "${Falaise_PID_DIR}/libFalaise_ParticleIdentification.so")
+target_link_libraries(snemo_control_plot ${Falaise_LIBRARIES} ${Falaise_PID_LIBRARY})
 
 install(FILES
   ${PROJECT_BINARY_DIR}/libsnemo_control_plot${CMAKE_SHARED_LIBRARY_SUFFIX}
