@@ -146,7 +146,7 @@ namespace analysis {
          << datatools::logger::get_priority_label(_logging) << "'" << std::endl;
     out_ << indent << datatools::i_tree_dumpable::tag
          << "Plotter initialized : " << is_initialized() << std::endl;
-    out_ << indent << datatools::i_tree_dumpable::tag
+    out_ << indent << datatools::i_tree_dumpable::inherit_tag(inherit_)
          << "Bank label name : " << get_bank_label() << std::endl;
     return;
   }
