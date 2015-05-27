@@ -80,12 +80,18 @@ boundaries and x-binning.
 
 *** Plotter declarations
 #+BEGIN_SRC shell
-  plotters : string[3] = "SDP" "CDP" "TCDP"
+  plotters : string[4] = "SDP" "CDP" "TCDP" "TTDP"
 #+END_SRC
 **** Simulated data plotter
 #+BEGIN_SRC shell
   #@description Logging flag
-  SDP.logging.priority : string = "trace"
+  SDP.logging.priority : string = "error"
+#+END_SRC
+
+**** Tracker trajectory data plotter
+#+BEGIN_SRC shell
+  #@description Logging flag
+  TTDP.logging.priority : string = "error"
 #+END_SRC
 
 ** Histogram declarations
@@ -398,4 +404,36 @@ histograms all belong to the =__template= group.
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
-  #+END_SRC
+#+END_SRC
+*** Tracker trajectory data bank histograms
+#+BEGIN_SRC shell
+  [name="TTD::helix_radius" type="mygsl::histogram_1d"]
+  #@config The histogram of the helix radius
+
+  #@description The group of the histogram (optional)
+  group : string = "TTD::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "mm"
+
+  #@description The lower bound of the histogram
+  min : real as length = 0.0 mm
+
+  #@description The upper bound of the histogram
+  max : real as length = 2 m
+
+  #@description The X axis label
+  display.xaxis.label : string = "r_{helix}"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
