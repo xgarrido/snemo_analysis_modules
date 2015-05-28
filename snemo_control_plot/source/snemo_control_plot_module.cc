@@ -25,6 +25,7 @@
 #include <calibrated_data_plotter.h>
 #include <tracker_clustering_data_plotter.h>
 #include <tracker_trajectory_data_plotter.h>
+#include <topology_data_plotter.h>
 
 namespace snemo {
 namespace analysis {
@@ -57,7 +58,7 @@ namespace analysis {
   // Initialization :
   void snemo_control_plot_module::initialize(const datatools::properties  & config_,
                                              datatools::service_manager   & service_manager_,
-                                             dpp::module_handle_dict_type & module_dict_)
+                                             dpp::module_handle_dict_type & /*module_dict_*/)
   {
     DT_THROW_IF(is_initialized(),
                 std::logic_error,
@@ -110,6 +111,8 @@ namespace analysis {
         _plotters_.push_back(new snemo::analysis::tracker_clustering_data_plotter);
       } else if (a_plotter_name == snemo::analysis::tracker_trajectory_data_plotter::get_id()) {
         _plotters_.push_back(new snemo::analysis::tracker_trajectory_data_plotter);
+      } else if (a_plotter_name == snemo::analysis::topology_data_plotter::get_id()) {
+        _plotters_.push_back(new snemo::analysis::topology_data_plotter);
       } else {
         DT_THROW_IF(true, std::logic_error, "Unkown '" << a_plotter_name << "' plotter!");
       }

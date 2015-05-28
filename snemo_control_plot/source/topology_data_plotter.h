@@ -75,6 +75,14 @@ namespace analysis {
     /// Specialized method for plotting 'TD' bank
     void _plot(const snemo::datamodel::topology_data & td_);
 
+  private:
+
+    /// Dedicated plot method for '1e1a' topology pattern
+    void _plot_1e1a_(const snemo::datamodel::topology_data & td_);
+
+    /// Dedicated plot method for '2e' topology pattern
+    void _plot_2e_(const snemo::datamodel::topology_data & td_);
+
   };
 
 }  // end of namespace analysis

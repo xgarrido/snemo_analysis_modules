@@ -80,7 +80,7 @@ boundaries and x-binning.
 
 *** Plotter declarations
 #+BEGIN_SRC shell
-  plotters : string[4] = "SDP" "CDP" "TCDP" "TTDP"
+  plotters : string[5] = "SDP" "CDP" "TCDP" "TTDP" "TDP"
 #+END_SRC
 **** Simulated data plotter
 #+BEGIN_SRC shell
@@ -239,7 +239,7 @@ histograms all belong to the =__template= group.
   max : real = 9.5
 
   #@description The X axis label
-  display.xaxis.label : string = "N_{calib.}(calorimeter)"
+  display.xaxis.label : string = "N^{calib.}_{calorimeter}"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -406,6 +406,7 @@ histograms all belong to the =__template= group.
   display.yaxis.label : string = "Counts"
 #+END_SRC
 *** Tracker trajectory data bank histograms
+**** Helix radius
 #+BEGIN_SRC shell
   [name="TTD::helix_radius" type="mygsl::histogram_1d"]
   #@config The histogram of the helix radius
@@ -433,6 +434,269 @@ histograms all belong to the =__template= group.
 
   #@description The X axis label
   display.xaxis.label : string = "r_{helix}"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+*** Topology data bank histograms
+**** 1e1\alpha plots
+***** Electron energy
+#+BEGIN_SRC shell
+  [name="TD::1e1a::electron_energy" type="mygsl::histogram_1d"]
+  #@config The histogram of the electron energy for 1e1a topology
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::1e1a::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "keV"
+
+  #@description The lower bound of the histogram
+  min : real as energy = 0.0 keV
+
+  #@description The upper bound of the histogram
+  max : real as energy = 4.0 MeV
+
+  #@description The X axis label
+  display.xaxis.label : string = "electron energy"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+
+***** Electron track length
+#+BEGIN_SRC shell
+  [name="TD::1e1a::electron_track_length" type="mygsl::histogram_1d"]
+  #@config The histogram of the electron track length
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::1e1a::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "mm"
+
+  #@description The lower bound of the histogram
+  min : real as length = 0.0 mm
+
+  #@description The upper bound of the histogram
+  max : real as length = 3 m
+
+  #@description The X axis label
+  display.xaxis.label : string = "electron track length"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+
+***** Alpha delayed time
+#+BEGIN_SRC shell
+  [name="TD::1e1a::alpha_delayed_time" type="mygsl::histogram_1d"]
+  #@config The histogram of the alpha delayed time
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::1e1a::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "us"
+
+  #@description The lower bound of the histogram
+  min : real as time = 0.0 us
+
+  #@description The upper bound of the histogram
+  max : real as time = 1 ms
+
+  #@description The X axis label
+  display.xaxis.label : string = "#alpha delay time"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+
+***** Alpha track length
+#+BEGIN_SRC shell
+  [name="TD::1e1a::alpha_track_length" type="mygsl::histogram_1d"]
+  #@config The histogram of the alpha track length
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::1e1a::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "mm"
+
+  #@description The lower bound of the histogram
+  min : real as length = 0.0 mm
+
+  #@description The upper bound of the histogram
+  max : real as length = 400 mm
+
+  #@description The X axis label
+  display.xaxis.label : string = "#alpha track length"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+**** 2e plots
+***** Minimal electron energy
+#+BEGIN_SRC shell
+  [name="TD::2e::minimal_energy" type="mygsl::histogram_1d"]
+  #@config The histogram of the minimal energy for 2e topology
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::2e::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "keV"
+
+  #@description The lower bound of the histogram
+  min : real as energy = 0.0 keV
+
+  #@description The upper bound of the histogram
+  max : real as energy = 4.0 MeV
+
+  #@description The X axis label
+  display.xaxis.label : string = "electron minimal energy"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+***** Maximal electron energy
+#+BEGIN_SRC shell
+  [name="TD::2e::maximal_energy" type="mygsl::histogram_1d"]
+  #@config The histogram of the maximal energy for 2e topology
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::2e::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "keV"
+
+  #@description The lower bound of the histogram
+  min : real as energy = 0.0 keV
+
+  #@description The upper bound of the histogram
+  max : real as energy = 4.0 MeV
+
+  #@description The X axis label
+  display.xaxis.label : string = "electron maximal energy"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+
+***** Total electron energy
+#+BEGIN_SRC shell
+  [name="TD::2e::total_energy" type="mygsl::histogram_1d"]
+  #@config The histogram of the total energy for 2e topology
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::2e::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "keV"
+
+  #@description The lower bound of the histogram
+  min : real as energy = 0.0 keV
+
+  #@description The upper bound of the histogram
+  max : real as energy = 4.0 MeV
+
+  #@description The X axis label
+  display.xaxis.label : string = "electron total energy"
+
+  #@description The Y axis label
+  display.yaxis.label : string = "Counts"
+#+END_SRC
+***** Angle between electrons
+#+BEGIN_SRC shell
+  [name="TD::2e::angle" type="mygsl::histogram_1d"]
+  #@config The histogram of the angle between electrons for 2e topology
+
+  #@description The group of the histogram (optional)
+  group : string = "TD::2e::histos"
+
+  #@description The build mode (default : "regular", "table", "mimic");
+  mode : string = "regular"
+
+  #@description The linear mode (default)
+  linear : boolean = 1
+
+  #@description The number of bins
+  number_of_bins : integer = 100
+
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "degree"
+
+  #@description The lower bound of the histogram
+  min : real as angle = 0.0 degree
+
+  #@description The upper bound of the histogram
+  max : real as angle = 180 degree
+
+  #@description The X axis label
+  display.xaxis.label : string = "#theta angle"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
