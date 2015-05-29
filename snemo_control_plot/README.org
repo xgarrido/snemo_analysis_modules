@@ -53,7 +53,7 @@ The module name to be used when processing a file is =scp_module=.
 #+END_SRC
 
 *** Histogram service label
-Set the same histogram service label as defined [[Histogram service][here]]
+Set the same histogram service label as defined [[Histogram declarations][here]]
 #+BEGIN_SRC shell
   #@description The Histogram Service label
   Histo_label : string = "Histo"

@@ -15,7 +15,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # Use C++11
-set(CMAKE_CXX_FLAGS "-std=c++11 -W -Wall")
+set(CMAKE_CXX_FLAGS "-W -Wall -std=c++11")
 
 # - Third party
 find_package(Falaise 1.0.0 REQUIRED)
