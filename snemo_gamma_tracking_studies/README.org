@@ -1,4 +1,4 @@
-#+TITLE:  SuperNEMO control plot module
+#+TITLE:  SuperNEMO \gamma tracking studies
 #+AUTHOR: Xavier Garrido
 #+DATE:   2014-05-23
 #+OPTIONS: ^:{} num:nil toc:nil
