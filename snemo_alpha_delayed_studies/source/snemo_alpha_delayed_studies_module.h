@@ -56,6 +56,9 @@ namespace analysis {
     /// Typedef for a list of alpha tracks
     typedef std::vector<alpha_track_parameters> alpha_list_type;
 
+    /// Check histogram pool existence
+    bool has_histogram_pool() const;
+
     /// Setting histogram pool
     void set_histogram_pool(mygsl::histogram_pool & pool_);
 
@@ -85,8 +88,14 @@ namespace analysis {
     void _set_defaults();
 
     /// Get alphas simulated parameters from 'simulated_data' bank
-    dpp::base_module::process_status _process_simulated_alphas(const datatools::things & data_,
-                                                               alpha_list_type & alphas_);
+    void _process_simulated_alphas(const datatools::things & data_, alpha_list_type & alphas_);
+
+    /// Get alphas reconstructed parameters from 'topology_data' bank
+    void _process_reconstructed_alphas(const datatools::things & data_, alpha_list_type & alphas_);
+
+    /// Compare alpha track length
+    void _compare_track_length(const alpha_list_type & sim_alphas_,
+                               const alpha_list_type & rec_alphas_);
 
   private:
 

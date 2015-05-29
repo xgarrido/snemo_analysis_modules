@@ -14,7 +14,9 @@ include_directories(${PROJECT_SOURCE_DIR} ${Falaise_INCLUDE_DIRS})
 add_library(snemo_alpha_delayed_studies SHARED
   snemo_alpha_delayed_studies_module.h snemo_alpha_delayed_studies_module.cc)
 
-target_link_libraries(snemo_alpha_delayed_studies ${Falaise_LIBRARIES})
+set(Falaise_PID_DIR "${Falaise_INCLUDE_DIR}/../lib64/Falaise/modules")
+set(Falaise_PID_LIBRARY "${Falaise_PID_DIR}/libFalaise_ParticleIdentification.so")
+target_link_libraries(snemo_alpha_delayed_studies ${Falaise_LIBRARIES} ${Falaise_PID_LIBRARY})
 
 install(FILES
   ${PROJECT_BINARY_DIR}/libsnemo_alpha_delayed_studies${CMAKE_SHARED_LIBRARY_SUFFIX}
