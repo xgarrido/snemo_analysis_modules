@@ -1,0 +1,50 @@
+#+TITLE:  SuperNEMO \alpha delayed tracks studies
+#+AUTHOR: Xavier Garrido
+#+DATE:   2015-05-29
+#+OPTIONS: ^:{} num:nil toc:nil
+#+STARTUP: entitiespretty
+
+This repository holds a SN@ilWare configuration to study \alpha delayed tracks such
+as comparison between the reconstructed track length and the simulated particle
+path.
+
+The current version is hosted at
+[[https://github.com/xgarrido/snemo_simulation_modules/snemo_alpha_delayed_studies]]
+under =git= version control.
+
+The code itself is implemented in the =source= directory which holds the
+=snemo_alpha_delayed_studies_module.*= source code as well as a =CMakeLists.txt=
+file in order to compile, build and install the module following =cmake= rules.
+
+* Module declaration
+
+The next item holds the configuration of the module. The second item is related
+to histogram declarations.
+
+** Module declaration
+:PROPERTIES:
+:MKDIRP: yes
+:TANGLE: ../config/snemo_alpha_delayed_studies_module.conf
+:END:
+
+The module name to be used when processing a file is
+=alpha_delayed_studies_module=.
+
+*** File preamble
+#+BEGIN_SRC sh
+  #@description A sample list of setups
+  #@key_label   "name"
+  #@meta_label  "type"
+#+END_SRC
+*** Declaration & description
+#+BEGIN_SRC sh
+  [name="alpha_delayed_studies_module" type="snemo::analysis::snemo_alpha_delayed_studies_module"]
+
+  #@description A SuperNEMO module to evaluate alpha delayed reconstruction efficiency
+#+END_SRC
+
+*** Logging priority
+#+BEGIN_SRC sh
+  #@description Logging priority
+  logging.priority : string = "debug"
+#+END_SRC
