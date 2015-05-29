@@ -140,6 +140,8 @@ namespace analysis {
         return status;
       }
     }
+    DT_LOG_DEBUG(get_logging_priority(), "Number of primary simulated alphas = " << simulated_alphas.size());
+    DT_LOG_DEBUG(get_logging_priority(), "Particle path length = " << simulated_alphas.back().length/CLHEP::mm << " mm");
     // gamma_dict_type reconstructed_gammas;
     // {
     //   const process_status status = _process_reconstructed_gammas(data_record_, reconstructed_gammas);
@@ -167,65 +169,43 @@ namespace analysis {
     // Get the 'simulated_data' entry from the data model :
     const mctools::simulated_data & sd = data_record_.get<mctools::simulated_data>(sd_label);
 
-  //   DT_LOG_DEBUG(get_logging_priority(), "Simulated data : ");
-  //   if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) sd.tree_dump();
+    DT_LOG_DEBUG(get_logging_priority(), "Simulated data : ");
+    if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) sd.tree_dump();
 
-  //   // // Get total number of gammas simulated
-  //   // for (auto i : sd.get_primary_event().get_particles()) {
-  //   //   if (i.is_gamma()) _efficiency_.ngamma++;
-  //   // }
+    // Fetch simulated step hits
+    const std::string hit_label = "__visu.tracks";
+    if (! sd.has_step_hits(hit_label)) return dpp::base_module::PROCESS_STOP;
+    const mctools::simulated_data::hit_handle_collection_type & hit_collection
+      = sd.get_step_hits(hit_label);
+    if (hit_collection.empty()) {
+      DT_LOG_DEBUG(get_logging_priority(), "No simulated step hits");
+      return dpp::base_module::PROCESS_STOP;
+    }
 
-  //   // Check if some 'calibrated_data' are available in the data model:
-  //   const std::string cd_label = snemo::datamodel::data_info::default_calibrated_data_label();
-  //   if (! data_record_.has(cd_label)) {
-  //     DT_LOG_ERROR(get_logging_priority(), "Missing calibrated data to be processed !");
-  //     return dpp::base_module::PROCESS_ERROR;
-  //   }
-  //   // Get the 'calibrated_data' entry from the data model :
-  //   const snemo::datamodel::calibrated_data & cd
-  //     = data_record_.get<snemo::datamodel::calibrated_data>(cd_label);
+    std::set<int> track_id_list;
+    for (auto ihit : hit_collection) {
+      const mctools::base_step_hit & a_hit = ihit.get();
 
-  //   DT_LOG_DEBUG(get_logging_priority(), "Calibrated data : ");
-  //   if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) cd.tree_dump();
+      // Check if step comes from alpha particle
+      const std::string a_label = a_hit.get_particle_name();
+      if (a_label != "alpha") continue;
 
-  //   // Stop proccess if no calibrated calorimeters
-  //   if (! cd.has_calibrated_calorimeter_hits()) return dpp::base_module::PROCESS_STOP;
-  //   const snemo::datamodel::calibrated_data::calorimeter_hit_collection_type & cch
-  //     = cd.calibrated_calorimeter_hits();
+      // Check also if the alpha is a primary particle
+      if (! a_hit.is_primary_particle()) continue;
 
-  //   // Fetch simulated step hits from calorimeter blocks
-  //   const std::string hit_label = "__visu.tracks.calo";
-  //   if (! sd.has_step_hits(hit_label)) return dpp::base_module::PROCESS_STOP;
-  //   const mctools::simulated_data::hit_handle_collection_type & hit_collection
-  //     = sd.get_step_hits(hit_label);
-  //   if (hit_collection.empty()) {
-  //     DT_LOG_DEBUG(get_logging_priority(), "No simulated calorimeter hits");
-  //     return dpp::base_module::PROCESS_STOP;
-  //   }
-
-  //   for (auto ihit : hit_collection) {
-  //     const mctools::base_step_hit & a_hit = ihit.get();
-  //     const datatools::properties & a_aux = a_hit.get_auxiliaries();
-
-  //     int track_id = -1;
-  //     if (a_aux.has_key(mctools::track_utils::TRACK_ID_KEY)) {
-  //       track_id = a_aux.fetch_integer(mctools::track_utils::TRACK_ID_KEY);
-  //     }
-  //     if (a_aux.has_key(mctools::track_utils::PARENT_TRACK_ID_KEY)) {
-  //       track_id = a_aux.fetch_integer(mctools::track_utils::PARENT_TRACK_ID_KEY);
-  //     }
-  //     DT_THROW_IF(track_id == -1, std::logic_error, "Missing primary track id !");
-  //     if (track_id == 0) continue; // Primary particles
-
-  //     // Check if calorimeter has been calibrated
-  //     const geomtools::geom_id & gid = a_hit.get_geom_id();
-  //     if (std::find_if(cch.begin(), cch.end(), [gid] (auto hit_) {
-  //           return gid == hit_.get().get_geom_id();
-  //         }) == cch.end()) continue;
-
-
-  //     simulated_gammas_[track_id].insert(gid);
-  //   }
+      // Finally check track id
+      if (! a_hit.has_track_id()) {
+        DT_LOG_WARNING(get_logging_priority(), "Missing track id !");
+        continue;
+      }
+      if (! track_id_list.count(a_hit.get_track_id())) {
+        track_id_list.insert(a_hit.get_track_id());
+        alpha_track_parameters dummy;
+        simulated_alphas_.push_back(dummy);
+      }
+      alpha_track_parameters & alpha = simulated_alphas_.back();
+      alpha.length += (a_hit.get_position_stop() - a_hit.get_position_start()).mag();
+    }
 
     return dpp::base_module::PROCESS_OK;
   }
