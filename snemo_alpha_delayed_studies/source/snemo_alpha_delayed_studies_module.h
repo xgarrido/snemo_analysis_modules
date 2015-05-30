@@ -51,6 +51,7 @@ namespace analysis {
     /// Special structure to store and to compare alpha tracks
     struct alpha_track_parameters {
       double length;
+      int nggs;
     };
 
     /// Typedef for a list of alpha tracks
@@ -99,7 +100,9 @@ namespace analysis {
 
   private:
 
-    mygsl::histogram_pool * _histogram_pool_; //!< Histogram pool
+    mygsl::histogram_pool * _histogram_pool_;  //!< Histogram pool
+
+    std::vector<int> _selected_geiger_range_; //!< Selection of alpha track with given geiger number
 
     // Macro to automate the registration of the module :
     DPP_MODULE_REGISTRATION_INTERFACE(snemo_alpha_delayed_studies_module);

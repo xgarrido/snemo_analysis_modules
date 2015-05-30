@@ -47,7 +47,7 @@ The module name to be used when processing a file is
 *** Logging priority
 #+BEGIN_SRC sh
   #@description Logging priority
-  logging.priority : string = "debug"
+  logging.priority : string = "warning"
 #+END_SRC
 
 *** Histogram service label
@@ -74,6 +74,13 @@ individual histogram.
   Histo.template_files : string[1] as path = \
       "@SNEMO_ANALYSIS_MODULES_DIR@/snemo_alpha_delayed_studies_histogram_templates.conf"
 #+END_SRC
+
+*** Plot for different number of Geiger cells
+#+BEGIN_SRC shell
+  #@description Number of Geiger cells associated to alpha tracks
+  select_geiger_range : integer[4] = 1 2 3 4
+#+END_SRC
+
 ** Histogram declarations
 :PROPERTIES:
 :MKDIRP: yes
@@ -92,11 +99,11 @@ section.
 
 *** \alpha delayed track length distribution
 #+BEGIN_SRC shell
-  [name="1e1a::delta_track_length" type="mygsl::histogram_1d"]
+  [name="1e1a::delta_template" type="mygsl::histogram_1d"]
   #@config The histogram of the relative difference between rec./sim. alpha track length
 
   #@description The group of the histogram (optional)
-  group : string = "1e1a::histos"
+  group : string = "__template"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -107,14 +114,17 @@ section.
   #@description The number of bins
   number_of_bins : integer = 50
 
+  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
+  unit : string = "%"
+
   #@description The lower bound of the histogram
-  min : real = -1.0
+  min : real as fraction = -100 %
 
   #@description The upper bound of the histogram
-  max : real = +1.0
+  max : real as fraction = +100 %
 
   #@description The X axis label
-  display.xaxis.label : string = "#ell"
+  display.xaxis.label : string = "#alpha track length relative bias"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"

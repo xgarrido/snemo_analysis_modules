@@ -20,6 +20,7 @@
 #include <mctools/simulated_data.h>
 
 // - Falaise
+#include <snemo/datamodels/pid_utils.h>
 #include <snemo/datamodels/data_model.h>
 #include <snemo/datamodels/particle_track_data.h>
 #include <snemo/datamodels/topology_data.h>
@@ -102,6 +103,10 @@ namespace analysis {
     }
     DT_THROW_IF(! has_histogram_pool(), std::logic_error, "No histogram pool has been instantiated !");
 
+    if (config_.has_key("select_geiger_range")) {
+      config_.fetch("select_geiger_range", _selected_geiger_range_);
+    }
+
     // Tag the module as initialized :
     _set_initialized(true);
     return;
@@ -143,8 +148,6 @@ namespace analysis {
 
     alpha_list_type simulated_alphas;
     this->_process_simulated_alphas(data_record_, simulated_alphas);
-    DT_LOG_DEBUG(get_logging_priority(), "Number of primary simulated alphas = " << simulated_alphas.size());
-    DT_LOG_DEBUG(get_logging_priority(), "Particle path length = " << simulated_alphas.back().length/CLHEP::mm << " mm");
 
     alpha_list_type reconstructed_alphas;
     this->_process_reconstructed_alphas(data_record_, reconstructed_alphas);
@@ -217,7 +220,6 @@ namespace analysis {
       DT_LOG_ERROR(get_logging_priority(), "Missing topology data to be processed !");
       return;
     }
-    // Get the 'topology_data' entry from the data model :
     const snemo::datamodel::topology_data & td
       = data_record_.get<snemo::datamodel::topology_data>(td_label);
 
@@ -233,10 +235,34 @@ namespace analysis {
     }
     const snemo::datamodel::topology_1e1a_pattern & a_1e1a_pattern =
       dynamic_cast<const snemo::datamodel::topology_1e1a_pattern &>(a_pattern);
-    alpha_track_parameters alpha;
+    alpha_track_parameters alpha = {0, 0};
     alpha.length = a_1e1a_pattern.get_alpha_track_length();
-    reconstructed_alphas_.push_back(alpha);
 
+    // Store the number of geiger cells associated to alpha track
+    if (! _selected_geiger_range_.empty()) {
+      const std::string ptd_label = snemo::datamodel::data_info::default_particle_track_data_label();
+      if (! data_record_.has(ptd_label)) {
+        DT_LOG_DEBUG(get_logging_priority(), "Missing particle track data to select alpha's cluster size !");
+        return;
+      }
+      const snemo::datamodel::particle_track_data & ptd
+        = data_record_.get<snemo::datamodel::particle_track_data>(ptd_label);
+      snemo::datamodel::particle_track_data::particle_collection_type alphas;
+      const size_t nalphas
+        = snemo::datamodel::pid_utils::fetch_particles(ptd, alphas,
+                                                       snemo::datamodel::pid_utils::alpha_label());
+      if (nalphas != 1) {
+        DT_LOG_DEBUG(get_logging_priority(), "Something nasty has occured !");
+        return;
+      }
+      const snemo::datamodel::particle_track & a_alpha = alphas.front().get();
+      if (! a_alpha.has_trajectory()) return;
+      if (! a_alpha.get_trajectory().has_cluster()) return;
+      alpha.nggs = a_alpha.get_trajectory().get_cluster().get_number_of_hits();
+    }
+
+    // Finally push new alpha parameters
+    reconstructed_alphas_.push_back(alpha);
     return;
   }
 
@@ -248,12 +274,32 @@ namespace analysis {
       return;
     }
 
-    mygsl::histogram_pool & a_pool = grab_histogram_pool();
-    if (a_pool.has_1d("1e1a::delta_track_length")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d("1e1a::delta_track_length");
-      const double ratio = rec_alphas_.front().length/sim_alphas_.front().length;
-      h1d.fill(1.0 - ratio);
+    const alpha_track_parameters & a_sim_alpha = sim_alphas_.front();
+    const alpha_track_parameters & a_rec_alpha = rec_alphas_.front();
+
+    std::ostringstream key;
+    key << "1e1a::delta_track_length";
+    if (a_rec_alpha.nggs != 0 && ! _selected_geiger_range_.empty()) {
+      for (auto i : _selected_geiger_range_) {
+        if (a_rec_alpha.nggs <= i) {
+          key << "_<=" << i << "gg";
+          break;
+        } else if (i == _selected_geiger_range_.back()) {
+          key << "_>" << i << "gg";
+        }
+      }
     }
+    mygsl::histogram_pool & a_pool = grab_histogram_pool();
+    if (! a_pool.has_1d(key.str())) {
+      mygsl::histogram_1d & h = a_pool.add_1d(key.str(), "", "1e1a::histos");
+      datatools::properties hconfig;
+      hconfig.store_string("mode", "mimic");
+      hconfig.store_string("mimic.histogram_1d", "1e1a::delta_template");
+      mygsl::histogram_pool::init_histo_1d(h, hconfig, &a_pool);
+    }
+    mygsl::histogram_1d & h1d = a_pool.grab_1d(key.str());
+    const double ratio = a_rec_alpha.length/a_sim_alpha.length;
+    h1d.fill((ratio - 1.0)*100*CLHEP::perCent);
     return;
   }
 
