@@ -42,7 +42,7 @@ The module name is =bb0nu_halflife_limit_module= which is needed when using
 #+END_SRC
 *** Declaration & description
 #+BEGIN_SRC sh
-  [name="bb0nu_halflife_limit_module" type="analysis::snemo_bb0nu_halflife_limit_module"]
+  [name="bb0nu_halflife_limit_module" type="snemo::analysis::snemo_bb0nu_halflife_limit_module"]
 
   #@description A SuperNEMO module to calculate the 0nu sensitivity
 #+END_SRC
@@ -75,9 +75,9 @@ distribution as well as efficiency have been computed : then the output
 histograms can be set as new input for the =histogram_service= in such way, the
 processing does not to be redo for these peculiar files.
 #+BEGIN_SRC sh
-  #@description The input file from where to load the histograms
-  Histo_input_file : string as path = \
-      "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.saved.xml"
+  # #@description The input file from where to load the histograms
+  # Histo_input_file : string as path = \
+  #     "/tmp/${USER}/snemo.d/snemo_bb0nu_halflife_limit_histos.saved.xml"
 #+END_SRC
 
 *** Histogram templates
@@ -88,7 +88,7 @@ boundaries and x-binning (see [[Histogram declarations][below]]).
 #+BEGIN_SRC sh
   #@description The ouput file where to store the histograms
   Histo_template_files : string[1] as path = \
-      "@SNEMO_SIMULATION_MODULES_DIR@/snemo_bb0nu_histogram_templates.conf"
+      "@SNEMO_ANALYSIS_MODULES_DIR@/snemo_bb0nu_histogram_templates.conf"
 #+END_SRC
 *** Building histogram keys
 The key fields are used to build different identifiants for histogram
@@ -139,18 +139,21 @@ halflife, exposure are used.
 ***** \nbsp^{208}Tl activity
 #+BEGIN_SRC sh
   #@description The mass activity for internal Thallium-208 contamination
-  experiment.Tl208.mass_activity : real as mass_activity = 2 uBq/kg
+  experiment.Tl208.activity : real as mass_activity = 2 uBq/kg
 #+END_SRC
+
 ***** \nbsp^{214}Bi activity
 #+BEGIN_SRC sh
   #@description The mass activity for internal Bismuth-214 contamination
-  experiment.Bi214.mass_activity : real as mass_activity = 10 uBq/kg
+  experiment.Bi214.activity : real as mass_activity = 10 uBq/kg
 #+END_SRC
+
 ***** \nbsp^{222}Rn activity
 #+BEGIN_SRC sh
   #@description The volume activity for Radon inside tracking chamber
-  experiment.Rn222.volume_activity : real as volume_activity = 100 uBq/m3
+  experiment.Rn222.activity : real as volume_activity = 100 uBq/m3
 #+END_SRC
+
 ** Histogram declarations
 :PROPERTIES:
 :TANGLE: ../config/snemo_bb0nu_histogram_templates.conf
@@ -169,7 +172,7 @@ neutrinoless double bet decay sensitivity.
 |----------------+------------|
 | Number of bins | 25         |
 | Minimal energy | 2000.0 keV |
-| Maximal energy | 3200.0 keV |
+| Maximal energy | 3100.0 keV |
 |----------------+------------|
 
 *** Retrieve binning information                                   :noexport:

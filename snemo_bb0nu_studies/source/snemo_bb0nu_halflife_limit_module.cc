@@ -11,6 +11,7 @@
 // Third party:
 // - Bayeux/datatools:
 #include <datatools/clhep_units.h>
+#include <datatools/units.h>
 #include <datatools/service_manager.h>
 // - Bayeux/mygsl
 #include <mygsl/histogram_pool.h>
@@ -24,6 +25,7 @@
 #include <snemo/datamodels/event_header.h>
 #include <snemo/datamodels/particle_track_data.h>
 
+namespace snemo {
 namespace analysis {
 
   // Character separator between key for histogram dict.
@@ -49,66 +51,60 @@ namespace analysis {
   void snemo_bb0nu_halflife_limit_module::experiment_entry_type::initialize(const datatools::properties & config_)
   {
     // Get experimental conditions
-    DT_THROW_IF(!config_.has_key("isotope_mass_number"), std::logic_error,
+    DT_THROW_IF(! config_.has_key("isotope_mass_number"), std::logic_error,
                 "Missing 'isotope_mass_number' value !");
     isotope_mass_number = config_.fetch_real("isotope_mass_number");
-    if (!config_.has_explicit_unit("isotope_mass_number")) {
+    if (! config_.has_explicit_unit("isotope_mass_number")) {
       isotope_mass_number *= CLHEP::g/CLHEP::mole;
     }
 
-    DT_THROW_IF(!config_.has_key("isotope_mass"), std::logic_error, "Missing 'isotope_mass' value !");
+    DT_THROW_IF(! config_.has_key("isotope_mass"), std::logic_error, "Missing 'isotope_mass' value !");
     isotope_mass = config_.fetch_real("isotope_mass");
     if (! config_.has_explicit_unit("isotope_mass")) {
       isotope_mass *= CLHEP::kg;
     }
 
-    DT_THROW_IF(!config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
+    DT_THROW_IF(! config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
                 "Missing 'isotope_bb2nu_halflife' value !");
     isotope_bb2nu_halflife = config_.fetch_real("isotope_bb2nu_halflife");
 
-    DT_THROW_IF(!config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
+    DT_THROW_IF(! config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
                 "Missing 'exposure_time' value !");
     exposure_time = config_.fetch_real("exposure_time");
-
-    DT_THROW_IF(!config_.has_key("isotope_bb2nu_halflife"), std::logic_error,
-                "Missing 'tracker_volume' value !");
-    tracker_volume = config_.fetch_real("tracker_volume");
-    if (! config_.has_explicit_unit("tracker_volume")) {
-      tracker_volume *= CLHEP::m3;
-    }
 
     if (config_.has_key("background_list")) {
       std::vector<std::string> bkgs;
       config_.fetch("background_list", bkgs);
-      for (std::vector<std::string>::const_iterator ibkg = bkgs.begin();
-           ibkg != bkgs.end(); ++ibkg) {
-        const std::string & bkgname = *ibkg;
+      for (auto ibkg : bkgs) {
+        const std::string & bkgname = ibkg;
         std::string key;
-        if (config_.has_key(key = bkgname + ".mass_activity")) {
-          background_activities[bkgname] = config_.fetch_real(key);
-          if (! config_.has_explicit_unit(key)) {
-            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::kg;
-          }
-          background_activities[bkgname] *= isotope_mass;
-        } else if (config_.has_key(key = bkgname + ".volume_activity")) {
-          background_activities[bkgname] = config_.fetch_real(key);
-          if (! config_.has_explicit_unit(key)) {
-            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::m3;
-          }
-          background_activities[bkgname] *= tracker_volume;
-        } else if (config_.has_key(key = bkgname + ".surface_activity")) {
-          background_activities[bkgname] = config_.fetch_real(key);
-          if (! config_.has_explicit_unit(key)) {
-            background_activities[bkgname] *= CLHEP::becquerel/CLHEP::m2;
-          }
-        } else {
-          DT_THROW_IF(true, std::logic_error,
-                      "No background activity for " << bkgname << " element");
-        }
-
+        DT_THROW_IF(! config_.has_key(key = bkgname + ".activity"), std::logic_error,
+                    "Missing activity for '" << bkgname << "' background !");
+        const double activity = config_.fetch_real(key);
+        DT_THROW_IF(! config_.has_unit_symbol(key), std::logic_error, "Missing activity unit !");
+        const std::string & unit_symbol = config_.get_unit_symbol(key);
         DT_LOG_NOTICE(datatools::logger::PRIO_NOTICE,
-                      "Adding '" << bkgname << "' background with an absolute activity of "
-                      << background_activities[bkgname]/CLHEP::becquerel << " Bq");
+                      "Adding '" << bkgname << "' background with an activity of "
+                      << activity/datatools::units::get_unit(unit_symbol) << " " << unit_symbol);
+        double norm = 1.0;
+        if (datatools::units::is_unit_in_dimension_from(unit_symbol, "volume_activity")) {
+          DT_THROW_IF(! config_.has_key(key = bkgname + ".volume"), std::logic_error,
+                      "Missing volume normalization for '" << bkgname << "' background !");
+          norm = config_.fetch_real(key);
+        } else if (datatools::units::is_unit_in_dimension_from(unit_symbol, "surface_activity")) {
+          DT_THROW_IF(! config_.has_key(key = bkgname + ".surface"), std::logic_error,
+                      "Missing surface normalization for '" << bkgname << "' background !");
+          norm = config_.fetch_real(key);
+        } else if (datatools::units::is_unit_in_dimension_from(unit_symbol, "mass_activity")) {
+          DT_THROW_IF(! config_.has_key(key = bkgname + ".mass"), std::logic_error,
+                      "Missing mass normalization for '" << bkgname << "' background !");
+          norm = config_.fetch_real(key);
+        } else if (datatools::units::is_unit_in_dimension_from(unit_symbol, "activity")) {
+          // Nothing to be done
+        } else {
+          DT_THROW_IF(true, std::logic_error, "Activity of '" << bkgname << "' has unknown units !");
+        }
+        background_activities[bkgname] = activity * norm;
       }
     }
     return;
@@ -116,7 +112,7 @@ namespace analysis {
 
   // Registration instantiation macro :
   DPP_MODULE_REGISTRATION_IMPLEMENT(snemo_bb0nu_halflife_limit_module,
-                                    "analysis::snemo_bb0nu_halflife_limit_module");
+                                    "snemo::analysis::snemo_bb0nu_halflife_limit_module");
 
   // Setting signal flag name for histogram properties
   const std::string & snemo_bb0nu_halflife_limit_module::signal_flag()
@@ -159,7 +155,7 @@ namespace analysis {
   // Initialization :
   void snemo_bb0nu_halflife_limit_module::initialize(const datatools::properties  & config_,
                                                      datatools::service_manager   & service_manager_,
-                                                     dpp::module_handle_dict_type & module_dict_)
+                                                     dpp::module_handle_dict_type & /*module_dict_*/)
   {
     DT_THROW_IF(is_initialized(),
                 std::logic_error,
@@ -377,7 +373,7 @@ namespace analysis {
     // and the weight of each event
     double weight = 1.0;
     if (eh_properties.has_key("analysis.total_number_of_event")) {
-      weight /= eh_properties.fetch_real("analysis.total_number_of_event");
+      weight /= eh_properties.fetch_integer("analysis.total_number_of_event");
     }
     if (eh_properties.has_key(mctools::event_utils::EVENT_GENBB_WEIGHT)) {
       weight *= eh_properties.fetch_real(mctools::event_utils::EVENT_GENBB_WEIGHT);
@@ -678,6 +674,7 @@ namespace analysis {
 }
 
 } // namespace analysis
+} // namespace snemo
 
 // end of snemo_bb0nu_halflife_limit_module.cc
 /*

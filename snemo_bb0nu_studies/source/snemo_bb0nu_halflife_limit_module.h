@@ -2,9 +2,9 @@
  * Author(s)     : Xavier Garrido <garrido@lal.in2p3.fr>
  *                 Steven Calvez  <calvez@lal.in2p3.fr>
  * Creation date : 2012-06-13
- * Last modified : 2014-06-13
+ * Last modified : 2015-06-04
  *
- * Copyright (C) 2012-2014 Xavier Garrido <garrido@lal.in2p3.fr>
+ * Copyright (C) 2012-2015 Xavier Garrido <garrido@lal.in2p3.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,12 +31,13 @@
  *
  */
 
-#ifndef ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
-#define ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H 1
+#ifndef SNEMO_ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
+#define SNEMO_ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H 1
 
 // Data processing module abstract base class
 #include <dpp/base_module.h>
 
+// Standard libraries
 #include <map>
 #include <string>
 #include <vector>
@@ -45,11 +46,18 @@ namespace mygsl {
   class histogram_pool;
 }
 
+namespace snemo {
 namespace analysis {
 
   class snemo_bb0nu_halflife_limit_module : public dpp::base_module
   {
   public:
+
+    struct background_entry_type
+    {
+      double activity;
+      std::string alias;
+    };
 
     struct experiment_entry_type
     {
@@ -59,7 +67,7 @@ namespace analysis {
       double isotope_mass;
       double isotope_bb2nu_halflife;
       double exposure_time;
-      double tracker_volume;
+
       background_dict_type background_activities;
 
       void initialize(const datatools::properties & config_);
@@ -130,8 +138,9 @@ namespace analysis {
   };
 
 } // namespace analysis
+} // namespace snemo
 
-#endif // ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
+#endif // SNEMO_ANALYSIS_SNEMO_BB0NU_HALFLIFE_LIMIT_MODULE_H
 
 // end of snemo_bb0nu_halflife_limit_module.h
 /*

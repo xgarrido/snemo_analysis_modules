@@ -14,6 +14,9 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "in-source build detected")
 endif()
 
+# Use C++11
+set(CMAKE_CXX_FLAGS "-W -Wall -std=c++11")
+
 # - Third party
 find_package(Falaise 1.0.0 REQUIRED)
 
@@ -22,7 +25,9 @@ include_directories(${PROJECT_SOURCE_DIR} ${Falaise_INCLUDE_DIRS})
 add_library(snemo_bb0nu_studies SHARED
   snemo_bb0nu_halflife_limit_module.h snemo_bb0nu_halflife_limit_module.cc)
 
-target_link_libraries(snemo_bb0nu_studies ${Falaise_LIBRARIES})
+set(Falaise_PID_DIR "${Falaise_INCLUDE_DIR}/../lib64/Falaise/modules")
+set(Falaise_PID_LIBRARY "${Falaise_PID_DIR}/libFalaise_ParticleIdentification.so")
+target_link_libraries(snemo_bb0nu_studies ${Falaise_LIBRARIES} ${Falaise_PID_LIBRARY})
 
 install(FILES
   ${PROJECT_BINARY_DIR}/libsnemo_bb0nu_studies${CMAKE_SHARED_LIBRARY_SUFFIX}
