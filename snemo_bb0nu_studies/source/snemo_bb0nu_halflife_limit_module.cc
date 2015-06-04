@@ -23,7 +23,8 @@
 // - Falaise
 #include <snemo/datamodels/data_model.h>
 #include <snemo/datamodels/event_header.h>
-#include <snemo/datamodels/particle_track_data.h>
+#include <snemo/datamodels/topology_data.h>
+#include <snemo/datamodels/topology_2e_pattern.h>
 
 namespace snemo {
 namespace analysis {
@@ -271,59 +272,21 @@ namespace analysis {
     const snemo::datamodel::event_header & eh
       = data_record_.get<snemo::datamodel::event_header>(eh_label);
 
-    // Check if the 'particle track' record bank is available :
-    const std::string ptd_label = snemo::datamodel::data_info::default_particle_track_data_label();
-    if (! data_record_.has(ptd_label)) {
+    // Check if the 'topology data' record bank is available :
+    const std::string td_label = "TD";//snemo::datamodel::data_info::default_particle_track_data_label();
+    if (! data_record_.has(td_label)) {
       DT_LOG_ERROR(get_logging_priority(), "Could not find any bank with label '"
-                   << ptd_label << "' !");
+                   << td_label << "' !");
       return dpp::base_module::PROCESS_STOP;
     }
-    const snemo::datamodel::particle_track_data & ptd
-      = data_record_.get<snemo::datamodel::particle_track_data>(ptd_label);
+    const snemo::datamodel::topology_data & td
+      = data_record_.get<snemo::datamodel::topology_data>(td_label);
 
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) {
       DT_LOG_DEBUG(get_logging_priority(), "Event header : ");
       eh.tree_dump();
-      DT_LOG_DEBUG(get_logging_priority(), "Particle track data : ");
-      ptd.tree_dump();
-    }
-
-    // Total calibrated energy carried by electrons
-    double total_energy = 0.0;
-
-    // Store geom_id to avoid double inclusion of energy deposited
-    std::set<geomtools::geom_id> gids;
-
-    // Loop over all saved particles
-    const snemo::datamodel::particle_track_data::particle_collection_type &
-      the_particles = ptd.get_particles();
-
-    for (snemo::datamodel::particle_track_data::particle_collection_type::const_iterator
-           iparticle = the_particles.begin(); iparticle != the_particles.end();
-         ++iparticle) {
-      const snemo::datamodel::particle_track & a_particle = iparticle->get();
-
-      if (! a_particle.has_associated_calorimeter_hits()) {
-        DT_LOG_DEBUG(get_logging_priority(),
-                     "Particle track is not associated to any calorimeter block !");
-        continue;
-      }
-
-      const snemo::datamodel::calibrated_calorimeter_hit::collection_type &
-        the_calorimeters = a_particle.get_associated_calorimeter_hits();
-
-      if (the_calorimeters.size() > 2) {
-        DT_LOG_DEBUG(get_logging_priority(),
-                     "The particle is associated to more than 2 calorimeters !");
-        continue;
-      }
-
-      for (size_t i = 0; i < the_calorimeters.size(); ++i) {
-        const geomtools::geom_id & gid = the_calorimeters.at(i).get().get_geom_id();
-        if (gids.find(gid) != gids.end()) continue;
-        gids.insert(gid);
-        total_energy += the_calorimeters.at(i).get().get_energy();
-      }
+      DT_LOG_DEBUG(get_logging_priority(), "Topology data : ");
+      td.tree_dump();
     }
 
     // Build unique key for histogram map:
@@ -335,8 +298,7 @@ namespace analysis {
          ifield != _key_fields_.end(); ++ifield) {
       const std::string & a_field = *ifield;
       if (! eh_properties.has_key(a_field)) {
-        DT_LOG_WARNING(get_logging_priority(),
-                       "No properties with key '" << a_field << "' "
+        DT_LOG_WARNING(get_logging_priority(), "No properties with key '" << a_field << "' "
                        << "has been found in event header !");
         continue;
       }
@@ -351,8 +313,20 @@ namespace analysis {
       else if (eh_properties.is_real(a_field))    key << eh_properties.fetch_real(a_field);
       else if (eh_properties.is_string(a_field))  key << eh_properties.fetch_string(a_field);
     }
-    DT_LOG_TRACE(get_logging_priority(), "Total energy = " << total_energy / CLHEP::keV << " keV");
     DT_LOG_TRACE(get_logging_priority(), "Key = " << key.str());
+
+    // Get total energy
+    if (! td.has_pattern()) {
+      DT_LOG_ERROR(get_logging_priority(), "Missing topology pattern !");
+      return dpp::base_module::PROCESS_STOP;
+    }
+    const snemo::datamodel::base_topology_pattern & a_pattern = td.get_pattern();
+    if (a_pattern.get_pattern_id() != snemo::datamodel::topology_2e_pattern::pattern_id()) {
+      DT_LOG_ERROR(get_logging_priority(), "0nu sensitivity can only be calculated for '2e' topology!");
+      return dpp::base_module::PROCESS_STOP;
+    }
+    const snemo::datamodel::topology_2e_pattern & a_2e_pattern
+      = dynamic_cast<const snemo::datamodel::topology_2e_pattern &>(a_pattern);
 
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
@@ -367,7 +341,7 @@ namespace analysis {
 
     // Getting the current histogram
     mygsl::histogram_1d & a_histo = a_pool.grab_1d(key.str ());
-    a_histo.fill(total_energy);
+    a_histo.fill(a_2e_pattern.get_total_energy());
 
     // Compute normalization factor given the total number of events generated
     // and the weight of each event
