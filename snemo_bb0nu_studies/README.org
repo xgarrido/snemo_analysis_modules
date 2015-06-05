@@ -126,16 +126,6 @@ halflife, exposure are used.
 
 **** Background activities
 
-#+CAPTION: *List of background contaminants with their respective activities.*
-#+TBLNAME: bkg_activities
-|-----------------+----------+--------+------+---------|
-| Background name | Activity | Unit   | Mass | Volume  |
-|-----------------+----------+--------+------+---------|
-| Tl208           |        2 | uBq/kg | 7 kg |         |
-| Bi214           |       10 | uBq/kg | 7 kg |         |
-| Rn222           |      100 | uBq/m3 |      | 15.2 m3 |
-|-----------------+----------+--------+------+---------|
-
 ***** Code generator                                           :noexport:
 #+NAME: bkg_generator
 #+BEGIN_SRC python :results output :var table=bkg_activities :tangle no
@@ -161,9 +151,23 @@ halflife, exposure are used.
       print('experiment.' + name[idx] + '.' + symbol + ' : real as ' + symbol + ' = ' + norm)
 #+END_SRC
 
+***** Background table
+
+#+CAPTION: *List of background contaminants with their respective activities.*
+#+TBLNAME: bkg_activities
+|-----------------+----------+--------+------+---------|
+| Background name | Activity | Unit   | Mass | Volume  |
+|-----------------+----------+--------+------+---------|
+| Tl208           |        2 | uBq/kg | 7 kg |         |
+| Bi214           |       10 | uBq/kg | 7 kg |         |
+| Rn222           |      100 | uBq/m3 |      | 15.2 m3 |
+|-----------------+----------+--------+------+---------|
+
+Set range of background to be used
 #+BEGIN_SRC python :noweb yes
-  <<bkg_generator(table=bkg_activities[3:4])>>
+  <<bkg_generator(table=bkg_activities[3:6])>>
 #+END_SRC
+
 
 ** Histogram declarations
 :PROPERTIES:
