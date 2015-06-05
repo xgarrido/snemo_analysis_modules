@@ -377,12 +377,10 @@ namespace analysis {
 
     // Sum of number of events
     std::map<std::string, double> m_event;
-    for (std::vector<std::string>::const_iterator iname = hnames.begin();
-         iname != hnames.end(); ++iname) {
-      const std::string & a_name = *iname;
-      DT_THROW_IF(! a_pool.has_1d(a_name), std::logic_error,
-                  "Histogram '" << a_name << "' is not 1D histogram !");
-      const mygsl::histogram_1d & a_histogram = a_pool.get_1d(a_name);
+    for (auto iname : hnames) {
+      DT_THROW_IF(! a_pool.has_1d(iname), std::logic_error,
+                  "Histogram '" << iname << "' is not 1D histogram !");
+      const mygsl::histogram_1d & a_histogram = a_pool.get_1d(iname);
 
       // Loop over bin content
       for (size_t i = 0; i < a_histogram.bins(); ++i) {
@@ -401,8 +399,8 @@ namespace analysis {
         }
 
         // Compute fraction of event for each histogram bin
-        const double efficiency = (sum - m_event[a_name]) * weight;
-        m_event[a_name] += value;
+        const double efficiency = (sum - m_event[iname]) * weight;
+        m_event[iname] += value;
 
         if (! datatools::is_valid(efficiency)) {
           DT_LOG_WARNING(get_logging_priority(), "Skipping non valid efficiency computation !");
@@ -410,7 +408,7 @@ namespace analysis {
         }
 
         // Adding histogram efficiency
-        const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "efficiency";
+        const std::string & key_str = iname + KEY_FIELD_SEPARATOR + "efficiency";
         if (! a_pool.has(key_str)) {
           mygsl::histogram_1d & h = a_pool.add_1d(key_str, "", "efficiency");
           datatools::properties hconfig;
@@ -425,7 +423,7 @@ namespace analysis {
 
         // Flag signal/background histogram
         datatools::properties & a_aux = a_new_histogram.grab_auxiliaries();
-        if (a_name.find("0nubb") != std::string::npos) {
+        if (iname.find("0nubb") != std::string::npos) {
           a_aux.update_flag(snemo_bb0nu_halflife_limit_module::signal_flag());
         } else {
           a_aux.update_flag(snemo_bb0nu_halflife_limit_module::background_flag());
@@ -469,27 +467,25 @@ namespace analysis {
     // Loop over 'background' histograms and count the number of background
     // events within the energy window
     std::vector<double> vbkg_counts;
-    for (std::vector<std::string>::const_iterator iname = bkg_names.begin();
-         iname != bkg_names.end(); ++iname) {
-      const std::string & a_name = *iname;
-      DT_THROW_IF(! a_pool.has_1d(a_name), std::logic_error,
-                  "Histogram '" << a_name << "' is not 1D histogram !");
-      if (a_pool.get_group(a_name) != "efficiency") {
+    for (auto iname : bkg_names) {
+      DT_THROW_IF(! a_pool.has_1d(iname), std::logic_error,
+                  "Histogram '" << iname << "' is not 1D histogram !");
+      if (a_pool.get_group(iname) != "efficiency") {
         DT_LOG_ERROR(get_logging_priority(),
-                     "Histogram '" << a_name << "' does not belong to 'efficiency' group !");
+                     "Histogram '" << iname << "' does not belong to 'efficiency' group !");
         continue;
       }
       // Get normalization factor
       double norm_factor;
       datatools::invalidate(norm_factor);
-      if (a_name.find("2nubb") != std::string::npos) {
+      if (iname.find("2nubb") != std::string::npos) {
         norm_factor = kbg;
       } else {
         const experiment_entry_type::background_dict_type & bkgs = _experiment_conditions_.background_activities;
         for (experiment_entry_type::background_dict_type::const_iterator
                ibkg = bkgs.begin();
              ibkg != bkgs.end(); ++ibkg) {
-          if (a_name.find(ibkg->first) != std::string::npos) {
+          if (iname.find(ibkg->first) != std::string::npos) {
             DT_LOG_TRACE(get_logging_priority(),
                          "Found background element '" << ibkg->first << "'");
             const double year2sec = 3600 * 24 * 365;
@@ -499,13 +495,13 @@ namespace analysis {
       }
       if (! datatools::is_valid(norm_factor)) {
         DT_LOG_WARNING(get_logging_priority(),
-                       "No background activity has been found ! Skip histogram '" << a_name << "'");
+                       "No background activity has been found ! Skip histogram '" << iname << "'");
         continue;
       }
       DT_LOG_TRACE(get_logging_priority(),
-                   "Total number of decay for '" << a_name << "' = " << norm_factor);
+                   "Total number of decay for '" << iname << "' = " << norm_factor);
 
-      const mygsl::histogram_1d & a_histogram = a_pool.get_1d(a_name);
+      const mygsl::histogram_1d & a_histogram = a_pool.get_1d(iname);
       for (size_t i = 0; i < a_histogram.bins(); ++i) {
         const double value = a_histogram.get(i) * norm_factor;
         if (vbkg_counts.empty()) vbkg_counts.assign(a_histogram.bins(), 0.0);
@@ -513,7 +509,7 @@ namespace analysis {
       }
 
       // Adding histogram efficiency in terms of number of events
-      const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "event_number";
+      const std::string & key_str = iname + KEY_FIELD_SEPARATOR + "event_number";
       if (a_pool.has(key_str)) {
         DT_LOG_WARNING(get_logging_priority(), "Histogram '" << key_str << "' already exists ! Remove it !");
         a_pool.remove(key_str);
@@ -532,18 +528,16 @@ namespace analysis {
       return;
     }
     // Loop over 'signal' histograms
-    for (std::vector<std::string>::const_iterator iname = signal_names.begin();
-         iname != signal_names.end(); ++iname) {
+    for (auto iname : signal_names) {
       double best_halflife_limit = 0.0;
-      const std::string & a_name = *iname;
-      DT_THROW_IF(! a_pool.has_1d(a_name), std::logic_error,
-                  "Histogram '" << a_name << "' is not 1D histogram !");
-      if (a_pool.get_group(a_name) != "efficiency") {
+      DT_THROW_IF(! a_pool.has_1d(iname), std::logic_error,
+                  "Histogram '" << iname << "' is not 1D histogram !");
+      if (a_pool.get_group(iname) != "efficiency") {
         DT_LOG_ERROR(get_logging_priority(),
-                     "Histogram '" << a_name << "' does not belongs to 'efficiency' group !");
+                     "Histogram '" << iname << "' does not belongs to 'efficiency' group !");
         continue;
       }
-      const mygsl::histogram_1d & a_histogram = a_pool.get_1d(a_name);
+      const mygsl::histogram_1d & a_histogram = a_pool.get_1d(iname);
       // Loop over bin content
       for (size_t i = 0; i < a_histogram.bins(); ++i) {
         const double value = a_histogram.get(i);
@@ -557,7 +551,7 @@ namespace analysis {
         best_halflife_limit = std::max(best_halflife_limit, halflife);
 
         // Adding histogram halflife
-        const std::string & key_str = a_name + KEY_FIELD_SEPARATOR + "halflife";
+        const std::string & key_str = iname + KEY_FIELD_SEPARATOR + "halflife";
         if (!a_pool.has(key_str)) {
           mygsl::histogram_1d & h = a_pool.add_1d(key_str, "", "halflife");
           datatools::properties hconfig;
@@ -618,15 +612,12 @@ namespace analysis {
 
     std::vector<std::string> hnames;
     _histogram_pool_->names(hnames);
-    for (std::vector<std::string>::const_iterator i = hnames.begin();
-         i != hnames.end(); ++i) {
-      const std::string & a_name = *i;
-      if (a_name.find("template") != std::string::npos) continue;
+    for (auto iname : hnames) {
+      if (iname.find("template") != std::string::npos) continue;
 
-      std::vector<std::string>::const_iterator j = i;
       out_ << indent;
       std::ostringstream indent_oss;
-      if (++j == hnames.end()) {
+      if (iname == *std::prev(hnames.end())) {
         out_  << datatools::i_tree_dumpable::last_tag;
         indent_oss << indent << datatools::i_tree_dumpable::last_skip_tag;
       } else {
@@ -634,12 +625,12 @@ namespace analysis {
         indent_oss << indent << datatools::i_tree_dumpable::skip_tag;
       }
 
-      out_ << "Label " << a_name << std::endl;
-      const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d(a_name);
+      out_ << "Label " << iname << std::endl;
+      const mygsl::histogram_1d & a_histogram = _histogram_pool_->get_1d(iname);
       a_histogram.tree_dump(out_, "", indent_oss.str(), inherit_);
 
       if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) {
-        DT_LOG_DEBUG(get_logging_priority(), "Histogram " << a_name << " dump:");
+        DT_LOG_DEBUG(get_logging_priority(), "Histogram " << iname << " dump:");
         a_histogram.print(std::clog);
       }
     }
