@@ -124,34 +124,45 @@ halflife, exposure are used.
   experiment.exposure_time : real = 2.5 #year
 #+END_SRC
 
-**** Tracking chamber volume
-#+BEGIN_SRC sh
-  #@description The total gas volume of the tracking chamber
-  experiment.tracker_volume : real as volume = 15.2 m3
-#+END_SRC
-
 **** Background activities
-#+BEGIN_SRC sh
-  #@description The list of background element
-  experiment.background_list : string[3] = "Tl208" "Bi214" "Rn222"
+
+#+CAPTION: *List of background contaminants with their respective activities.*
+#+TBLNAME: bkg_activities
+|-----------------+----------+--------+------+---------|
+| Background name | Activity | Unit   | Mass | Volume  |
+|-----------------+----------+--------+------+---------|
+| Tl208           |        2 | uBq/kg | 7 kg |         |
+| Bi214           |       10 | uBq/kg | 7 kg |         |
+| Rn222           |      100 | uBq/m3 |      | 15.2 m3 |
+|-----------------+----------+--------+------+---------|
+
+***** Code generator                                           :noexport:
+#+NAME: bkg_generator
+#+BEGIN_SRC python :results output :var table=bkg_activities :tangle no
+  name, activity, unit, mass, volume = zip(*table)
+  # Build background list
+  print('#@description The list of backgrounds')
+  print('experiment.background_list : string[' + str(len(name)) + '] =', end="")
+  for i in name: print(' "' + i + '"', end="")
+  print()
+  for idx in range(len(name)):
+      symbol=''
+      norm=''
+      if mass[idx]:
+          symbol='mass'
+          norm=mass[idx]
+      elif volume[idx]:
+          symbol='volume'
+          norm=volume[idx]
+      print('\n#@description The activity of ' + name[idx] + ' contaminant')
+      print('experiment.' + name[idx] + '.activity : real as ' + symbol + '_activity = ' + \
+            str(activity[idx]) + ' ' + unit[idx])
+      print('\n#@description The ' + symbol + ' of ' + name[idx] + ' contaminant')
+      print('experiment.' + name[idx] + '.' + symbol + ' : real as ' + symbol + ' = ' + norm)
 #+END_SRC
 
-***** \nbsp^{208}Tl activity
-#+BEGIN_SRC sh
-  #@description The mass activity for internal Thallium-208 contamination
-  experiment.Tl208.activity : real as mass_activity = 2 uBq/kg
-#+END_SRC
-
-***** \nbsp^{214}Bi activity
-#+BEGIN_SRC sh
-  #@description The mass activity for internal Bismuth-214 contamination
-  experiment.Bi214.activity : real as mass_activity = 10 uBq/kg
-#+END_SRC
-
-***** \nbsp^{222}Rn activity
-#+BEGIN_SRC sh
-  #@description The volume activity for Radon inside tracking chamber
-  experiment.Rn222.activity : real as volume_activity = 100 uBq/m3
+#+BEGIN_SRC python :noweb yes
+  <<bkg_generator(table=bkg_activities[3:4])>>
 #+END_SRC
 
 ** Histogram declarations
