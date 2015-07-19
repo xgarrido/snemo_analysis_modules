@@ -126,6 +126,9 @@ histograms all belong to the =__template= group.
   #@description The group of the histogram (optional)
   group : string = "SD::histos"
 
+  #@description The title of the histogram (optional)
+  title : string = "Number of simulated tracker hits"
+
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
 
@@ -142,7 +145,7 @@ histograms all belong to the =__template= group.
   max : real = 99.5
 
   #@description The X axis label
-  display.xaxis.label : string = "Ngg"
+  display.xaxis.label : string = "$N_\text{sim.}$ (tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -155,6 +158,9 @@ histograms all belong to the =__template= group.
 
   #@description The group of the histogram (optional)
   group : string = "SD::histos"
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of simulated calorimeter hits"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -172,7 +178,7 @@ histograms all belong to the =__template= group.
   max : real = 9.5
 
   #@description The X axis label
-  display.xaxis.label : string = "Ncalo"
+  display.xaxis.label : string = "$N_\text{sim.}$ (calorimeter)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -184,11 +190,11 @@ histograms all belong to the =__template= group.
   [name="CD::ngghits" type="mygsl::histogram_1d"]
   #@config The histogram of the number of calibrated tracker hits
 
-  #@description The title of the histogram (optional)
-  title : string = "Number of calibrated tracker hits"
-
   #@description The group of the histogram (optional)
   group : string = "CD::histos"
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of calibrated tracker hits"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -206,7 +212,7 @@ histograms all belong to the =__template= group.
   max : real = 99.5
 
   #@description The X axis label
-  display.xaxis.label : string = "N_{calib.}(tracker)"
+  display.xaxis.label : string = "$N_\text{calib.}$ (tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -217,11 +223,11 @@ histograms all belong to the =__template= group.
   [name="CD::ncalohits" type="mygsl::histogram_1d"]
   #@config The histogram of the number of calibrated calorimeter hits
 
-  #@description The title of the histogram (optional)
-  title : string = "Number of calibrated calorimeter hits"
-
   #@description The group of the histogram (optional)
   group : string = "CD::histos"
+
+  #@description The title of the histogram (optional)
+  title : string = "Number of calibrated calorimeter hits"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -239,7 +245,7 @@ histograms all belong to the =__template= group.
   max : real = 9.5
 
   #@description The X axis label
-  display.xaxis.label : string = "N^{calib.}_{calorimeter}"
+  display.xaxis.label : string = "$N_\text{calib.}$ (calorimeter)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -252,6 +258,9 @@ histograms all belong to the =__template= group.
 
   #@description The group of the histogram (optional)
   group : string = "CD::histos"
+
+  #@description The title of the histogram (optional)
+  title : string = "Distribution of Geiger drift distance"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -272,7 +281,7 @@ histograms all belong to the =__template= group.
   max : real as length = 25 mm
 
   #@description The X axis label
-  display.xaxis.label : string = "r_{calib.}(tracker)"
+  display.xaxis.label : string = "$r_{calib.}$ (tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -284,6 +293,9 @@ histograms all belong to the =__template= group.
 
   #@description The group of the histogram (optional)
   group : string = "CD::histos"
+
+  #@description The title of the histogram (optional)
+  title : string = "Distribution of Geiger drift distance error"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -304,7 +316,7 @@ histograms all belong to the =__template= group.
   max : real as length = 1 mm
 
   #@description The X axis label
-  display.xaxis.label : string = "#sigma_{r_{calib.}}(tracker)"
+  display.xaxis.label : string = "$\sigma_{r_\text{calib.}}$ (tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -317,6 +329,9 @@ histograms all belong to the =__template= group.
 
   #@description The group of the histogram (optional)
   group : string = "CD::histos"
+
+  #@description The title of the histogram (optional)
+  title : string = "Distribution of Geiger longitudinal position"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -337,11 +352,12 @@ histograms all belong to the =__template= group.
   max : real as length = 1500 mm
 
   #@description The X axis label
-  display.xaxis.label : string = "z_{calib.}(tracker)"
+  display.xaxis.label : string = "$z_\text{calib.}$ (tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
 #+END_SRC
+
 **** Distribution of longitudinal position error
 #+BEGIN_SRC shell
   [name="CD::long_position_error" type="mygsl::histogram_1d"]
@@ -349,6 +365,9 @@ histograms all belong to the =__template= group.
 
   #@description The group of the histogram (optional)
   group : string = "CD::histos"
+
+  #@description The title of the histogram (optional)
+  title : string = "Distribution of Geiger longitudinal position error"
 
   #@description The build mode (default : "regular", "table", "mimic");
   mode : string = "regular"
@@ -369,7 +388,7 @@ histograms all belong to the =__template= group.
   max : real as length = 10 mm
 
   #@description The X axis label
-  display.xaxis.label : string = "#sigma_{z_{calib.}}(tracker)"
+  display.xaxis.label : string = "$\sigma_{z_\text{calib.}}$ (tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
