@@ -93,10 +93,10 @@ namespace analysis {
     if (! td_.has_pattern() || ! td_.get_pattern().has_pattern_id()) return;
     auto a_pattern_id = td_.get_pattern().get_pattern_id();
 
-    if (a_pattern_id == "1e1a") {
+    if (a_pattern_id == snemo::datamodel::topology_1e1a_pattern::pattern_id()) {
       _plot_1e1a_(td_);
     }
-    if (a_pattern_id == "2e") {
+    if (a_pattern_id == snemo::datamodel::topology_2e_pattern::pattern_id()) {
       _plot_2e_(td_);
     }
     return;
@@ -108,25 +108,25 @@ namespace analysis {
 
     std::string key;
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
-    if (a_pool.has_1d(key = "TD::1e1a::electron_energy") &&
-        a_pattern.has_electron_energy()) {
+    if (a_pool.has_1d(key = "TD::1e1a::electron_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_electron_energy());
+      const double energy = a_pattern.get_electron_energy();
+      if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::1e1a::electron_track_length") &&
-        a_pattern.has_electron_track_length()) {
+    if (a_pool.has_1d(key = "TD::1e1a::electron_track_length")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_electron_track_length());
+      const double length = a_pattern.get_electron_track_length();
+      if (datatools::is_valid(length)) h1d.fill(length);
     }
-    if (a_pool.has_1d(key = "TD::1e1a::alpha_delayed_time") &&
-        a_pattern.has_alpha_delayed_time()) {
+    if (a_pool.has_1d(key = "TD::1e1a::alpha_delayed_time")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_alpha_delayed_time());
+      const double time = a_pattern.get_alpha_delayed_time();
+      if (datatools::is_valid(time)) h1d.fill(time);
     }
-    if (a_pool.has_1d(key = "TD::1e1a::alpha_track_length") &&
-        a_pattern.has_alpha_track_length()) {
+    if (a_pool.has_1d(key = "TD::1e1a::alpha_track_length")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_alpha_track_length());
+      const double length = a_pattern.get_alpha_track_length();
+      if (datatools::is_valid(length)) h1d.fill(length);
     }
 
     return;
@@ -138,20 +138,20 @@ namespace analysis {
 
     std::string key;
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
-    if (a_pool.has_1d(key = "TD::2e::minimal_energy") &&
-        a_pattern.has_minimal_energy()) {
+    if (a_pool.has_1d(key = "TD::2e::minimal_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_minimal_energy());
+      const double energy = a_pattern.get_minimal_energy();
+      if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::2e::maximal_energy") &&
-        a_pattern.has_maximal_energy()) {
+    if (a_pool.has_1d(key = "TD::2e::maximal_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_maximal_energy());
+      const double energy = a_pattern.get_maximal_energy();
+      if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::2e::total_energy") &&
-        a_pattern.has_total_energy()) {
+    if (a_pool.has_1d(key = "TD::2e::total_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_total_energy());
+      const double energy = a_pattern.get_total_energy();
+      if (datatools::is_valid(energy)) h1d.fill(energy);
     }
     if (a_pool.has_1d(key = "TD::2e::angle") &&
         a_pattern.has_angle()) {

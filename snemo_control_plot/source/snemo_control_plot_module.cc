@@ -12,13 +12,13 @@
 // - Boost :
 #include <boost/foreach.hpp>
 // - Bayeux/datatools:
-#include <datatools/service_manager.h>
+#include <bayeux/datatools/service_manager.h>
 // - Bayeux/mygsl
-#include <mygsl/histogram_pool.h>
+#include <bayeux/mygsl/histogram_pool.h>
 // - Bayeux/dpp
-#include <dpp/histogram_service.h>
+#include <bayeux/dpp/histogram_service.h>
 // - Bayeux/mctools
-#include <mctools/simulated_data.h>
+#include <bayeux/mctools/simulated_data.h>
 
 // This project:
 #include <simulated_data_plotter.h>
