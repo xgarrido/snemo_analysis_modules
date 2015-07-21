@@ -281,7 +281,7 @@ histograms all belong to the =__template= group.
   max : real as length = 25 mm
 
   #@description The X axis label
-  display.xaxis.label : string = "$r_{calib.}$ (tracker)"
+  display.xaxis.label : string = "$r_\text{calib.}$ (tracker)"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -419,7 +419,7 @@ histograms all belong to the =__template= group.
   max : real = 9.5
 
   #@description The X axis label
-  display.xaxis.label : string = "N_{cluster}"
+  display.xaxis.label : string = "$N_\text{cluster}$"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -452,7 +452,7 @@ histograms all belong to the =__template= group.
   max : real as length = 2 m
 
   #@description The X axis label
-  display.xaxis.label : string = "r_{helix}"
+  display.xaxis.label : string = "$r_\text{helix}$"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -552,7 +552,7 @@ histograms all belong to the =__template= group.
   max : real as time = 1 ms
 
   #@description The X axis label
-  display.xaxis.label : string = "#alpha delay time"
+  display.xaxis.label : string = "$\alpha$ delay time"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -585,7 +585,7 @@ histograms all belong to the =__template= group.
   max : real as length = 400 mm
 
   #@description The X axis label
-  display.xaxis.label : string = "#alpha track length"
+  display.xaxis.label : string = "$\alpha$ track length"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
@@ -715,7 +715,7 @@ histograms all belong to the =__template= group.
   max : real as angle = 180 degree
 
   #@description The X axis label
-  display.xaxis.label : string = "#theta angle"
+  display.xaxis.label : string = "$\theta$ angle"
 
   #@description The Y axis label
   display.yaxis.label : string = "Counts"
