@@ -25,7 +25,7 @@
  *
  * A module to plot several basic parameters from different banks (SD, CD,
  * ...). The purpose of this module is to generate automatically plots to do
- * comparisons between software version.
+ * comparisons between software versions.
  *
  * History:
  *

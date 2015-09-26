@@ -48,14 +48,13 @@ namespace analysis {
 
   bool base_plotter::has_name() const
   {
-    return ! _name.empty ();
+    return ! _name.empty();
   }
 
   void base_plotter::set_name(const std::string & name_)
   {
-    DT_THROW_IF(is_initialized (), std::logic_error,
-                "Plotter '" << _name << "' "
-                << "is already initialized ! "
+    DT_THROW_IF(is_initialized(), std::logic_error,
+                "Plotter '" << _name << "' is already initialized ! "
                 << "Cannot change the name !");
     _set_name(name_);
     return;
@@ -74,7 +73,7 @@ namespace analysis {
 
   bool base_plotter::has_description() const
   {
-    return ! _description.empty ();
+    return ! _description.empty();
   }
 
   const std::string & base_plotter::get_description() const
@@ -85,8 +84,7 @@ namespace analysis {
   void base_plotter::set_description(const std::string & description_)
   {
     DT_THROW_IF(is_initialized (), std::logic_error,
-                "Plotter '" << _name << "' "
-                << "is already initialized ! "
+                "Plotter '" << _name << "' is already initialized ! "
                 << "Cannot change the description !");
     _description = description_;
     return;
@@ -119,8 +117,7 @@ namespace analysis {
   base_plotter::~base_plotter()
   {
     DT_THROW_IF(_initialized, std::logic_error,
-                "Plotter '" << _name << "' "
-                << "still has its 'initialized' flag on ! "
+                "Plotter '" << _name << "' still has its 'initialized' flag on ! "
                 << "Possible bug !");
     return;
   }
@@ -131,10 +128,10 @@ namespace analysis {
                                bool inherit_) const
   {
     std::string indent;
-    if (! indent_.empty ()) {
+    if (! indent_.empty()) {
       indent = indent_;
     }
-    if ( ! title_.empty () ) {
+    if (! title_.empty()) {
       out_ << indent << title_ << std::endl;
     }
     out_ << indent << datatools::i_tree_dumpable::tag
@@ -230,6 +227,21 @@ namespace analysis {
         .add_example("Example::                       \n"
                      "                                \n"
                      "  name : string = \"CDPlotter\" \n"
+                     "                                \n"
+                     )
+        ;
+    }
+    {
+      datatools::configuration_property_description & cpd = ocd_.add_property_info();
+      cpd.set_name_pattern("bank_label")
+        .set_from("analysis::base_plotter")
+        .set_terse_description("The name of the data bank")
+        .set_traits(datatools::TYPE_STRING)
+        .set_mandatory(true)
+        .set_long_description("A name given to the data bank.")
+        .add_example("Example::                       \n"
+                     "                                \n"
+                     "  bank_label : string = \"CD\"  \n"
                      "                                \n"
                      )
         ;

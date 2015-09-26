@@ -153,10 +153,10 @@ namespace analysis {
       const double energy = a_pattern.get_total_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::2e::angle") &&
-        a_pattern.has_angle()) {
+    if (a_pool.has_1d(key = "TD::2e::angle")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      h1d.fill(a_pattern.get_angle());
+      const double angle = a_pattern.get_angle();
+      if (datatools::is_valid(angle)) h1d.fill(angle);
     }
     return;
   }
