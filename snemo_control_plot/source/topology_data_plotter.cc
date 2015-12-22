@@ -90,13 +90,12 @@ namespace analysis {
     DT_LOG_DEBUG (get_logging_priority(), "Topology data : ");
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) td_.tree_dump(std::clog);
 
-    if (! td_.has_pattern() || ! td_.get_pattern().has_pattern_id()) return;
-    auto a_pattern_id = td_.get_pattern().get_pattern_id();
+    if (! td_.has_pattern()) return;
 
-    if (a_pattern_id == snemo::datamodel::topology_1e1a_pattern::pattern_id()) {
+    if (td_.has_pattern_as<snemo::datamodel::topology_1e1a_pattern>()) {
       _plot_1e1a_(td_);
     }
-    if (a_pattern_id == snemo::datamodel::topology_2e_pattern::pattern_id()) {
+    if (td_.has_pattern_as<snemo::datamodel::topology_2e_pattern>()) {
       _plot_2e_(td_);
     }
     return;
@@ -104,7 +103,7 @@ namespace analysis {
 
   void topology_data_plotter::_plot_1e1a_(const snemo::datamodel::topology_data & td_)
   {
-    auto a_pattern = dynamic_cast<const snemo::datamodel::topology_1e1a_pattern&>(td_.get_pattern());
+    auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_1e1a_pattern>();
 
     std::string key;
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
@@ -134,28 +133,28 @@ namespace analysis {
 
   void topology_data_plotter::_plot_2e_(const snemo::datamodel::topology_data & td_)
   {
-    auto a_pattern = dynamic_cast<const snemo::datamodel::topology_2e_pattern&>(td_.get_pattern());
+    auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_2e_pattern>();
 
     std::string key;
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
     if (a_pool.has_1d(key = "TD::2e::minimal_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_minimal_energy();
+      const double energy = a_pattern.get_electron_minimal_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
     if (a_pool.has_1d(key = "TD::2e::maximal_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_maximal_energy();
+      const double energy = a_pattern.get_electron_maximal_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
     if (a_pool.has_1d(key = "TD::2e::total_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_total_energy();
+      const double energy = a_pattern.get_electrons_energy_sum();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
     if (a_pool.has_1d(key = "TD::2e::angle")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double angle = a_pattern.get_angle();
+      const double angle = a_pattern.get_electrons_angle();
       if (datatools::is_valid(angle)) h1d.fill(angle);
     }
     return;
