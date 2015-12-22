@@ -1,6 +1,5 @@
 #!/usr/bin/zsh -i
 
-
 function run()
 {
     __pkgtools__at_function_enter run
@@ -38,7 +37,7 @@ function run()
     fi
 
     pkgtools__msg_notice "Running $1 revision"
-    pkgtools__quietly_run "mydpp_processing --module channel_chain -M 10 -% 1 -P notice"
+    pkgtools__quietly_run "mydpp_processing --module channel_chain -M 1000 -% 100"
     local config_path=$SNAILWARE_SIMULATION_DIR/snemo_analysis_modules/config
     pkgtools__quietly_run \
         "bxdpp_processing --module snemo_control_plot              \
@@ -68,7 +67,7 @@ function compare()
              --save-directory ${build_dir}/figures"
 
         cd figures
-        pkgtools__quietly_run "ls *.tex | parallel tikz2pdf -o -q --xkcd {}"
+        pkgtools__quietly_run "ls *.tex | parallel tikz2pdf -o -q {}"
     )
 
     __pkgtools__at_function_exit
@@ -188,21 +187,21 @@ while [ -n "$1" ]; do
     shift 1
 done
 
-if [ -z ${dev_revision} -o -z ${ref_revision} ]; then
-    pkgtools__msg_error "Missing svn revision !"
-fi
-
 pkgtools__msg_devel "Reference revision ${ref_revision}"
 pkgtools__msg_devel "Dev. revision ${dev_revision}"
 
 # test -d ${build_dir} && rm -fr ${build_dir}; mkdir -p ${build_dir}/{root,figures}
 
-# run ${ref_revision}
-# run ${dev_revision}
-
-# compare ${ref_revision} ${dev_revision}
-
-generate_org_file
+# if [ ! -z ${ref_revision} ]; then
+#     run ${ref_revision}
+# fi
+# if [ ! -z ${dev_revision} ]; then
+#     run ${dev_revision}
+# fi
+if [ ! -z ${dev_revision} -a ! -z ${ref_revision} ]; then
+    compare ${ref_revision} ${dev_revision}
+    generate_org_file
+fi
 
 cd ${opwd}
 
