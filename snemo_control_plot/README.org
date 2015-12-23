@@ -284,28 +284,28 @@ Setting axis labels and histogram title.
 ***** Electron energy
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::1e1a::electron_energy", group="TD::1e1a::histos")>>
-  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Electron track length
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::1e1a::electron_track_length", group="TD::1e1a::histos")>>
-  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m">>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m")>>
   <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
 #+END_SRC
 
 ***** Alpha delayed time
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::1e1a::alpha_delay_time", group="TD::1e1a::histos")>>
-  <<set_binning(nbins=100, unit="us", min="0 us", max="1 ms">>
+  <<set_binning(nbins=100, unit="us", min="0 us", max="1 ms")>>
   <<set_label(title="Distribution of alpha delay time", xlabel="$\\alpha$ delay time", ylabel="Counts")>>
 #+END_SRC
 
 ***** Alpha track length
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::1e1a::alpha_track_length", group="TD::1e1a::histos")>>
-  <<set_binning(nbins=100, unit="mm", min="0 mm", max="400 mm">>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="400 mm")>>
   <<set_label(title="Distribution of alpha track length", xlabel="$\\alpha$ track length", ylabel="Counts")>>
 #+END_SRC
 
@@ -313,27 +313,27 @@ Setting axis labels and histogram title.
 ***** Minimal electron energy
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::2e::minimal_energy", group="TD::2e::histos")>>
-  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electrons minimal energy", xlabel="electron minimal energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Maximal electron energy
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::2e::maximal_energy", group="TD::2e::histos")>>
-  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electrons maximal energy", xlabel="electron maximal energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Total electron energy
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::2e::total_energy", group="TD::2e::histos")>>
-  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electrons total energy", xlabel="electron total energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Angle between electrons
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TTD::2e::angle", group="TD::2e::histos")>>
-  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree">>
+  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
   <<set_label(title="Distribution of angle between electrons", xlabel="$\\theta$ angle", ylabel="Counts")>>
 #+END_SRC
