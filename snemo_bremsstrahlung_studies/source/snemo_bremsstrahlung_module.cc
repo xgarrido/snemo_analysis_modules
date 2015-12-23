@@ -103,7 +103,7 @@ namespace analysis {
                   std::logic_error,
                   "Module '" << get_name() << "' has no '" << histogram_label << "' service !");
       dpp::histogram_service & Histo
-        = service_manager_.get<dpp::histogram_service>(histogram_label);
+        = service_manager_.grab<dpp::histogram_service>(histogram_label);
       set_histogram_pool(Histo.grab_pool());
       if (config_.has_key("Histo_output_files")) {
         std::vector<std::string> output_files;
@@ -132,31 +132,28 @@ namespace analysis {
                 ! service_manager_.is_a<geomtools::geometry_service>(geo_label),
                 std::logic_error,
                 "Module '" << get_name() << "' has no '" << geo_label << "' service !");
-    geomtools::geometry_service & Geo
+    const geomtools::geometry_service & Geo
       = service_manager_.get<geomtools::geometry_service>(geo_label);
 
     // Get geometry locator plugin
     const geomtools::manager & geo_mgr = Geo.get_geom_manager();
     std::string locator_plugin_name;
-    if (config_.has_key("locator_plugin_name"))
-      {
-        locator_plugin_name = config_.fetch_string("locator_plugin_name");
-      }
-    else
-      {
-        // If no locator plugin name is set, then search for the first one
-        const geomtools::manager::plugins_dict_type & plugins = geo_mgr.get_plugins();
-        for (geomtools::manager::plugins_dict_type::const_iterator ip = plugins.begin();
-             ip != plugins.end();
-             ip++) {
-          const std::string & plugin_name = ip->first;
-          if (geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(plugin_name)) {
-            DT_LOG_DEBUG(get_logging_priority(), "Find locator plugin with name = " << plugin_name);
-            locator_plugin_name = plugin_name;
-            break;
-          }
+    if (config_.has_key("locator_plugin_name")) {
+      locator_plugin_name = config_.fetch_string("locator_plugin_name");
+    } else {
+      // If no locator plugin name is set, then search for the first one
+      const geomtools::manager::plugins_dict_type & plugins = geo_mgr.get_plugins();
+      for (geomtools::manager::plugins_dict_type::const_iterator ip = plugins.begin();
+           ip != plugins.end();
+           ip++) {
+        const std::string & plugin_name = ip->first;
+        if (geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(plugin_name)) {
+          DT_LOG_DEBUG(get_logging_priority(), "Find locator plugin with name = " << plugin_name);
+          locator_plugin_name = plugin_name;
+          break;
         }
       }
+    }
     // Access to a given plugin by name and type :
     DT_THROW_IF(! geo_mgr.has_plugin(locator_plugin_name) ||
                 ! geo_mgr.is_plugin_a<snemo::geometry::locator_plugin>(locator_plugin_name),
@@ -273,7 +270,7 @@ namespace analysis {
 
       // Retrieve a subset of vertices
       snemo::datamodel::particle_track::vertex_collection_type vertices;
-      const size_t nvtx = a_particle.compute_vertices(vertices, snemo::datamodel::particle_track::VERTEX_ON_SOURCE_FOIL);
+      const size_t nvtx = a_particle.fetch_vertices(vertices, snemo::datamodel::particle_track::VERTEX_ON_SOURCE_FOIL);
       if (nvtx != 1) {
         DT_LOG_DEBUG(get_logging_priority(), "Current particle has more than one vertex on source foil !");
         continue;
