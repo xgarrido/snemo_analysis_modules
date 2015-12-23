@@ -84,7 +84,7 @@ namespace analysis {
                   std::logic_error,
                   "Module '" << get_name() << "' has no '" << histogram_label << "' service !");
       dpp::histogram_service & Histo
-        = service_manager_.get<dpp::histogram_service>(histogram_label);
+        = service_manager_.grab<dpp::histogram_service>(histogram_label);
       set_histogram_pool(Histo.grab_pool());
       if (config_.has_key("Histo.output_files")) {
         std::vector<std::string> output_files;
@@ -227,35 +227,19 @@ namespace analysis {
     if (get_logging_priority() >= datatools::logger::PRIO_DEBUG) td.tree_dump();
 
     if (! td.has_pattern()) return;
-    const snemo::datamodel::base_topology_pattern & a_pattern = td.get_pattern();
-    if (a_pattern.get_pattern_id() != snemo::datamodel::topology_1e1a_pattern::pattern_id()) {
+    if (td.has_pattern_as<snemo::datamodel::topology_1e1a_pattern>()) {
       DT_LOG_WARNING(get_logging_priority(), "Topology pattern does not match '"
                      << snemo::datamodel::topology_1e1a_pattern::pattern_id() << "' topology !");
       return;
     }
-    const snemo::datamodel::topology_1e1a_pattern & a_1e1a_pattern =
-      dynamic_cast<const snemo::datamodel::topology_1e1a_pattern &>(a_pattern);
+    const snemo::datamodel::topology_1e1a_pattern & a_1e1a_pattern
+      = td.get_pattern_as<snemo::datamodel::topology_1e1a_pattern>();
     alpha_track_parameters alpha = {0, 0};
     alpha.length = a_1e1a_pattern.get_alpha_track_length();
 
     // Store the number of geiger cells associated to alpha track
     if (! _selected_geiger_range_.empty()) {
-      const std::string ptd_label = snemo::datamodel::data_info::default_particle_track_data_label();
-      if (! data_record_.has(ptd_label)) {
-        DT_LOG_DEBUG(get_logging_priority(), "Missing particle track data to select alpha's cluster size !");
-        return;
-      }
-      const snemo::datamodel::particle_track_data & ptd
-        = data_record_.get<snemo::datamodel::particle_track_data>(ptd_label);
-      snemo::datamodel::particle_track_data::particle_collection_type alphas;
-      const size_t nalphas
-        = snemo::datamodel::pid_utils::fetch_particles(ptd, alphas,
-                                                       snemo::datamodel::pid_utils::alpha_label());
-      if (nalphas != 1) {
-        DT_LOG_DEBUG(get_logging_priority(), "Something nasty has occured !");
-        return;
-      }
-      const snemo::datamodel::particle_track & a_alpha = alphas.front().get();
+      const snemo::datamodel::particle_track & a_alpha = a_1e1a_pattern.get_alpha_track();
       if (! a_alpha.has_trajectory()) return;
       if (! a_alpha.get_trajectory().has_cluster()) return;
       alpha.nggs = a_alpha.get_trajectory().get_cluster().get_number_of_hits();
