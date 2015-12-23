@@ -98,10 +98,10 @@ namespace analysis {
 
     dpp::base_module::_common_initialize(config_);
 
-    DT_THROW_IF(!config_.has_key("bank_label"), std::logic_error, "Missing bank label !");
+    DT_THROW_IF(! config_.has_key("bank_label"), std::logic_error, "Missing bank label !");
     _bank_label_ = config_.fetch_string("bank_label");
 
-    DT_THROW_IF(!config_.has_key("output_filename"), std::logic_error, "Missing output filename !");
+    DT_THROW_IF(! config_.has_key("output_filename"), std::logic_error, "Missing output filename !");
     _output_filename_ = config_.fetch_string("output_filename");
     datatools::fetch_path_with_env(_output_filename_);
 
@@ -116,7 +116,7 @@ namespace analysis {
                 ! service_manager_.is_a<geomtools::geometry_service>(geo_label),
                 std::logic_error,
                 "Module '" << get_name() << "' has no '" << geo_label << "' service !");
-    geomtools::geometry_service & Geo
+    const geomtools::geometry_service & Geo
       = service_manager_.get<geomtools::geometry_service>(geo_label);
 
     // Get geometry locator plugin
