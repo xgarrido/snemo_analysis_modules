@@ -188,7 +188,7 @@ namespace analysis {
                   std::logic_error,
                   "Module '" << get_name() << "' has no '" << histogram_label << "' service !");
       dpp::histogram_service & Histo
-        = service_manager_.get<dpp::histogram_service>(histogram_label);
+        = service_manager_.grab<dpp::histogram_service>(histogram_label);
       set_histogram_pool(Histo.grab_pool());
       if (config_.has_key("Histo_output_files")) {
         std::vector<std::string> output_files;
@@ -320,13 +320,12 @@ namespace analysis {
       DT_LOG_ERROR(get_logging_priority(), "Missing topology pattern !");
       return dpp::base_module::PROCESS_STOP;
     }
-    const snemo::datamodel::base_topology_pattern & a_pattern = td.get_pattern();
-    if (a_pattern.get_pattern_id() != snemo::datamodel::topology_2e_pattern::pattern_id()) {
+    if (td.has_pattern_as<snemo::datamodel::topology_2e_pattern>()) {
       DT_LOG_ERROR(get_logging_priority(), "0nu sensitivity can only be calculated for '2e' topology!");
       return dpp::base_module::PROCESS_STOP;
     }
     const snemo::datamodel::topology_2e_pattern & a_2e_pattern
-      = dynamic_cast<const snemo::datamodel::topology_2e_pattern &>(a_pattern);
+      = td.get_pattern_as<snemo::datamodel::topology_2e_pattern>();
 
     // Getting histogram pool
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
@@ -341,7 +340,7 @@ namespace analysis {
 
     // Getting the current histogram
     mygsl::histogram_1d & a_histo = a_pool.grab_1d(key.str ());
-    a_histo.fill(a_2e_pattern.get_total_energy());
+    a_histo.fill(a_2e_pattern.get_electrons_energy_sum());
 
     // Compute normalization factor given the total number of events generated
     // and the weight of each event
