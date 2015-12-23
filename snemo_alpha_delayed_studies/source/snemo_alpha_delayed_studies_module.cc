@@ -22,7 +22,6 @@
 // - Falaise
 #include <snemo/datamodels/pid_utils.h>
 #include <snemo/datamodels/data_model.h>
-#include <snemo/datamodels/particle_track_data.h>
 #include <snemo/datamodels/topology_data.h>
 #include <snemo/datamodels/topology_1e1a_pattern.h>
 
