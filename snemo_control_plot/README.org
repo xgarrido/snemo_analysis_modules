@@ -117,606 +117,223 @@ histograms all belong to the =__template= group.
   #@meta_label  "type"
 #+END_SRC
 
+*** Skeleton codes                                               :noexport:
+:PROPERTIES:
+:TANGLE: no
+:RESULTS: output
+:END:
+This section declare some skeleton code to ease the creation of histograms.
+**** Setting name, type, group and mode
+Declaring histogram name, histogram type /i.e./ =mygsl::histogram_1d= or
+=mygsl::histogram_2d=, histogram group and finally histogram mode that can be
+either regular, table or mimic.
+#+NAME: set_name
+#+HEADERS: :var name="" :var type="mygsl::histogram_1d" :var group="" :var mode="regular"
+#+BEGIN_SRC shell
+  echo '[name="'$name'" type="'$type'"]'
+  echo
+  echo '#@config The group of the histogram'
+  echo 'group : string = "'$group'"'
+  echo
+  echo '#@description The build mode'
+  echo 'mode : string = "'$mode'"'
+#+END_SRC
+
+**** Setting axis binning
+This part allows to declare the axis binning, min/max values, linear/logarithmic
+mode and finally the axis unit.
+
+#+TBLNAME: units
+|--------+--------|
+| eV     | energy |
+| degree | angle  |
+| s      | time   |
+| m      | length |
+|--------+--------|
+
+#+NAME: set_binning
+#+HEADERS: :var arr=units :var unit=""
+#+HEADERS: :var mode="linear" :var nbins="" :var min="" :var max=""
+#+BEGIN_SRC shell
+  echo '#@description The '$mode' mode'
+  echo $mode' : boolean = 1'
+  echo
+  echo '#@decription The number of bins'
+  echo 'number_of_bins : integer = '$nbins
+  echo
+  local -A units=(${=arr})
+  local found=false
+  for u in "${(@k)units}"; do
+      if [[  $unit =~ $u ]]; then
+          echo '#@description The unit of the bins bounds'
+          echo 'unit : string = "'$unit'"'
+          echo
+          echo '#@description The lower bound of the histogram'
+          echo 'min : real as '${units[$u]}' = '$min
+          echo
+          echo '#@description The upper bound of the histogram'
+          echo 'max : real as '${units[$u]}' = '$max
+          found=true
+          break
+      fi
+  done
+  if ! $found; then
+      echo '#@description The lower bound of the histogram'
+      echo 'min : real = '$min
+      echo
+      echo '#@description The upper bound of the histogram'
+      echo 'max : real = '$max
+  fi
+#+END_SRC
+
+**** Setting axis labels and histogram title
+Setting axis labels and histogram title.
+
+#+NAME: set_label
+#+HEADERS: :var title="" :var xlabel="" :var ylabel=""
+#+BEGIN_SRC shell
+  if [ ! -z $title ]; then
+      echo '#@description The title of the histogram'
+      printf 'title : string = "%s"\n\n' "$title"
+  fi
+  if [ ! -z $xlabel ]; then
+      echo '#@description The X axis label'
+      printf 'display.xaxis.label : string = "%s"\n\n' "$xlabel"
+  fi
+  if [ ! -z $ylabel ]; then
+      echo '#@description The Y axis label'
+      printf 'display.yaxis.label : string = "%s"\n' "$ylabel"
+  fi
+#+END_SRC
 *** Simulated data bank histograms
 **** Number of Geiger hits
-#+BEGIN_SRC shell
-  [name="SD::ngghits" type="mygsl::histogram_1d"]
-  #@config The histogram of the number of MC Geiger hits
-
-  #@description The group of the histogram (optional)
-  group : string = "SD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Number of simulated tracker hits"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 50
-
-  #@description The lower bound of the histogram
-  min : real = -0.5
-
-  #@description The upper bound of the histogram
-  max : real = 99.5
-
-  #@description The X axis label
-  display.xaxis.label : string = "$N_\text{sim.}$ (tracker)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="SD::ngghits", group="SD::histos")>>
+  <<set_binning(nbins=50, min=-0.5, max=99.5)>>
+  <<set_label(title="Number of simulated tracker hits", xlabel="$N_\\text{sim.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Number of calorimeter hits
-#+BEGIN_SRC shell
-  [name="SD::ncalohits" type="mygsl::histogram_1d"]
-  #@config The histogram of the number of MC calo hits
-
-  #@description The group of the histogram (optional)
-  group : string = "SD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Number of simulated calorimeter hits"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 10
-
-  #@description The lower bound of the histogram
-  min : real = -0.5
-
-  #@description The upper bound of the histogram
-  max : real = 9.5
-
-  #@description The X axis label
-  display.xaxis.label : string = "$N_\text{sim.}$ (calorimeter)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="SD::ncalohits", group="SD::histos")>>
+  <<set_binning(nbins=10, min=-0.5, max=9.5)>>
+  <<set_label(title="Number of simulated calorimeter hits", xlabel="$N_\\text{sim.}$ (calorimeter)", ylabel="Counts")>>
 #+END_SRC
 
 *** Calibrated data bank histograms
 **** Number of calibrated tracker hits
-#+BEGIN_SRC shell
-  [name="CD::ngghits" type="mygsl::histogram_1d"]
-  #@config The histogram of the number of calibrated tracker hits
-
-  #@description The group of the histogram (optional)
-  group : string = "CD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Number of calibrated tracker hits"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 25
-
-  #@description The lower bound of the histogram
-  min : real = -0.5
-
-  #@description The upper bound of the histogram
-  max : real = 99.5
-
-  #@description The X axis label
-  display.xaxis.label : string = "$N_\text{calib.}$ (tracker)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::ngghits", group="CD::histos")>>
+  <<set_binning(nbins=25, min=-0.5, max=99.5)>>
+  <<set_label(title="Number of calibrated tracker hits", xlabel="$N_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Number of calibrated calorimeter hits
-#+BEGIN_SRC shell
-  [name="CD::ncalohits" type="mygsl::histogram_1d"]
-  #@config The histogram of the number of calibrated calorimeter hits
-
-  #@description The group of the histogram (optional)
-  group : string = "CD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Number of calibrated calorimeter hits"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 10
-
-  #@description The lower bound of the histogram
-  min : real = -0.5
-
-  #@description The upper bound of the histogram
-  max : real = 9.5
-
-  #@description The X axis label
-  display.xaxis.label : string = "$N_\text{calib.}$ (calorimeter)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::ncalohits", group="CD::histos")>>
+  <<set_binning(nbins=10, min=-0.5, max=9.5)>>
+  <<set_label(title="Number of calibrated tracker hits", xlabel="$N_\\text{calib.}$ (calorimeter)", ylabel="Counts")>>
 #+END_SRC
 
 **** Distribution of drift radius
-#+BEGIN_SRC shell
-  [name="CD::drift_radius" type="mygsl::histogram_1d"]
-  #@config The histogram of the Geiger cell radius
-
-  #@description The group of the histogram (optional)
-  group : string = "CD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Distribution of Geiger drift distance"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "mm"
-
-  #@description The lower bound of the histogram
-  min : real as length = 0 mm
-
-  #@description The upper bound of the histogram
-  max : real as length = 25 mm
-
-  #@description The X axis label
-  display.xaxis.label : string = "$r_\text{calib.}$ (tracker)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::drift_radius", group="CD::histos")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="25 mm")>>
+  <<set_label(title="Distribution of Geiger drift distance error", xlabel="$r_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
+
 **** Distribution of drift radius error
-#+BEGIN_SRC shell
-  [name="CD::drift_radius_error" type="mygsl::histogram_1d"]
-  #@config The histogram of the Geiger cell radius error
-
-  #@description The group of the histogram (optional)
-  group : string = "CD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Distribution of Geiger drift distance error"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "mm"
-
-  #@description The lower bound of the histogram
-  min : real as length = 0 mm
-
-  #@description The upper bound of the histogram
-  max : real as length = 1 mm
-
-  #@description The X axis label
-  display.xaxis.label : string = "$\sigma_{r_\text{calib.}}$ (tracker)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::drift_radius_error", group="CD::histos")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="1 mm")>>
+  <<set_label(title="Distribution of Geiger drift distance", xlabel="$\\sigma_{r_\\text{calib.}}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Distribution of longitudinal position
-#+BEGIN_SRC shell
-  [name="CD::long_position" type="mygsl::histogram_1d"]
-  #@config The histogram of the Geiger cell longitudinal position
-
-  #@description The group of the histogram (optional)
-  group : string = "CD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Distribution of Geiger longitudinal position"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "mm"
-
-  #@description The lower bound of the histogram
-  min : real as length = 0 mm
-
-  #@description The upper bound of the histogram
-  max : real as length = 1500 mm
-
-  #@description The X axis label
-  display.xaxis.label : string = "$z_\text{calib.}$ (tracker)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::long_position", group="CD::histos")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="1.5 m")>>
+  <<set_label(title="Distribution of Geiger longitudinal position", xlabel="$z_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Distribution of longitudinal position error
-#+BEGIN_SRC shell
-  [name="CD::long_position_error" type="mygsl::histogram_1d"]
-  #@config The histogram of the Geiger cell longitudinal position error
-
-  #@description The group of the histogram (optional)
-  group : string = "CD::histos"
-
-  #@description The title of the histogram (optional)
-  title : string = "Distribution of Geiger longitudinal position error"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "mm"
-
-  #@description The lower bound of the histogram
-  min : real as length = 0 mm
-
-  #@description The upper bound of the histogram
-  max : real as length = 10 mm
-
-  #@description The X axis label
-  display.xaxis.label : string = "$\sigma_{z_\text{calib.}}$ (tracker)"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::long_position_error", group="CD::histos")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="10 mm")>>
+  <<set_label(title="Distribution of Geiger longitudinal position error", xlabel="$\\sigma_{z_\\text{calib.}}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 *** Tracker clustering data bank histograms
 **** Number of clusters
-#+BEGIN_SRC shell
-  [name="TCD::nclusters" type="mygsl::histogram_1d"]
-  #@config The histogram of the number of tracker clusters
-
-  #@description The group of the histogram (optional)
-  group : string = "TCD::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 10
-
-  #@description The lower bound of the histogram
-  min : real = -0.5
-
-  #@description The upper bound of the histogram
-  max : real = 9.5
-
-  #@description The X axis label
-  display.xaxis.label : string = "$N_\text{cluster}$"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TCD::nclusters", group="TCD::histos")>>
+  <<set_binning(nbins=10, min=-0.5, max=9.5)>>
+  <<set_label(title="Distribution of number of clusters", xlabel="$N_\\text{cluster}$", ylabel="Counts")>>
 #+END_SRC
+
 *** Tracker trajectory data bank histograms
 **** Helix radius
-#+BEGIN_SRC shell
-  [name="TTD::helix_radius" type="mygsl::histogram_1d"]
-  #@config The histogram of the helix radius
-
-  #@description The group of the histogram (optional)
-  group : string = "TTD::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "mm"
-
-  #@description The lower bound of the histogram
-  min : real as length = 0.0 mm
-
-  #@description The upper bound of the histogram
-  max : real as length = 2 m
-
-  #@description The X axis label
-  display.xaxis.label : string = "$r_\text{helix}$"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::nclusters", group="TTD::histos")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="2 m")>>
+  <<set_label(title="Distribution of helix trajectory radius", xlabel="$r_\\text{helix}$", ylabel="Counts")>>
 #+END_SRC
+
 *** Topology data bank histograms
 **** 1e1\alpha plots
 ***** Electron energy
-#+BEGIN_SRC shell
-  [name="TD::1e1a::electron_energy" type="mygsl::histogram_1d"]
-  #@config The histogram of the electron energy for 1e1a topology
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::1e1a::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
-
-  #@description The lower bound of the histogram
-  min : real as energy = 0.0 keV
-
-  #@description The upper bound of the histogram
-  max : real as energy = 4.0 MeV
-
-  #@description The X axis label
-  display.xaxis.label : string = "electron energy"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::1e1a::electron_energy", group="TD::1e1a::histos")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Electron track length
-#+BEGIN_SRC shell
-  [name="TD::1e1a::electron_track_length" type="mygsl::histogram_1d"]
-  #@config The histogram of the electron track length
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::1e1a::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "mm"
-
-  #@description The lower bound of the histogram
-  min : real as length = 0.0 mm
-
-  #@description The upper bound of the histogram
-  max : real as length = 3 m
-
-  #@description The X axis label
-  display.xaxis.label : string = "electron track length"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::1e1a::electron_track_length", group="TD::1e1a::histos")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m">>
+  <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
 #+END_SRC
 
 ***** Alpha delayed time
-#+BEGIN_SRC shell
-  [name="TD::1e1a::alpha_delayed_time" type="mygsl::histogram_1d"]
-  #@config The histogram of the alpha delayed time
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::1e1a::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "us"
-
-  #@description The lower bound of the histogram
-  min : real as time = 0.0 us
-
-  #@description The upper bound of the histogram
-  max : real as time = 1 ms
-
-  #@description The X axis label
-  display.xaxis.label : string = "$\alpha$ delay time"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::1e1a::alpha_delay_time", group="TD::1e1a::histos")>>
+  <<set_binning(nbins=100, unit="us", min="0 us", max="1 ms">>
+  <<set_label(title="Distribution of alpha delay time", xlabel="$\\alpha$ delay time", ylabel="Counts")>>
 #+END_SRC
 
 ***** Alpha track length
-#+BEGIN_SRC shell
-  [name="TD::1e1a::alpha_track_length" type="mygsl::histogram_1d"]
-  #@config The histogram of the alpha track length
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::1e1a::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "mm"
-
-  #@description The lower bound of the histogram
-  min : real as length = 0.0 mm
-
-  #@description The upper bound of the histogram
-  max : real as length = 400 mm
-
-  #@description The X axis label
-  display.xaxis.label : string = "$\alpha$ track length"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::1e1a::alpha_track_length", group="TD::1e1a::histos")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="400 mm">>
+  <<set_label(title="Distribution of alpha track length", xlabel="$\\alpha$ track length", ylabel="Counts")>>
 #+END_SRC
+
 **** 2e plots
 ***** Minimal electron energy
-#+BEGIN_SRC shell
-  [name="TD::2e::minimal_energy" type="mygsl::histogram_1d"]
-  #@config The histogram of the minimal energy for 2e topology
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::2e::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
-
-  #@description The lower bound of the histogram
-  min : real as energy = 0.0 keV
-
-  #@description The upper bound of the histogram
-  max : real as energy = 4.0 MeV
-
-  #@description The X axis label
-  display.xaxis.label : string = "electron minimal energy"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::2e::minimal_energy", group="TD::2e::histos")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_label(title="Distribution of electrons minimal energy", xlabel="electron minimal energy", ylabel="Counts")>>
 #+END_SRC
+
 ***** Maximal electron energy
-#+BEGIN_SRC shell
-  [name="TD::2e::maximal_energy" type="mygsl::histogram_1d"]
-  #@config The histogram of the maximal energy for 2e topology
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::2e::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
-
-  #@description The lower bound of the histogram
-  min : real as energy = 0.0 keV
-
-  #@description The upper bound of the histogram
-  max : real as energy = 4.0 MeV
-
-  #@description The X axis label
-  display.xaxis.label : string = "electron maximal energy"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::2e::maximal_energy", group="TD::2e::histos")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_label(title="Distribution of electrons maximal energy", xlabel="electron maximal energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Total electron energy
-#+BEGIN_SRC shell
-  [name="TD::2e::total_energy" type="mygsl::histogram_1d"]
-  #@config The histogram of the total energy for 2e topology
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::2e::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "keV"
-
-  #@description The lower bound of the histogram
-  min : real as energy = 0.0 keV
-
-  #@description The upper bound of the histogram
-  max : real as energy = 4.0 MeV
-
-  #@description The X axis label
-  display.xaxis.label : string = "electron total energy"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::2e::total_energy", group="TD::2e::histos")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV">>
+  <<set_label(title="Distribution of electrons total energy", xlabel="electron total energy", ylabel="Counts")>>
 #+END_SRC
+
 ***** Angle between electrons
-#+BEGIN_SRC shell
-  [name="TD::2e::angle" type="mygsl::histogram_1d"]
-  #@config The histogram of the angle between electrons for 2e topology
-
-  #@description The group of the histogram (optional)
-  group : string = "TD::2e::histos"
-
-  #@description The build mode (default : "regular", "table", "mimic");
-  mode : string = "regular"
-
-  #@description The linear mode (default)
-  linear : boolean = 1
-
-  #@description The number of bins
-  number_of_bins : integer = 100
-
-  #@description The unit of the bins' bounds (a standard unit, typically SI or CLHEP)
-  unit : string = "degree"
-
-  #@description The lower bound of the histogram
-  min : real as angle = 0.0 degree
-
-  #@description The upper bound of the histogram
-  max : real as angle = 180 degree
-
-  #@description The X axis label
-  display.xaxis.label : string = "$\theta$ angle"
-
-  #@description The Y axis label
-  display.yaxis.label : string = "Counts"
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TTD::2e::angle", group="TD::2e::histos")>>
+  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree">>
+  <<set_label(title="Distribution of angle between electrons", xlabel="$\\theta$ angle", ylabel="Counts")>>
 #+END_SRC
