@@ -208,14 +208,14 @@ Setting axis labels and histogram title.
 *** Simulated data bank histograms
 **** Number of Geiger hits
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="SD::ngghits", group="SD::histos")>>
+  <<set_name(name="SD::ngghits", group="SD")>>
   <<set_binning(nbins=50, min=-0.5, max=99.5)>>
   <<set_label(title="Number of simulated tracker hits", xlabel="$N_\\text{sim.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Number of calorimeter hits
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="SD::ncalohits", group="SD::histos")>>
+  <<set_name(name="SD::ncalohits", group="SD")>>
   <<set_binning(nbins=10, min=-0.5, max=9.5)>>
   <<set_label(title="Number of simulated calorimeter hits", xlabel="$N_\\text{sim.}$ (calorimeter)", ylabel="Counts")>>
 #+END_SRC
@@ -223,42 +223,42 @@ Setting axis labels and histogram title.
 *** Calibrated data bank histograms
 **** Number of calibrated tracker hits
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="CD::ngghits", group="CD::histos")>>
+  <<set_name(name="CD::ngghits", group="CD")>>
   <<set_binning(nbins=25, min=-0.5, max=99.5)>>
   <<set_label(title="Number of calibrated tracker hits", xlabel="$N_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Number of calibrated calorimeter hits
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="CD::ncalohits", group="CD::histos")>>
+  <<set_name(name="CD::ncalohits", group="CD")>>
   <<set_binning(nbins=10, min=-0.5, max=9.5)>>
   <<set_label(title="Number of calibrated tracker hits", xlabel="$N_\\text{calib.}$ (calorimeter)", ylabel="Counts")>>
 #+END_SRC
 
 **** Distribution of drift radius
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="CD::drift_radius", group="CD::histos")>>
+  <<set_name(name="CD::drift_radius", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="25 mm")>>
   <<set_label(title="Distribution of Geiger drift distance error", xlabel="$r_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Distribution of drift radius error
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="CD::drift_radius_error", group="CD::histos")>>
+  <<set_name(name="CD::drift_radius_error", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="1 mm")>>
   <<set_label(title="Distribution of Geiger drift distance", xlabel="$\\sigma_{r_\\text{calib.}}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Distribution of longitudinal position
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="CD::long_position", group="CD::histos")>>
+  <<set_name(name="CD::long_position", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="1.5 m")>>
   <<set_label(title="Distribution of Geiger longitudinal position", xlabel="$z_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
 **** Distribution of longitudinal position error
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="CD::long_position_error", group="CD::histos")>>
+  <<set_name(name="CD::long_position_error", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="10 mm")>>
   <<set_label(title="Distribution of Geiger longitudinal position error", xlabel="$\\sigma_{z_\\text{calib.}}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
@@ -266,7 +266,7 @@ Setting axis labels and histogram title.
 *** Tracker clustering data bank histograms
 **** Number of clusters
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TCD::nclusters", group="TCD::histos")>>
+  <<set_name(name="TCD::nclusters", group="TCD")>>
   <<set_binning(nbins=10, min=-0.5, max=9.5)>>
   <<set_label(title="Distribution of number of clusters", xlabel="$N_\\text{cluster}$", ylabel="Counts")>>
 #+END_SRC
@@ -274,7 +274,7 @@ Setting axis labels and histogram title.
 *** Tracker trajectory data bank histograms
 **** Helix radius
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::nclusters", group="TTD::histos")>>
+  <<set_name(name="TTD::nclusters", group="TTD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="2 m")>>
   <<set_label(title="Distribution of helix trajectory radius", xlabel="$r_\\text{helix}$", ylabel="Counts")>>
 #+END_SRC
@@ -283,28 +283,28 @@ Setting axis labels and histogram title.
 **** 1e1\alpha plots
 ***** Electron energy
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::1e1a::electron_energy", group="TD::1e1a::histos")>>
+  <<set_name(name="TD::1e1a::electron_energy", group="TD/1e1a")>>
   <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Electron track length
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::1e1a::electron_track_length", group="TD::1e1a::histos")>>
+  <<set_name(name="TD::1e1a::electron_track_length", group="TD/1e1a")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m")>>
   <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
 #+END_SRC
 
 ***** Alpha delayed time
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::1e1a::alpha_delay_time", group="TD::1e1a::histos")>>
+  <<set_name(name="TD::1e1a::alpha_delay_time", group="TD/1e1a")>>
   <<set_binning(nbins=100, unit="us", min="0 us", max="1 ms")>>
   <<set_label(title="Distribution of alpha delay time", xlabel="$\\alpha$ delay time", ylabel="Counts")>>
 #+END_SRC
 
 ***** Alpha track length
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::1e1a::alpha_track_length", group="TD::1e1a::histos")>>
+  <<set_name(name="TD::1e1a::alpha_track_length", group="TD/1e1a")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="400 mm")>>
   <<set_label(title="Distribution of alpha track length", xlabel="$\\alpha$ track length", ylabel="Counts")>>
 #+END_SRC
@@ -312,28 +312,28 @@ Setting axis labels and histogram title.
 **** 2e plots
 ***** Minimal electron energy
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::2e::minimal_energy", group="TD::2e::histos")>>
+  <<set_name(name="TD::2e::minimal_energy", group="TD/2e")>>
   <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electrons minimal energy", xlabel="electron minimal energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Maximal electron energy
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::2e::maximal_energy", group="TD::2e::histos")>>
+  <<set_name(name="TD::2e::maximal_energy", group="TD/2e")>>
   <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electrons maximal energy", xlabel="electron maximal energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Total electron energy
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::2e::total_energy", group="TD::2e::histos")>>
+  <<set_name(name="TD::2e::total_energy", group="TD/2e")>>
   <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
   <<set_label(title="Distribution of electrons total energy", xlabel="electron total energy", ylabel="Counts")>>
 #+END_SRC
 
 ***** Angle between electrons
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::2e::angle", group="TD::2e::histos")>>
+  <<set_name(name="TD::2e::angle", group="TD/2e")>>
   <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
   <<set_label(title="Distribution of angle between electrons", xlabel="$\\theta$ angle", ylabel="Counts")>>
 #+END_SRC
