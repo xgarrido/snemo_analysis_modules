@@ -320,7 +320,7 @@ namespace analysis {
       DT_LOG_ERROR(get_logging_priority(), "Missing topology pattern !");
       return dpp::base_module::PROCESS_STOP;
     }
-    if (td.has_pattern_as<snemo::datamodel::topology_2e_pattern>()) {
+    if (! td.has_pattern_as<snemo::datamodel::topology_2e_pattern>()) {
       DT_LOG_ERROR(get_logging_priority(), "0nu sensitivity can only be calculated for '2e' topology!");
       return dpp::base_module::PROCESS_STOP;
     }
