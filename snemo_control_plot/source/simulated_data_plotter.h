@@ -78,7 +78,7 @@ namespace analysis {
 
   };
 
-}  // end of namespace analysis
+} // end of namespace analysis
 } // end of namespace snemo
 
 #include <datatools/ocd_macros.h>
