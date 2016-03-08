@@ -2,7 +2,7 @@
 #+AUTHOR: Xavier Garrido
 #+DATE:   2014-05-23
 #+OPTIONS: ^:{} num:nil toc:nil
-#+STARTUP: entitiespretty
+# #+STARTUP: entitiespretty
 
 This repository holds a SN@ilWare configuration to run SuperNEMO simulations and
 to produce several "control" plots. It provides one SN@ilWare module which
@@ -259,7 +259,7 @@ Setting axis labels and histogram title.
 **** Distribution of longitudinal position error
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="CD::long_position_error", group="CD")>>
-  <<set_binning(nbins=100, unit="mm", min="0 mm", max="10 mm")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="100 mm")>>
   <<set_label(title="Distribution of Geiger longitudinal position error", xlabel="$\\sigma_{z_\\text{calib.}}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
@@ -274,12 +274,34 @@ Setting axis labels and histogram title.
 *** Tracker trajectory data bank histograms
 **** Helix radius
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TTD::nclusters", group="TTD")>>
-  <<set_binning(nbins=100, unit="mm", min="0 mm", max="2 m")>>
+  <<set_name(name="TTD::helix_radius", group="TTD")>>
+  <<set_binning(nbins=100, unit="m", min="0 m", max="3 m")>>
   <<set_label(title="Distribution of helix trajectory radius", xlabel="$r_\\text{helix}$", ylabel="Counts")>>
 #+END_SRC
 
 *** Topology data bank histograms
+**** 1e plots
+***** Electron energy
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e::electron_energy", group="TD/1e")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
+  <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
+#+END_SRC
+
+***** Electron track length
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e::electron_track_length", group="TD/1e")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m")>>
+  <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
+#+END_SRC
+
+***** Angle between electron and the $x$ axis
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e::electron_angle", group="TD/1e")>>
+  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
+  <<set_label(title="Distribution of angle between electron and the $x$ axis", xlabel="$\\theta$ angle", ylabel="Counts")>>
+#+END_SRC
+
 **** 1e1\alpha plots
 ***** Electron energy
 #+BEGIN_SRC shell :noweb yes
@@ -295,6 +317,13 @@ Setting axis labels and histogram title.
   <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
 #+END_SRC
 
+***** Angle between electron and the $x$ axis
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e1a::electron_angle", group="TD/1e1a")>>
+  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
+  <<set_label(title="Distribution of angle between electron and the $x$ axis", xlabel="$\\theta$ angle", ylabel="Counts")>>
+#+END_SRC
+
 ***** Alpha delayed time
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TD::1e1a::alpha_delay_time", group="TD/1e1a")>>
@@ -307,6 +336,50 @@ Setting axis labels and histogram title.
   <<set_name(name="TD::1e1a::alpha_track_length", group="TD/1e1a")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="400 mm")>>
   <<set_label(title="Distribution of alpha track length", xlabel="$\\alpha$ track length", ylabel="Counts")>>
+#+END_SRC
+
+**** 1e1\gamma plots
+***** Electron energy
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e1g::electron_energy", group="TD/1e1g")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
+  <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
+#+END_SRC
+
+***** Electron track length
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e1g::electron_track_length", group="TD/1e1g")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m")>>
+  <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
+#+END_SRC
+
+***** Angle between electron and the $x$ axis
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e1g::electron_angle", group="TD/1e1g")>>
+  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
+  <<set_label(title="Distribution of angle between electron and the $x$ axis", xlabel="$\\theta$ angle", ylabel="Counts")>>
+#+END_SRC
+
+**** 1e2\gamma plots
+***** Electron energy
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e2g::electron_energy", group="TD/1e2g")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
+  <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
+#+END_SRC
+
+***** Electron track length
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e2g::electron_track_length", group="TD/1e2g")>>
+  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m")>>
+  <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
+#+END_SRC
+
+***** Angle between electron and the $x$ axis
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e2g::electron_angle", group="TD/1e2g")>>
+  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
+  <<set_label(title="Distribution of angle between electron and the $x$ axis", xlabel="$\\theta$ angle", ylabel="Counts")>>
 #+END_SRC
 
 **** 2e plots
