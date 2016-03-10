@@ -129,6 +129,7 @@ Declaring histogram name, histogram type /i.e./ =mygsl::histogram_1d= or
 either regular, table or mimic.
 #+NAME: set_name
 #+HEADERS: :var name="" :var type="mygsl::histogram_1d" :var group="" :var mode="regular"
+#+HEADERS: :var table="" :var mimic=""
 #+BEGIN_SRC shell
   echo '[name="'$name'" type="'$type'"]'
   echo
@@ -137,6 +138,15 @@ either regular, table or mimic.
   echo
   echo '#@description The build mode'
   echo 'mode : string = "'$mode'"'
+  if [[ $mode == "mimic" ]]; then
+      echo
+      echo '#@description Histogram name to be mimic'
+      if [[ $type == "mygsl::histogram_1d" ]]; then
+          echo 'mimic.histogram_1d : string = "'$mimic'"'
+      elif [[ $type == "mygsl::histogram_2d" ]]; then
+          echo 'mimic.histogram_2d : string = "'$mimic'"'
+      fi
+  fi
 #+END_SRC
 
 **** Setting axis binning
@@ -341,45 +351,33 @@ Setting axis labels and histogram title.
 **** 1e1\gamma plots
 ***** Electron energy
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TD::1e1g::electron_energy", group="TD/1e1g")>>
-  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
-  <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
+  <<set_name(name="TD::1e1g::electron_energy", group="TD/1e1g", mode="mimic", mimic="TD::1e::electron_energy")>>
 #+END_SRC
 
 ***** Electron track length
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TD::1e1g::electron_track_length", group="TD/1e1g")>>
-  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m")>>
-  <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
+  <<set_name(name="TD::1e1g::electron_track_length", group="TD/1e1g", mode="mimic", mimic="TD::1e::electron_track_length")>>
 #+END_SRC
 
 ***** Angle between electron and the $x$ axis
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TD::1e1g::electron_angle", group="TD/1e1g")>>
-  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
-  <<set_label(title="Distribution of angle between electron and the $x$ axis", xlabel="$\\theta$ angle", ylabel="Counts")>>
+  <<set_name(name="TD::1e1g::electron_angle", group="TD/1e1g", mode="mimic", mimic="TD::1e::electron_angle")>>
 #+END_SRC
 
 **** 1e2\gamma plots
 ***** Electron energy
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TD::1e2g::electron_energy", group="TD/1e2g")>>
-  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
-  <<set_label(title="Distribution of electron energy", xlabel="electron energy", ylabel="Counts")>>
+  <<set_name(name="TD::1e2g::electron_energy", group="TD/1e2g", mode="mimic", mimic="TD::1e::electron_energy")>>
 #+END_SRC
 
 ***** Electron track length
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TD::1e2g::electron_track_length", group="TD/1e2g")>>
-  <<set_binning(nbins=100, unit="mm", min="0 mm", max="3 m")>>
-  <<set_label(title="Distribution of electron track length", xlabel="electron track length", ylabel="Counts")>>
+  <<set_name(name="TD::1e2g::electron_track_length", group="TD/1e2g", mode="mimic", mimic="TD::1e::electron_track_length")>>
 #+END_SRC
 
 ***** Angle between electron and the $x$ axis
 #+BEGIN_SRC shell :noweb yes
-  <<set_name(name="TD::1e2g::electron_angle", group="TD/1e2g")>>
-  <<set_binning(nbins=100, unit="degree", min="0 degree", max="180 degree")>>
-  <<set_label(title="Distribution of angle between electron and the $x$ axis", xlabel="$\\theta$ angle", ylabel="Counts")>>
+  <<set_name(name="TD::1e2g::electron_angle", group="TD/1e2g", mode="mimic", mimic="TD::1e::electron_angle")>>
 #+END_SRC
 
 **** 2e plots
