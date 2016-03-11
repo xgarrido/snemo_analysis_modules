@@ -19,9 +19,11 @@
 // - Falaise
 #include <falaise/snemo/datamodels/data_model.h>
 #include <falaise/snemo/datamodels/topology_data.h>
+#include <falaise/snemo/datamodels/topology_1e_pattern.h>
 #include <falaise/snemo/datamodels/topology_1e1a_pattern.h>
 #include <falaise/snemo/datamodels/topology_1eNg_pattern.h>
 #include <falaise/snemo/datamodels/topology_2e_pattern.h>
+#include <falaise/snemo/datamodels/topology_2eNg_pattern.h>
 
 namespace snemo {
 namespace analysis {
@@ -94,133 +96,114 @@ namespace analysis {
     if (! td_.has_pattern()) return;
 
     if (td_.has_pattern_as<snemo::datamodel::topology_1e_pattern>()) {
-      _plot_1e_(td_);
+      auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_1e_pattern>();
+      _plot_1e_(a_pattern);
     }
     if (td_.has_pattern_as<snemo::datamodel::topology_1e1a_pattern>()) {
-      _plot_1e1a_(td_);
+      auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_1e1a_pattern>();
+      _plot_1e1a_(a_pattern);
     }
     if (td_.has_pattern_as<snemo::datamodel::topology_1eNg_pattern>()) {
-      _plot_1eNg_(td_);
+      auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_1eNg_pattern>();
+      _plot_1eNg_(a_pattern);
     }
     if (td_.has_pattern_as<snemo::datamodel::topology_2e_pattern>()) {
-      _plot_2e_(td_);
+      auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_2e_pattern>();
+      _plot_2e_(a_pattern);
+    }
+    if (td_.has_pattern_as<snemo::datamodel::topology_2eNg_pattern>()) {
+      auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_2eNg_pattern>();
+      _plot_2eNg_(a_pattern);
     }
     return;
   }
 
-  void topology_data_plotter::_plot_1e_(const snemo::datamodel::topology_data & td_)
+  void topology_data_plotter::_plot_1e_(const snemo::datamodel::topology_1e_pattern & pattern_,
+                                        const std::string & prefix_)
   {
-    auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_1e_pattern>();
-
-    std::string key;
+    std::string a_key;
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
-    if (a_pool.has_1d(key = "TD::1e::electron_energy")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_electron_energy();
+    if (a_pool.has_1d(a_key = prefix_ + "electron_energy")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double energy = pattern_.get_electron_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::1e::electron_track_length")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double length = a_pattern.get_electron_track_length();
+    if (a_pool.has_1d(a_key = prefix_ + "electron_track_length")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double length = pattern_.get_electron_track_length();
       if (datatools::is_valid(length)) h1d.fill(length);
     }
-    if (a_pool.has_1d(key = "TD::1e::electron_angle")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double angle = a_pattern.get_electron_angle();
+    if (a_pool.has_1d(a_key = prefix_ + "electron_angle")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double angle = pattern_.get_electron_angle();
       if (datatools::is_valid(angle)) h1d.fill(angle);
     }
     return;
   }
 
-  void topology_data_plotter::_plot_1e1a_(const snemo::datamodel::topology_data & td_)
+  void topology_data_plotter::_plot_1e1a_(const snemo::datamodel::topology_1e1a_pattern & pattern_,
+                                          const std::string & prefix_)
   {
-    auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_1e1a_pattern>();
-
-    std::string key;
+    _plot_1e_(pattern_, prefix_);
+    std::string a_key;
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
-    if (a_pool.has_1d(key = "TD::1e1a::electron_energy")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_electron_energy();
-      if (datatools::is_valid(energy)) h1d.fill(energy);
-    }
-    if (a_pool.has_1d(key = "TD::1e1a::electron_track_length")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double length = a_pattern.get_electron_track_length();
-      if (datatools::is_valid(length)) h1d.fill(length);
-    }
-    if (a_pool.has_1d(key = "TD::1e1a::electron_angle")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double angle = a_pattern.get_electron_angle();
-      if (datatools::is_valid(angle)) h1d.fill(angle);
-    }
-    if (a_pool.has_1d(key = "TD::1e1a::alpha_delayed_time")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double time = a_pattern.get_alpha_delayed_time();
+    if (a_pool.has_1d(a_key = prefix_ + "alpha_delayed_time")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double time = pattern_.get_alpha_delayed_time();
       if (datatools::is_valid(time)) h1d.fill(time);
     }
-    if (a_pool.has_1d(key = "TD::1e1a::alpha_track_length")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double length = a_pattern.get_alpha_track_length();
+    if (a_pool.has_1d(a_key = prefix_ + "alpha_track_length")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double length = pattern_.get_alpha_track_length();
       if (datatools::is_valid(length)) h1d.fill(length);
     }
 
     return;
   }
 
-  void topology_data_plotter::_plot_1eNg_(const snemo::datamodel::topology_data & td_)
+  void topology_data_plotter::_plot_1eNg_(const snemo::datamodel::topology_1eNg_pattern & pattern_,
+                                          const std::string & /*prefix_*/)
   {
-    auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_1eNg_pattern>();
-
-    std::ostringstream prefix;
-    prefix << "TD::1e" << a_pattern.get_number_of_gammas() << "g::";
-
-    std::string key;
-    mygsl::histogram_pool & a_pool = grab_histogram_pool();
-    if (a_pool.has_1d(key = prefix.str() + "electron_energy")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_electron_energy();
-      if (datatools::is_valid(energy)) h1d.fill(energy);
-    }
-    if (a_pool.has_1d(key = prefix.str() + "electron_track_length")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double length = a_pattern.get_electron_track_length();
-      if (datatools::is_valid(length)) h1d.fill(length);
-    }
-    if (a_pool.has_1d(key = prefix.str() + "electron_angle")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double angle = a_pattern.get_electron_angle();
-      if (datatools::is_valid(angle)) h1d.fill(angle);
-    }
-
+    std::ostringstream a_prefix;
+    a_prefix << "TD::1e" << pattern_.get_number_of_gammas() << "g::";
+    _plot_1e_(pattern_, a_prefix.str());
     return;
   }
 
-  void topology_data_plotter::_plot_2e_(const snemo::datamodel::topology_data & td_)
+  void topology_data_plotter::_plot_2e_(const snemo::datamodel::topology_2e_pattern & pattern_,
+                                        const std::string & prefix_)
   {
-    auto a_pattern = td_.get_pattern_as<snemo::datamodel::topology_2e_pattern>();
-
-    std::string key;
+    std::string a_key;
     mygsl::histogram_pool & a_pool = grab_histogram_pool();
-    if (a_pool.has_1d(key = "TD::2e::minimal_energy")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_electron_minimal_energy();
+    if (a_pool.has_1d(a_key = prefix_ + "electron_minimal_energy")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double energy = pattern_.get_electron_minimal_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::2e::maximal_energy")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_electron_maximal_energy();
+    if (a_pool.has_1d(a_key = prefix_ + "maximal_energy")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double energy = pattern_.get_electron_maximal_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::2e::total_energy")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double energy = a_pattern.get_electrons_energy_sum();
+    if (a_pool.has_1d(a_key = prefix_ + "electrons_energy_sum")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double energy = pattern_.get_electrons_energy_sum();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(key = "TD::2e::angle")) {
-      mygsl::histogram_1d & h1d = a_pool.grab_1d(key);
-      const double angle = a_pattern.get_electrons_angle();
+    if (a_pool.has_1d(a_key = prefix_ + "electrons_angle")) {
+      mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+      const double angle = pattern_.get_electrons_angle();
       if (datatools::is_valid(angle)) h1d.fill(angle);
     }
+    return;
+  }
+
+  void topology_data_plotter::_plot_2eNg_(const snemo::datamodel::topology_2eNg_pattern & pattern_,
+                                          const std::string & /*prefix_*/)
+  {
+    std::ostringstream a_prefix;
+    a_prefix << "TD::2e" << pattern_.get_number_of_gammas() << "g::";
+    _plot_2e_(pattern_, a_prefix.str());
     return;
   }
 

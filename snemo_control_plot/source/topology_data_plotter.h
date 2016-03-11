@@ -38,6 +38,11 @@ namespace snemo {
 // Forward declaration:
 namespace datamodel {
   class topology_data;
+  class topology_1e_pattern;
+  class topology_1eNg_pattern;
+  class topology_1e1a_pattern;
+  class topology_2e_pattern;
+  class topology_2eNg_pattern;
 }
 namespace analysis {
 
@@ -78,16 +83,24 @@ namespace analysis {
   private:
 
     /// Dedicated plot method for '1e' topology pattern
-    void _plot_1e_(const snemo::datamodel::topology_data & td_);
+    void _plot_1e_(const snemo::datamodel::topology_1e_pattern & pattern_,
+                   const std::string & prefix_ = "TD::1e::");
 
     /// Dedicated plot method for '1e1a' topology pattern
-    void _plot_1e1a_(const snemo::datamodel::topology_data & td_);
+    void _plot_1e1a_(const snemo::datamodel::topology_1e1a_pattern & pattern_,
+                     const std::string & prefix_ = "TD::1e1a::");
 
     /// Dedicated plot method for '1eNg' topology pattern
-    void _plot_1eNg_(const snemo::datamodel::topology_data & td_);
+    void _plot_1eNg_(const snemo::datamodel::topology_1eNg_pattern & pattern_,
+                     const std::string & prefix_ = "TD::1eNg::");
 
     /// Dedicated plot method for '2e' topology pattern
-    void _plot_2e_(const snemo::datamodel::topology_data & td_);
+    void _plot_2e_(const snemo::datamodel::topology_2e_pattern & pattern_,
+                   const std::string & prefix_ = "TD::2e::");
+
+    /// Dedicated plot method for '2eNg' topology pattern
+    void _plot_2eNg_(const snemo::datamodel::topology_2eNg_pattern & pattern_,
+                     const std::string & prefix_ = "TD::2eNg::");
 
   };
 
