@@ -11,7 +11,6 @@
 // Third party:
 // - Bayeux/datatools:
 #include <bayeux/datatools/properties.h>
-#include <bayeux/datatools/ioutils.h>
 #include <bayeux/datatools/object_configuration_description.h>
 // - Bayeux/mctools:
 #include <bayeux/mctools/simulated_data.h>
