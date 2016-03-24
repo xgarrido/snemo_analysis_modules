@@ -23,6 +23,9 @@ find_package(Falaise 1.0.0 REQUIRED)
 include_directories(${PROJECT_SOURCE_DIR} ${Falaise_INCLUDE_DIRS})
 
 add_library(snemo_control_plot SHARED
+  singleton.h
+  geometry_tools.h
+  geometry_tools.cc
   snemo_control_plot_module.h
   snemo_control_plot_module.cc
   base_plotter.h
