@@ -66,7 +66,7 @@ namespace analysis {
 
     dpp::base_module::_common_initialize(config_);
 
-    // Service label
+    // Histogram service
     std::string histogram_label;
     if (config_.has_key("Histo_label")) {
       histogram_label = config_.fetch_string("Histo_label");
@@ -85,14 +85,14 @@ namespace analysis {
       if (config_.has_key("Histo.output_files")) {
         std::vector<std::string> output_files;
         config_.fetch("Histo.output_files", output_files);
-        for (auto a_file : output_files) {
+        for (auto & a_file : output_files) {
           Histo.add_output_file(a_file);
         }
       }
       if (config_.has_key("Histo.template_files")) {
         std::vector<std::string> template_files;
         config_.fetch("Histo.template_files", template_files);
-        for (auto a_file : template_files) {
+        for (auto & a_file : template_files) {
           Histo.grab_pool().load(a_file);
         }
       }
@@ -102,7 +102,7 @@ namespace analysis {
     DT_THROW_IF(! config_.has_key("plotters"), std::logic_error, "Missing 'plotters' key !");
     std::vector<std::string> plotter_names;
     config_.fetch("plotters", plotter_names);
-    for (auto a_plotter_name : plotter_names) {
+    for (auto & a_plotter_name : plotter_names) {
       if (a_plotter_name == snemo::analysis::simulated_data_plotter::get_id()) {
         _plotters_.push_back(new snemo::analysis::simulated_data_plotter);
       } else if (a_plotter_name == snemo::analysis::calibrated_data_plotter::get_id()) {
@@ -135,7 +135,7 @@ namespace analysis {
                 "Module '" << get_name() << "' is not initialized !");
 
     // Reset plotters
-    for (auto a_plotter : _plotters_) {
+    for (auto & a_plotter : _plotters_) {
       a_plotter->reset();
     }
 
@@ -168,7 +168,7 @@ namespace analysis {
                 "Module '" << get_name() << "' is not initialized !");
 
     // Filling the histograms :
-    for (auto a_plotter : _plotters_) {
+    for (auto & a_plotter : _plotters_) {
       a_plotter->plot(data_record_);
     }
 
