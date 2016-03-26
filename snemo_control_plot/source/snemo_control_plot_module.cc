@@ -21,6 +21,7 @@
 #include <bayeux/mctools/simulated_data.h>
 
 // This project:
+#include <geometry_tools.h>
 #include <simulated_data_plotter.h>
 #include <calibrated_data_plotter.h>
 #include <tracker_clustering_data_plotter.h>
@@ -65,6 +66,10 @@ namespace analysis {
                 "Module '" << get_name() << "' is already initialized ! ");
 
     dpp::base_module::_common_initialize(config_);
+
+    // Initialize geometry toolbox
+    snemo::utils::geometry_tools & a_geo_tb = snemo::utils::geometry_tools::get_instance();
+    a_geo_tb.initialize(config_, service_manager_);
 
     // Histogram service
     std::string histogram_label;
