@@ -92,7 +92,7 @@ namespace analysis {
 
     /// Dedicated plot method for '1eNg' topology pattern
     void _plot_1eNg_(const snemo::datamodel::topology_1eNg_pattern & pattern_,
-                     const std::string & prefix_ = "TD::1eNg::");
+                     const std::string & prefix_ = "TD::1e");
 
     /// Dedicated plot method for '2e' topology pattern
     void _plot_2e_(const snemo::datamodel::topology_2e_pattern & pattern_,
@@ -100,7 +100,7 @@ namespace analysis {
 
     /// Dedicated plot method for '2eNg' topology pattern
     void _plot_2eNg_(const snemo::datamodel::topology_2eNg_pattern & pattern_,
-                     const std::string & prefix_ = "TD::2eNg::");
+                     const std::string & prefix_ = "TD::2e");
 
   };
 

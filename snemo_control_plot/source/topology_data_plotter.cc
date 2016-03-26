@@ -162,11 +162,67 @@ namespace analysis {
   }
 
   void topology_data_plotter::_plot_1eNg_(const snemo::datamodel::topology_1eNg_pattern & pattern_,
-                                          const std::string & /*prefix_*/)
+                                          const std::string & prefix_)
   {
+    const size_t nbr_gammas = pattern_.get_number_of_gammas();
     std::ostringstream a_prefix;
-    a_prefix << "TD::1e" << pattern_.get_number_of_gammas() << "g::";
+    a_prefix << prefix_ << nbr_gammas << "g::";
     _plot_1e_(pattern_, a_prefix.str());
+
+    // Fetch gamma energies
+    snemo::datamodel::topology_1eNg_pattern::energy_collection_type gammas_energies;
+    pattern_.fetch_gammas_energies(gammas_energies);
+    std::sort(gammas_energies.begin(), gammas_energies.end());
+
+    if (nbr_gammas == 1) {
+      std::string a_key;
+      mygsl::histogram_pool & a_pool = grab_histogram_pool();
+      if (a_pool.has_1d(a_key = a_prefix.str() + "gamma_energy")) {
+        mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+        const double energy = gammas_energies.front();
+        if (datatools::is_valid(energy)) h1d.fill(energy);
+      }
+      if (a_pool.has_2d(a_key = a_prefix.str() + "electron_energy_vs_gamma_energy")) {
+        mygsl::histogram_2d & h2d = a_pool.grab_2d(a_key);
+        const double gamma_energy = gammas_energies.front();
+        const double electron_energy = pattern_.get_electron_energy();
+        if (datatools::is_valid(gamma_energy) &&
+            datatools::is_valid(electron_energy)) {
+          h2d.fill(gamma_energy, electron_energy);
+        }
+      }
+    } else if (nbr_gammas == 2) {
+      std::string a_key;
+      mygsl::histogram_pool & a_pool = grab_histogram_pool();
+      if (a_pool.has_1d(a_key = a_prefix.str() + "gamma_minimal_energy")) {
+        mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+        const double energy = gammas_energies.front();
+        if (datatools::is_valid(energy)) h1d.fill(energy);
+      }
+      if (a_pool.has_1d(a_key = a_prefix.str() + "gamma_maximal_energy")) {
+        mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+        const double energy = gammas_energies.back();
+        if (datatools::is_valid(energy)) h1d.fill(energy);
+      }
+    } else if (nbr_gammas == 3) {
+      std::string a_key;
+      mygsl::histogram_pool & a_pool = grab_histogram_pool();
+      if (a_pool.has_1d(a_key = a_prefix.str() + "gamma_minimal_energy")) {
+        mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+        const double energy = gammas_energies.front();
+        if (datatools::is_valid(energy)) h1d.fill(energy);
+      }
+      if (a_pool.has_1d(a_key = a_prefix.str() + "gamma_mid_energy")) {
+        mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+        const double energy = gammas_energies.at(2);
+        if (datatools::is_valid(energy)) h1d.fill(energy);
+      }
+      if (a_pool.has_1d(a_key = a_prefix.str() + "gamma_maximal_energy")) {
+        mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
+        const double energy = gammas_energies.back();
+        if (datatools::is_valid(energy)) h1d.fill(energy);
+      }
+    }
     return;
   }
 
@@ -180,7 +236,7 @@ namespace analysis {
       const double energy = pattern_.get_electron_minimal_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
     }
-    if (a_pool.has_1d(a_key = prefix_ + "maximal_energy")) {
+    if (a_pool.has_1d(a_key = prefix_ + "electron_maximal_energy")) {
       mygsl::histogram_1d & h1d = a_pool.grab_1d(a_key);
       const double energy = pattern_.get_electron_maximal_energy();
       if (datatools::is_valid(energy)) h1d.fill(energy);
