@@ -75,6 +75,14 @@ namespace analysis {
     /// Specialized method for plotting 'CD' bank
     void _plot(const snemo::datamodel::calibrated_data & cd_);
 
+  private:
+
+    /// Dedicated plotter for calibrated calorimeter hits
+    void _plot_calorimeter_hits_(const snemo::datamodel::calibrated_data & cd_);
+
+    /// Dedicated plotter for calibrated tracker hits
+    void _plot_tracker_hits_(const snemo::datamodel::calibrated_data & cd_);
+
   };
 
 } // end of namespace analysis
