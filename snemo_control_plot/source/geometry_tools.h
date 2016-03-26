@@ -35,12 +35,22 @@
 #include <singleton.h>
 
 // Forward declaration
-namespace datatools
-{
+namespace datatools {
   class properties;
   class service_manager;
 }
-
+namespace geomtools {
+  class manager;
+}
+namespace snemo {
+  namespace geometry {
+    class locator_plugin;
+    class calo_locator;
+    class xcalo_locator;
+    class gveto_locator;
+    class gg_locator;
+  }
+}
 namespace snemo {
 namespace utils {
 
@@ -48,6 +58,30 @@ namespace utils {
   class geometry_tools : public ::snemo::utils::singleton<geometry_tools>
   {
   public:
+
+    /// Return the Geiger locator
+    const snemo::geometry::gg_locator & get_gg_locator() const;
+
+    /// Return the main wall calorimeter locator
+    const snemo::geometry::calo_locator & get_calo_locator() const;
+
+    /// Return the X-wall calorimeter locator
+    const snemo::geometry::xcalo_locator & get_xcalo_locator() const;
+
+    /// Return the gamma veto calorimeter locator
+    const snemo::geometry::gveto_locator & get_gveto_locator() const;
+
+    /// Check the geometry manager
+    bool has_geometry_manager() const;
+
+    /// Address the geometry manager
+    void set_geometry_manager(const geomtools::manager & gmgr_);
+
+    /// Return a non-mutable reference to the geometry manager
+    const geomtools::manager & get_geometry_manager() const;
+
+    /// Check if theclusterizer is initialized
+    bool is_initialized() const;
 
     /// The main initialization method (post-construction):
     void initialize(const datatools::properties & config_,
@@ -72,6 +106,11 @@ namespace utils {
 
     /// Make the class singleton friend
     friend class utils::singleton<geometry_tools>;
+
+  private:
+    bool                                 _initialized_;       //!< Initialization status
+    const geomtools::manager *           _geometry_manager_;  //!< The SuperNEMO geometry manager
+    const snemo::geometry::locator_plugin * _locator_plugin_; //!< The SuperNEMO locator plugin
 
   };
 
