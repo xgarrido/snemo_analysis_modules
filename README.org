@@ -93,10 +93,10 @@ service files.
   logging.priority : string = "warning"
 
   #@description Embedded module factory debug flag
-  factory.debug : boolean = 0
+  factory.debug : boolean = false
 
   #@description Embedded module factory 'no preload' flag
-  factory.no_preload : boolean = 0
+  factory.no_preload : boolean = false
 #+END_SRC
 
 *** Service manager configuration
@@ -161,7 +161,7 @@ receives a table list and builds the corresponding =dlls.conf= file.
           dllname=$(basename ${dll/.so/})
           echo '[name="'${dllname}'" filename="'$(pwd)/${dll}'"]'
           echo '#config The '${dllname}' library'
-          echo 'autoload : boolean = 1'
+          echo 'autoload : boolean = true'
       fi
   done
 
@@ -178,7 +178,7 @@ receives a table list and builds the corresponding =dlls.conf= file.
           echo '[name="'$dll'" filename=""]'
       fi
       echo '#config The '$dll' library'
-      echo 'autoload : boolean = 1'
+      echo 'autoload : boolean = true'
       echo
   done
 #+END_SRC
@@ -252,10 +252,10 @@ reconstruction ... but all of them will use the same geometry.
       "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf"
 
   #@description Embedded SuperNEMO geometry manager must build its mapping lookup table
-  manager.build_mapping : boolean = 1
+  manager.build_mapping : boolean = true
 
   #@description Embedded geometry manager's mapping lookup table does not exclude any geometry category
-  manager.no_excluded_categories : boolean = 1
+  manager.no_excluded_categories : boolean = true
 #+END_SRC
 
 ** Histogram service

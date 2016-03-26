@@ -52,8 +52,13 @@ The module name to be used when processing a file is =scp_module=.
   logging.priority : string = "warning"
 #+END_SRC
 
+*** Geometry service label
+#+BEGIN_SRC shell
+  #@description The Geometry Service label
+  Geo_label : string = "Geo"
+#+END_SRC
+
 *** Histogram service label
-Set the same histogram service label as defined [[Histogram declarations][here]]
 #+BEGIN_SRC shell
   #@description The Histogram Service label
   Histo_label : string = "Histo"
@@ -162,37 +167,37 @@ mode and finally the axis unit.
 |--------+--------|
 
 #+NAME: set_binning
-#+HEADERS: :var arr=units :var unit=""
+#+HEADERS: :var arr=units :var unit="" :var prefix=""
 #+HEADERS: :var mode="linear" :var nbins="" :var min="" :var max=""
 #+BEGIN_SRC shell
   echo '#@description The '$mode' mode'
-  echo $mode' : boolean = true'
+  echo ${prefix}${mode}' : boolean = true'
   echo
-  echo '#@decription The number of bins'
-  echo 'number_of_bins : integer = '$nbins
+  echo '#@decription The '${prefix/./}' number of bins'
+  echo ${prefix}'number_of_bins : integer = '$nbins
   echo
   local -A units=(${=arr})
   local found=false
   for u in "${(@k)units}"; do
       if [[  $unit =~ $u ]]; then
-          echo '#@description The unit of the bins bounds'
-          echo 'unit : string = "'$unit'"'
+          echo '#@description The '${prefix/./}' unit of the bins bounds'
+          echo ${prefix}'unit : string = "'$unit'"'
           echo
-          echo '#@description The lower bound of the histogram'
-          echo 'min : real as '${units[$u]}' = '$min
+          echo '#@description The '${prefix/./}' lower bound of the histogram'
+          echo ${prefix}'min : real as '${units[$u]}' = '$min
           echo
-          echo '#@description The upper bound of the histogram'
-          echo 'max : real as '${units[$u]}' = '$max
+          echo '#@description The '${prefix/./}' upper bound of the histogram'
+          echo ${prefix}'max : real as '${units[$u]}' = '$max
           found=true
           break
       fi
   done
   if ! $found; then
-      echo '#@description The lower bound of the histogram'
-      echo 'min : real = '$min
+      echo '#@description The '${prefix/./}' lower bound of the histogram'
+      echo ${prefix}'min : real = '$min
       echo
-      echo '#@description The upper bound of the histogram'
-      echo 'max : real = '$max
+      echo '#@description The '${prefix/./}' upper bound of the histogram'
+      echo ${prefix}'max : real = '$max
   fi
 #+END_SRC
 
@@ -231,46 +236,56 @@ Setting axis labels and histogram title.
 #+END_SRC
 
 *** Calibrated data bank histograms
-**** Number of calibrated tracker hits
+**** Tracker hits
+***** Number of calibrated tracker hits
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="CD::ngghits", group="CD")>>
   <<set_binning(nbins=25, min=-0.5, max=99.5)>>
   <<set_label(title="Number of calibrated tracker hits", xlabel="$N_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
-**** Number of calibrated calorimeter hits
-#+BEGIN_SRC shell :noweb yes
-  <<set_name(name="CD::ncalohits", group="CD")>>
-  <<set_binning(nbins=10, min=-0.5, max=9.5)>>
-  <<set_label(title="Number of calibrated tracker hits", xlabel="$N_\\text{calib.}$ (calorimeter)", ylabel="Counts")>>
-#+END_SRC
-
-**** Distribution of drift radius
+***** Distribution of drift radius
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="CD::drift_radius", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="25 mm")>>
   <<set_label(title="Distribution of Geiger drift distance error", xlabel="$r_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
-**** Distribution of drift radius error
+***** Distribution of drift radius error
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="CD::drift_radius_error", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="1 mm")>>
   <<set_label(title="Distribution of Geiger drift distance", xlabel="$\\sigma_{r_\\text{calib.}}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
-**** Distribution of longitudinal position
+***** Distribution of longitudinal position
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="CD::long_position", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="1.5 m")>>
   <<set_label(title="Distribution of Geiger longitudinal position", xlabel="$z_\\text{calib.}$ (tracker)", ylabel="Counts")>>
 #+END_SRC
 
-**** Distribution of longitudinal position error
+***** Distribution of longitudinal position error
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="CD::long_position_error", group="CD")>>
   <<set_binning(nbins=100, unit="mm", min="0 mm", max="100 mm")>>
   <<set_label(title="Distribution of Geiger longitudinal position error", xlabel="$\\sigma_{z_\\text{calib.}}$ (tracker)", ylabel="Counts")>>
+#+END_SRC
+
+***** Tracker heatmap
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::gg_heatmap", group="CD", type="mygsl::histogram_2d")>>
+  <<set_binning(prefix="x.", nbins=19, min="-9.5", max="+9.5")>>
+  <<set_binning(prefix="y.", nbins=114, min="-0.5", max="113.5")>>
+  <<set_label(title="Geiger heatmap", xlabel="row number", ylabel="layer number")>>
+#+END_SRC
+
+**** Calorimeter hits
+***** Number of calibrated calorimeter hits
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="CD::ncalohits", group="CD")>>
+  <<set_binning(nbins=10, min=-0.5, max=9.5)>>
+  <<set_label(title="Number of calibrated tracker hits", xlabel="$N_\\text{calib.}$ (calorimeter)", ylabel="Counts")>>
 #+END_SRC
 
 *** Tracker clustering data bank histograms
@@ -362,6 +377,21 @@ Setting axis labels and histogram title.
 ***** Angle between electron and the $x$ axis
 #+BEGIN_SRC shell :noweb yes
   <<set_name(name="TD::1e1g::electron_angle", group="TD/1e1g", mode="mimic", mimic="TD::1e::electron_angle")>>
+#+END_SRC
+
+***** Gamma energy
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e1g::gamma_energy", group="TD/1e1g")>>
+  <<set_binning(nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
+  <<set_label(title="Distribution of gamma energy", xlabel="gamma energy", ylabel="Counts")>>
+#+END_SRC
+
+***** E_{electron} vs. E_{gamma}
+#+BEGIN_SRC shell :noweb yes
+  <<set_name(name="TD::1e1g::electron_energy_vs_gamma_energy", group="TD/1e1g", type="mygsl::histogram_2d")>>
+  <<set_binning(prefix="x.", nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
+  <<set_binning(prefix="y.", nbins=100, unit="keV", min="0 keV", max="4 MeV")>>
+  <<set_label(title="Electron energy versus gamma energy", xlabel="gamma energy", ylabel="electron energy")>>
 #+END_SRC
 
 **** 1e2\gamma plots
